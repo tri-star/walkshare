@@ -49,7 +49,7 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
         appBar: AppBar(title: const Text('Strollog')),
         body: GoogleMap(
-          mapType: MapType.hybrid,
+          mapType: MapType.normal,
           initialCameraPosition: _kGooglePlex,
           onMapCreated: (GoogleMapController controller) {
             _controller.complete(controller);
