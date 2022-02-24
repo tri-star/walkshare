@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +39,8 @@ class _MapPageState extends State<MapPage> {
     zoom: 14.4746,
   );
 
+  Position? _currentPosition;
+
   // static CameraPosition _kLake = CameraPosition(
   //     bearing: 192.8334901395799,
   //     target: LatLng(37.43296265331129, -122.08832357078792),
@@ -46,14 +49,64 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    _getCurrentLocation().then((position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    });
+
     return Scaffold(
         appBar: AppBar(title: const Text('Strollog')),
-        body: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: _kGooglePlex,
-          onMapCreated: (GoogleMapController controller) {
-            _controller.complete(controller);
-          },
-        ));
+        body: MapComponent(_controller, _currentPosition));
+  }
+
+  Future<Position> _getCurrentLocation() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      return Future.error('位置情報サービスが無効になっています');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('位置情報サービスの利用が拒否されました');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('位置情報サービスの利用が拒否されました');
+    }
+
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+}
+
+class MapComponent extends StatelessWidget {
+  Completer<GoogleMapController> _controller;
+
+  Position? _position;
+
+  MapComponent(Completer<GoogleMapController> controller, Position? position)
+      : _controller = controller,
+        _position = position;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_position == null) {
+      return Text('位置情報を取得中...');
+    }
+
+    return Container(
+      child: GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: CameraPosition(
+          target: new LatLng(_position!.latitude!, _position!.longitude!),
+        ),
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
+      ),
+    );
   }
 }
