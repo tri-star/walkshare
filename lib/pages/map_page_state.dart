@@ -4,14 +4,14 @@ import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/services/location_service.dart';
 
-class MapPageState extends ChangeNotifier {
+class MapPageStore extends ChangeNotifier {
   final LocationService _locationService;
 
   bool _locationRequested = false;
   Position? _position;
   MapController? _mapController;
 
-  MapPageState(this._locationService);
+  MapPageStore(this._locationService);
 
   bool get locationRequested => _locationRequested;
   Position? get position => _position;
@@ -77,7 +77,7 @@ class MapPageState extends ChangeNotifier {
   operator ==(other) {
     if (identical(this, other)) return true;
 
-    return other is MapPageState &&
+    return other is MapPageStore &&
         _locationRequested == other._locationRequested &&
         _position == other._position &&
         _mapController == other._mapController;

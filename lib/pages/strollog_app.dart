@@ -15,9 +15,9 @@ class StrollogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<MapPageState>(
+        ChangeNotifierProvider<MapPageStore>(
           create: (_context) {
-            return MapPageState(
+            return MapPageStore(
                 Provider.of<LocationService>(_context, listen: false));
           },
         ),
@@ -38,7 +38,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  MapPageState? _state;
+  MapPageStore? _state;
   final MapController _mapController = MapController();
 
   @override
@@ -53,7 +53,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _createMapView() {
     if (_state == null) {
-      _state = Provider.of<MapPageState>(context);
+      _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
     }
 
