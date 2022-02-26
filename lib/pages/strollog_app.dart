@@ -5,7 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
-import 'package:strollog/pages/map_page_state.dart';
+import 'package:strollog/pages/map_page_store.dart';
 import 'package:strollog/services/location_service.dart';
 
 class StrollogApp extends StatelessWidget {
