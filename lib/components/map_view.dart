@@ -14,19 +14,21 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (_googleMapController != null) {}
-
     return GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(_position.latitude, _position.longitude),
-          zoom: 15,
-        ));
+      onMapCreated: _onMapCreated,
+      initialCameraPosition: CameraPosition(
+        target: LatLng(_position.latitude, _position.longitude),
+        zoom: 15,
+      ),
+      onCameraMove: _onCameraMove,
+    );
   }
 
   _onMapCreated(GoogleMapController googleMapController) {
     _controller.subscribe(googleMapController);
   }
+
+  _onCameraMove(CameraPosition cameraPosition) {}
 }
 
 class MapController {
@@ -36,10 +38,14 @@ class MapController {
     _controller = controller;
   }
 
-  void move(Position position) {
-    _controller?.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
+  Future<void> move(Position position) async {
+    if (_controller == null) {
+      return;
+    }
+    var zoom = await _controller!.getZoomLevel();
+    _controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(
       target: LatLng(position.latitude, position.longitude),
-      zoom: 15,
+      zoom: zoom,
     )));
   }
 }
