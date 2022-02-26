@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:strollog/domain/position.dart';
-import 'package:strollog/pages/map_page_state.dart';
 
 class MapView extends StatelessWidget {
   final Position _position;
