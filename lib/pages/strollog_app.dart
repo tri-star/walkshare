@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
@@ -18,6 +21,9 @@ class StrollogApp extends StatelessWidget {
                 Provider.of<LocationService>(_context, listen: false));
           },
         ),
+        Provider<Completer<GoogleMapController>>(
+          create: (_context) => Completer(),
+        ),
       ],
       child: const MapPage(),
     );
@@ -33,6 +39,7 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   MapPageState? _state;
+  final MapController _mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +54,7 @@ class _MapPageState extends State<MapPage> {
   Widget _createMapView() {
     if (_state == null) {
       _state = Provider.of<MapPageState>(context);
+      _state!.setMapController(_mapController);
     }
 
     if (!_state!.locationRequested) {
@@ -62,6 +70,6 @@ class _MapPageState extends State<MapPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return MapView(_state!.position!);
+    return MapView(_mapController, _state!.position!);
   }
 }

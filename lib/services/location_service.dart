@@ -1,8 +1,38 @@
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart' as AppPosition;
 
+typedef LocationUpdateCallback = Function(AppPosition.Position newPosition);
+
 class LocationService {
+  StreamSubscription? _subscription;
+
+  Future<void> listen(LocationUpdateCallback callback) async {
+    if (_subscription != null) {
+      await _subscription!.cancel();
+    }
+
+    var setting = const LocationSettings(
+      accuracy: LocationAccuracy.best,
+      distanceFilter: 10,
+    );
+
+    _subscription = Geolocator.getPositionStream(locationSettings: setting)
+        .listen((position) {
+      callback(AppPosition.Position(position.latitude, position.longitude));
+    });
+  }
+
+  Future<void> stopListen() async {
+    if (_subscription == null) {
+      return;
+    }
+    await _subscription!.cancel();
+    _subscription = null;
+  }
+
   Future<bool> isLocationServiceEnabled() async {
     return await Geolocator.isLocationServiceEnabled();
   }
