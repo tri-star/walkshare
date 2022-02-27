@@ -11,7 +11,7 @@ class MapPageStore extends ChangeNotifier {
   bool _locationRequested = false;
   Position? _position;
   MapController? _mapController;
-  StrollRoute _strollRoute;
+  final StrollRoute _strollRoute;
 
   MapPageStore(this._locationService) : _strollRoute = StrollRoute();
 
@@ -70,7 +70,6 @@ class MapPageStore extends ChangeNotifier {
 
     await _locationService.listen((position) {
       _position = position;
-      print(_position.toString());
       _strollRoute.addRoutePoint(position);
       _mapController?.move(_position!);
       notifyListeners();
