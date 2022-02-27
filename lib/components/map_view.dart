@@ -1,15 +1,19 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:strollog/domain/stroll_route.dart';
 
 class MapView extends StatelessWidget {
-  final Position _position;
-  GoogleMapController? _googleMapController;
-  MapController _controller;
+  final Position _initialPosition;
+  final MapController _controller;
+  final StrollRoute _strollRoute;
 
-  MapView(MapController controller, Position position, {Key? key})
+  const MapView(MapController controller, Position initialPosition,
+      StrollRoute strollRoute,
+      {Key? key})
       : _controller = controller,
-        _position = position,
+        _initialPosition = initialPosition,
+        _strollRoute = strollRoute,
         super(key: key);
 
   @override
@@ -17,10 +21,11 @@ class MapView extends StatelessWidget {
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
-        target: LatLng(_position.latitude, _position.longitude),
+        target: LatLng(_initialPosition.latitude, _initialPosition.longitude),
         zoom: 15,
       ),
       onCameraMove: _onCameraMove,
+      polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
     );
   }
 
@@ -29,6 +34,18 @@ class MapView extends StatelessWidget {
   }
 
   _onCameraMove(CameraPosition cameraPosition) {}
+
+  Polyline _makePolyLines(List<Position> positions) {
+    return Polyline(
+      polylineId: PolylineId(positions.hashCode.toString()),
+      visible: true,
+      points: positions
+          .map((position) => LatLng(position.latitude, position.longitude))
+          .toList(),
+      color: Colors.red,
+      width: 5,
+    );
+  }
 }
 
 class MapController {

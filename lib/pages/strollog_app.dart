@@ -70,6 +70,6 @@ class _MapPageState extends State<MapPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return MapView(_mapController, _state!.position!);
+    return MapView(_mapController, _state!.position!, _state!.strollRoute);
   }
 }
