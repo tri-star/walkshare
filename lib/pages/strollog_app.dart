@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/pages/map_page_store.dart';
+import 'package:strollog/repositories/route_repository.dart';
+import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
 class StrollogApp extends StatelessWidget {
@@ -18,7 +20,9 @@ class StrollogApp extends StatelessWidget {
         ChangeNotifierProvider<MapPageStore>(
           create: (_context) {
             return MapPageStore(
-                Provider.of<LocationService>(_context, listen: false));
+                Provider.of<AuthService>(_context, listen: false),
+                Provider.of<LocationService>(_context, listen: false),
+                Provider.of<RouteRepository>(_context, listen: false));
           },
         ),
         Provider<Completer<GoogleMapController>>(
@@ -55,14 +59,15 @@ class _MapPageState extends State<MapPage> {
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
-    }
-
-    if (!_state!.locationRequested) {
-      _state!.requestLocationPermission().then((permission) {
-        if (permission == LocationPermissionResult.deniedForever) {
-          return const Center(child: Text("位置情報の使用が拒否されています。"));
+      _state!.init().then((_) {
+        if (!_state!.locationRequested) {
+          _state!.requestLocationPermission().then((permission) {
+            if (permission == LocationPermissionResult.deniedForever) {
+              return const Center(child: Text("位置情報の使用が拒否されています。"));
+            }
+            _state!.updateLocation();
+          });
         }
-        _state!.updateLocation();
       });
     }
 

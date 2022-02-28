@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/auth_page.dart';
 import 'package:strollog/pages/strollog_app.dart';
+import 'package:strollog/repositories/route_repository.dart';
+import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
 Future<void> main() async {
@@ -36,6 +38,12 @@ class Application extends StatelessWidget {
         providers: [
           Provider<LocationService>(
             create: (_) => LocationService(),
+          ),
+          Provider<AuthService>(
+            create: (_) => AuthService(),
+          ),
+          Provider<RouteRepository>(
+            create: (_) => RouteRepository(),
           ),
         ],
         child: StreamBuilder<User?>(

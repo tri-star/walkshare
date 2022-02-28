@@ -3,17 +3,22 @@ import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/stroll_route.dart';
+import 'package:strollog/repositories/route_repository.dart';
+import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
 class MapPageStore extends ChangeNotifier {
+  final AuthService _authService;
   final LocationService _locationService;
+  final RouteRepository _routeRepository;
 
   bool _locationRequested = false;
   Position? _position;
   MapController? _mapController;
   final StrollRoute _strollRoute;
 
-  MapPageStore(this._locationService) : _strollRoute = StrollRoute();
+  MapPageStore(this._authService, this._locationService, this._routeRepository)
+      : _strollRoute = StrollRoute('route_' + DateTime.now().toString());
 
   bool get locationRequested => _locationRequested;
   Position? get position => _position;
@@ -33,6 +38,11 @@ class MapPageStore extends ChangeNotifier {
     _mapController = mapController;
   }
 
+  Future<void> init() async {
+    var user = _authService.getUser();
+    await _routeRepository.save(user, _strollRoute);
+  }
+
   /// 位置情報の権限を確認、必要に応じて権限の取得を求める
   Future<LocationPermissionResult> requestLocationPermission() async {
     _locationRequested = true;
@@ -42,6 +52,8 @@ class MapPageStore extends ChangeNotifier {
     }
 
     listenLocation();
+    var user = _authService.getUser();
+    await _routeRepository.save(user, _strollRoute);
 
     notifyListeners();
     return permission;
@@ -72,6 +84,8 @@ class MapPageStore extends ChangeNotifier {
       _position = position;
       _strollRoute.addRoutePoint(position);
       _mapController?.move(_position!);
+      _routeRepository.pushPoints(_strollRoute.id, [_position!]);
+
       notifyListeners();
     });
   }
