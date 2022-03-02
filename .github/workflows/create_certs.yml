@@ -1,4 +1,4 @@
-name: iOSBuild
+name: create-certs
 
 on:
   push:
