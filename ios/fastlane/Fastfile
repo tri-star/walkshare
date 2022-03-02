@@ -1,0 +1,84 @@
+default_platform(:ios)
+
+platform :ios do
+
+    desc "Create certs"
+    lane :create_certs do
+
+        create_keychain(
+            default_keychain: true,
+            name: "mykeychain",
+            password: ENV["KEYCHAIN_PASSWORD"],
+            unlock: true,
+            timeout: 180
+        )
+
+        match(
+            readonly: false,
+            type: "adhoc",
+            keychain_name: "mykeychain",
+            keychain_password: ENV["KEYCHAIN_PASSWORD"],
+            verbose: true
+        )
+
+        slack(
+            message: "Init certificate complete.",
+            slack_url: ENV["SLACK_URL"]
+        )
+    end
+
+    desc "Archive AdHoc and send to Firebase"
+    lane :adhoc do
+
+        setup_ci(
+          provider: "travis",
+          force: true
+        )
+
+        match(
+            readonly: true,
+            type: "adhoc",
+            app_identifier: ENV["APPLE_APP_ID"],
+            clone_branch_directly: true,
+            shallow_clone: true
+        )
+
+        update_code_signing_settings(
+            path: "Runner.xcodeproj",
+            targets: "Runner",
+            code_sign_identity: "iPhone Distribution",
+            use_automatic_signing: false
+        )
+
+        apple_app_id = ENV["APPLE_APP_ID"]
+        provisioning_profile_specifier = lane_context[:MATCH_PROVISIONING_PROFILE_MAPPING][apple_app_id]
+        build_app(workspace: "Runner.xcworkspace",
+            export_method: "ad-hoc",
+            scheme: "Runner",
+            configuration: "Release",
+            xcargs: {
+            :BUNDLE_IDENTIFIER => apple_app_id,
+            :PROVISIONING_PROFILE_SPECIFIER => provisioning_profile_specifier,
+            :DEVELOPMENT_TEAM => ENV["APPLE_TEAM_ID"]
+            },
+            export_options: {
+                uploadSymbols: false,
+                provisioningProfiles: ENV["MATCH_PROVISIONING_PROFILE_MAPPING"]
+            }
+        )
+
+        firebase_app_distribution(
+            app: ENV["FIREBASE_APP_ID"],
+            groups: "developer",
+            release_notes: "test",
+            firebase_cli_path: `which firebase`.strip(),
+            firebase_cli_token: ENV["FIREBASE_TOKEN"],
+            debug: true
+        )
+        slack(
+            message: "ベータ版が配信されました\nhttps://appdistribution.firebase.dev/app_distro/projects",
+            slack_url: ENV["SLACK_URL"]
+        )
+    end
+
+end
