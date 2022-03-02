@@ -1,0 +1,32 @@
+name: iOSBuild
+
+on:
+  push:
+    branches:
+      - create-certs
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install fastlane and plugins
+        run: |
+          cd ios
+          gem install bundler
+          bundle install
+      - name: Run fastlane
+        env:
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          SLACK_URL: ${{ secrets.SLACK_URL }}
+          FASTLANE_USERNAME: ${{ secrets.FASTLANE_USERNAME }}
+          FASTLANE_PASSWORD: ${{ secrets.FASTLANE_PASSWORD }}
+          FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: |
+          cd ios
+          bundle exec fastlane create_certs --verbose
