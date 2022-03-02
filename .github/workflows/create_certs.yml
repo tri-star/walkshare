@@ -27,6 +27,8 @@ jobs:
           FASTLANE_SESSION: ${{ secrets.FASTLANE_SESSION }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          APPLE_APP_ID: ${{ secrets.APPLE_APP_ID }}
         run: |
           cd ios
           bundle exec fastlane create_certs --verbose
