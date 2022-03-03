@@ -12,11 +12,11 @@ import 'package:strollog/services/location_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  } else {
-    throw UnimplementedError("Web版は未対応です");
-  }
+  // if (!kIsWeb) {
+  //   await Firebase.initializeApp();
+  // } else {
+  //   throw UnimplementedError("Web版は未対応です");
+  // }
 
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
@@ -49,11 +49,12 @@ class Application extends StatelessWidget {
         child: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return const StrollogApp();
-            } else {
-              return AuthPage();
-            }
+            return const Text('Simple');
+            // if (snapshot.hasData) {
+            //   return const StrollogApp();
+            // } else {
+            //   return AuthPage();
+            // }
           },
         ),
       ),
