@@ -13,6 +13,8 @@ import GoogleMaps
 
       if let apiKey = nsDictionary?["API_KEY"] as? String {
         GMSServices.provideAPIKey(apiKey)
+      } else {
+        assert(false, "Couldn't get API KEY")
       }
     }
     GeneratedPluginRegistrant.register(with: self)
