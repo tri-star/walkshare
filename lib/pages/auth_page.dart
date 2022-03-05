@@ -37,34 +37,35 @@ class _AuthPageState extends State<AuthPage> {
                 child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Text('Strollog', style: TextStyle(fontSize: 40)),
-                      ),
-                      Center(
-                        child: Expanded(
-                            child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 300),
-                                child: _isLoading
-                                    ? Container(
-                                        color: Colors.grey[200], height: 50)
-                                    : SizedBox(
-                                        height: 50,
-                                        child: SignInButton(
-                                          Buttons.Google,
-                                          onPressed: _signInWithGoogle,
-                                        ),
-                                      ))),
+                    children: const [
+                      Text('test')
+                      // Container(
+                      //   margin: EdgeInsets.only(bottom: 20),
+                      //   child: Text('Strollog', style: TextStyle(fontSize: 40)),
+                      // ),
+                      // Center(
+                      //   child: Expanded(
+                      //       child: AnimatedSwitcher(
+                      //           duration: const Duration(milliseconds: 300),
+                      //           child: _isLoading
+                      //               ? Container(
+                      //                   color: Colors.grey[200], height: 50)
+                      //               : SizedBox(
+                      //                   height: 50,
+                      //                   child: SignInButton(
+                      //                     Buttons.Google,
+                      //                     onPressed: _signInWithGoogle,
+                      //                   ),
+                      //                 ))),
 
-                        // _errorMessage != ''
-                        //     ? SizedBox(height: 50, child: Text(_errorMessage))
-                        //     : const SizedBox(height: 50, child: Text("")),
-                      ),
-                      SizedBox(
-                        height: 80,
-                        child: null,
-                      ),
+                      //   // _errorMessage != ''
+                      //   //     ? SizedBox(height: 50, child: Text(_errorMessage))
+                      //   //     : const SizedBox(height: 50, child: Text("")),
+                      // ),
+                      // SizedBox(
+                      //   height: 80,
+                      //   child: null,
+                      // ),
                     ]))));
   }
 
