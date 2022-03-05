@@ -37,8 +37,14 @@ class _AuthPageState extends State<AuthPage> {
                 child: Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text('test')
+                    children: [
+                      SizedBox(
+                        height: 50,
+                        child: SignInButton(
+                          Buttons.Google,
+                          onPressed: _signInWithGoogle,
+                        ),
+                      )
                       // Container(
                       //   margin: EdgeInsets.only(bottom: 20),
                       //   child: Text('Strollog', style: TextStyle(fontSize: 40)),
