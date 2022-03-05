@@ -12,11 +12,11 @@ import 'package:strollog/services/location_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // if (!kIsWeb) {
-  //   await Firebase.initializeApp();
-  // } else {
-  //   throw UnimplementedError("Web版は未対応です");
-  // }
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+  } else {
+    throw UnimplementedError("Web版は未対応です");
+  }
 
   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
