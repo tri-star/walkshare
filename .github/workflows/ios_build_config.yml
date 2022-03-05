@@ -17,29 +17,10 @@ jobs:
         with:
           flutter-version: "2.10.1"
 
-      - name: Cache CocoaPods
-        id: cache-cocoapods
-        uses: actions/cache@v1
-        with:
-          path: /Users/runner/Library/Caches/CocoaPods/Pods
-          key: ${{ runner.os }}-cache-cocoapods-${{ hashFiles('pubspec.lock') }}
-
-      - name: Install fastlane and plugins
-        run: |
-          cd ios
-          gem install bundler
-          bundle install
-      - name: GoogleService-Info.plist
-        run: |
-          cd ios
-          echo "${GOOGLE_SERVICES_INFO_PLIST}" > Runner/GoogleService-Info.plist
-        env:
-          GOOGLE_SERVICES_INFO_PLIST: ${{ secrets.GOOGLE_SERVICES_INFO_PLIST }}
-
       - name: Flutter build config only
         run: |
           flutter pub get
-          flutter build ios --release --no-codesign
+          flutter build ios --config-only
 
       - name: cat Podfile
         run: |
