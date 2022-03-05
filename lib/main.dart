@@ -49,12 +49,11 @@ class Application extends StatelessWidget {
         child: StreamBuilder<User?>(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
-            return const Text('Simple');
-            // if (snapshot.hasData) {
-            //   return const StrollogApp();
-            // } else {
-            //   return AuthPage();
-            // }
+            if (snapshot.hasData) {
+              return const StrollogApp();
+            } else {
+              return AuthPage();
+            }
           },
         ),
       ),
