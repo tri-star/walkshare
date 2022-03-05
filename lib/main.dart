@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,17 +13,19 @@ import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  } else {
-    throw UnimplementedError("Web版は未対応です");
-  }
+    if (!kIsWeb) {
+      await Firebase.initializeApp();
+    } else {
+      throw UnimplementedError("Web版は未対応です");
+    }
 
-  // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
 
-  runApp(const Application());
+    runApp(const Application());
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError(error, stack));
 }
 
 class Application extends StatelessWidget {
