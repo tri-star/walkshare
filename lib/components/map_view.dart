@@ -27,6 +27,10 @@ class MapView extends StatelessWidget {
       ),
       onCameraMove: _onCameraMove,
       onLongPress: (LatLng newPos) {
+        // FirebaseAnalytics.instance.logEvent(
+        //   name: "map_long_pressed",
+        //   parameters: {},
+        // );
         showModalBottomSheet(
             context: context,
             isScrollControlled: true,
