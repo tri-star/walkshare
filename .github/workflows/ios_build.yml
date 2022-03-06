@@ -39,7 +39,7 @@ jobs:
       - name: Flutter build
         run: |
           flutter pub get
-          flutter build ios --release --no-codesign
+          flutter build ios --release --no-codesign --build-number=${GITHUB_RUN_NUMBER}
 
       - name: cat Podfile
         run: |

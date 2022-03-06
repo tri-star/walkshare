@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -27,6 +28,10 @@ class MapView extends StatelessWidget {
       ),
       onCameraMove: _onCameraMove,
       onLongPress: (LatLng newPos) {
+        FirebaseAnalytics.instance.logEvent(
+          name: "map_long_pressed",
+          parameters: {},
+        );
         showModalBottomSheet(
             context: context,
             isScrollControlled: true,

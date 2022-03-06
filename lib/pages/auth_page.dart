@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signin_button/button_list.dart';
@@ -83,8 +84,10 @@ class _AuthPageState extends State<AuthPage> {
         await FirebaseAuth.instance.signInWithCredential(credential);
       }
     } on FirebaseAuthException catch (e) {
+      FirebaseCrashlytics.instance.recordError(e, StackTrace.current);
       setError(e.message!);
     } on PlatformException catch (e) {
+      FirebaseCrashlytics.instance.recordError(e, StackTrace.current);
       setError(e.message!);
     } finally {
       setLoading(false);

@@ -10,7 +10,6 @@ import GoogleMaps
   ) -> Bool {
     if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") {
       let nsDictionary = NSDictionary(contentsOfFile: path)
-
       if let apiKey = nsDictionary?["API_KEY"] as? String {
         GMSServices.provideAPIKey(apiKey)
       }
