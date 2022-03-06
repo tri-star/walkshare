@@ -18,6 +18,7 @@ Future<void> main() async {
 
     if (!kIsWeb) {
       await Firebase.initializeApp();
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     } else {
       throw UnimplementedError("Web版は未対応です");
     }
