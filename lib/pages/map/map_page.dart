@@ -28,7 +28,6 @@ class _MapPageState extends State<MapPage> {
 
   Widget _createMapView() {
     if (_state == null) {
-      FirebaseCrashlytics.instance.crash();
       _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
