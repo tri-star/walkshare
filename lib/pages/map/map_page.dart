@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
@@ -27,6 +28,7 @@ class _MapPageState extends State<MapPage> {
 
   Widget _createMapView() {
     if (_state == null) {
+      FirebaseCrashlytics.instance.crash();
       _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
