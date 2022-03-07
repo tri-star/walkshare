@@ -35,12 +35,25 @@ class LocationService {
       setting = const LocationSettings(
         accuracy: LocationAccuracy.best,
         distanceFilter: 10,
+        timeLimit: Duration(seconds: 5),
       );
     }
 
     _subscription = Geolocator.getPositionStream(locationSettings: setting)
         .listen((position) {
       callback(AppPosition.Position(position.latitude, position.longitude));
+    });
+    _subscription?.onError((e) {
+      FirebaseAnalytics.instance.logEvent(
+        name: "listen_location_error",
+        parameters: {
+          "message": e.toString(),
+        },
+      );
+      _subscription = Geolocator.getPositionStream(locationSettings: setting)
+          .listen((position) {
+        callback(AppPosition.Position(position.latitude, position.longitude));
+      });
     });
   }
 
