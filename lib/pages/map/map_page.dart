@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,11 @@ class _MapPageState extends State<MapPage> {
 
   Widget _createMapView() {
     if (_state == null) {
+      FirebaseAnalytics.instance.logEvent(
+        name: "init_map_page",
+        parameters: {},
+      );
+
       _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
