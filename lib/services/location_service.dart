@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:strollog/domain/location_permission_result.dart';
@@ -10,9 +11,16 @@ typedef LocationUpdateCallback = Function(AppPosition.Position newPosition);
 class LocationService {
   StreamSubscription? _subscription;
 
-  Future<void> listen(LocationUpdateCallback callback) async {
+  void listen(LocationUpdateCallback callback) {
     if (_subscription != null) {
-      await _subscription!.cancel();
+      // await _subscription!.cancel();
+      FirebaseAnalytics.instance.logEvent(
+        name: "listen_location_error",
+        parameters: {
+          "message": "二重に呼び出されました",
+        },
+      );
+      return;
     }
 
     late LocationSettings setting;
