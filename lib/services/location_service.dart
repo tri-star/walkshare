@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart' as AppPosition;
@@ -14,10 +15,20 @@ class LocationService {
       await _subscription!.cancel();
     }
 
-    var setting = const LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 10,
-    );
+    late LocationSettings setting;
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      setting = AppleSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+          activityType: ActivityType.fitness,
+          pauseLocationUpdatesAutomatically: false);
+    } else {
+      setting = const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10,
+      );
+    }
 
     _subscription = Geolocator.getPositionStream(locationSettings: setting)
         .listen((position) {
