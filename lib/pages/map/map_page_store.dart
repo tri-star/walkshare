@@ -51,12 +51,6 @@ class MapPageStore extends ChangeNotifier {
     if (permission == LocationPermissionResult.denied) {
       permission = await _locationService.requestPermission();
     }
-    FirebaseAnalytics.instance.logEvent(
-      name: "location_permission",
-      parameters: {
-        "result": permission.toString(),
-      },
-    );
 
     listenLocation();
     var user = _authService.getUser();
@@ -82,13 +76,6 @@ class MapPageStore extends ChangeNotifier {
     }
 
     _locationService.listen((position) {
-      FirebaseAnalytics.instance.logEvent(
-        name: "position_update",
-        parameters: {
-          "position": position.toString(),
-        },
-      );
-
       _position = position;
       _strollRoute.addRoutePoint(position);
       _mapController?.move(_position!);

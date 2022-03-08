@@ -11,13 +11,6 @@ typedef LocationUpdateCallback = Function(AppPosition.Position newPosition);
 class LocationService {
   StreamSubscription? _subscription;
 
-  LocationService() {
-    FirebaseAnalytics.instance.logEvent(
-      name: "init_location_service",
-      parameters: {},
-    );
-  }
-
   void listen(LocationUpdateCallback callback) {
     if (_subscription != null) {
       // await _subscription!.cancel();

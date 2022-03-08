@@ -29,11 +29,6 @@ class _MapPageState extends State<MapPage> {
 
   Widget _createMapView() {
     if (_state == null) {
-      FirebaseAnalytics.instance.logEvent(
-        name: "init_map_page",
-        parameters: {},
-      );
-
       _state = Provider.of<MapPageStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
