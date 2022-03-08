@@ -42,7 +42,7 @@ class _MapPageState extends State<MapPage> {
             if (permission == LocationPermissionResult.deniedForever) {
               return const Center(child: Text("位置情報の使用が拒否されています。"));
             }
-            _state!.updateLocation();
+            //_state!.updateLocation();
           });
         }
       });
