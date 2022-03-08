@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
@@ -61,10 +62,7 @@ class MapPageStore extends ChangeNotifier {
 
   Future<void> updateLocation() async {
     if (!_locationRequested) {
-      var permission = await requestLocationPermission();
-      if (permission == LocationPermissionResult.deniedForever) {
-        return;
-      }
+      throw UnsupportedError("予期しない呼び出しです");
     }
 
     _position = await _locationService.getCurrentPosition();
@@ -74,13 +72,10 @@ class MapPageStore extends ChangeNotifier {
 
   Future<void> listenLocation() async {
     if (!_locationRequested) {
-      var permission = await requestLocationPermission();
-      if (permission == LocationPermissionResult.deniedForever) {
-        return;
-      }
+      throw UnsupportedError("予期しない呼び出しです2");
     }
 
-    await _locationService.listen((position) {
+    _locationService.listen((position) {
       _position = position;
       _strollRoute.addRoutePoint(position);
       _mapController?.move(_position!);

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart' as AppPosition;
@@ -9,19 +11,49 @@ typedef LocationUpdateCallback = Function(AppPosition.Position newPosition);
 class LocationService {
   StreamSubscription? _subscription;
 
-  Future<void> listen(LocationUpdateCallback callback) async {
+  void listen(LocationUpdateCallback callback) {
     if (_subscription != null) {
-      await _subscription!.cancel();
+      // await _subscription!.cancel();
+      FirebaseAnalytics.instance.logEvent(
+        name: "listen_location_error",
+        parameters: {
+          "message": "二重に呼び出されました",
+        },
+      );
+      return;
     }
 
-    var setting = const LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 10,
-    );
+    late LocationSettings setting;
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      setting = AppleSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 10,
+          activityType: ActivityType.fitness,
+          pauseLocationUpdatesAutomatically: false);
+    } else {
+      setting = const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10,
+        timeLimit: Duration(seconds: 5),
+      );
+    }
 
     _subscription = Geolocator.getPositionStream(locationSettings: setting)
         .listen((position) {
       callback(AppPosition.Position(position.latitude, position.longitude));
+    });
+    _subscription?.onError((e) {
+      FirebaseAnalytics.instance.logEvent(
+        name: "listen_location_error",
+        parameters: {
+          "message": e.toString(),
+        },
+      );
+      _subscription = Geolocator.getPositionStream(locationSettings: setting)
+          .listen((position) {
+        callback(AppPosition.Position(position.latitude, position.longitude));
+      });
     });
   }
 
