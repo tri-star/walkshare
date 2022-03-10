@@ -1,9 +1,12 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/stroll_route.dart';
+import 'package:strollog/pages/map/point_add_form.dart';
+import 'package:strollog/pages/map/point_add_form_store.dart';
 
 class MapView extends StatelessWidget {
   final Position _initialPosition;
@@ -40,39 +43,16 @@ class MapView extends StatelessWidget {
             isScrollControlled: true,
             builder: (context) {
               return Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: const [
-                        Text('タイトル'),
-                        Expanded(child: TextField()),
-                      ],
-                    ),
-                    Row(
-                      children: const [
-                        Text('コメント'),
-                        Expanded(child: TextField()),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(onPressed: null, child: Text('OK')),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('CANCEL')),
-                      ],
-                    ),
-                    Padding(
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom)),
-                  ],
-                ),
-              );
+                  padding: EdgeInsets.all(10),
+                  child: MultiProvider(
+                    providers: [
+                      ChangeNotifierProvider<PointAddFormStore>(
+                        create: (_) => PointAddFormStore(),
+                      ),
+                    ],
+                    child:
+                        PointAddForm(), // TODO: 違う階層のコンポーネントなので、呼び方を検討する必要がある
+                  ));
             });
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
@@ -106,6 +86,7 @@ class MapView extends StatelessWidget {
         .map((point) => Marker(
               markerId: MarkerId(point.hashCode.toString()),
               position: LatLng(point.point.latitude, point.point.longitude),
+              alpha: 0.7,
               infoWindow: InfoWindow(
                   title: point.title,
                   snippet: "${point.date.toIso8601String()}\n${point.comment}"),
