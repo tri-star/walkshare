@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/auth_page.dart';
 import 'package:strollog/pages/strollog_app.dart';
+import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
@@ -50,6 +51,9 @@ class Application extends StatelessWidget {
           ),
           Provider<RouteRepository>(
             create: (_) => RouteRepository(),
+          ),
+          Provider<MapInfoRepository>(
+            create: (_) => MapInfoRepository(),
           ),
         ],
         child: StreamBuilder<User?>(

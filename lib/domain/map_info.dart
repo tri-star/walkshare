@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:strollog/domain/position.dart';
 
+/// 地図上のスポット
 class MapPoint {
+  String title;
+
   String comment;
 
   DateTime date;
@@ -10,17 +13,20 @@ class MapPoint {
 
   double score;
 
-  MapPoint(this.point, {this.comment = "", DateTime? newDate, this.score = 1.0})
+  MapPoint(this.title, this.point,
+      {this.comment = "", DateTime? newDate, this.score = 1.0})
       : date = newDate ?? DateTime.now();
 
   MapPoint.fromJson(Map<String, dynamic> json)
-      : comment = json['comment'],
-        date = DateTime.parse(json['date']),
-        point = Position(json['point']['latitude'], json['point']['longitude']),
-        score = json['score'];
+      : title = json['title'],
+        comment = json['comment'],
+        date = json['date'].toDate(),
+        point = Position(json['point'].latitude, json['point'].longitude),
+        score = json['score'] + .0;
 
   Map<String, Object?> toJson() {
     return {
+      'title': title,
       'comment': comment,
       'date': date.toIso8601String(),
       'point': GeoPoint(point.latitude, point.longitude),
@@ -29,6 +35,7 @@ class MapPoint {
   }
 }
 
+/// 地図情報。お気に入りスポットなどの点をまとめたもの。
 class MapInfo {
   String? _id;
 

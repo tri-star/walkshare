@@ -49,8 +49,8 @@ class _MapPageState extends State<MapPage> {
 
     return Column(children: [
       Expanded(
-          child:
-              MapView(_mapController, _state!.position!, _state!.strollRoute)),
+          child: MapView(_mapController, _state!.position!, _state!.strollRoute,
+              _state!.mapInfo)),
       Text(_state!.strollRoute.routePoints.length.toString(),
           textAlign: TextAlign.right),
     ]);

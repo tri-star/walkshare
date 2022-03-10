@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/map/map_page.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
@@ -21,7 +22,8 @@ class StrollogApp extends StatelessWidget {
             return MapPageStore(
                 Provider.of<AuthService>(_context, listen: false),
                 Provider.of<LocationService>(_context, listen: false),
-                Provider.of<RouteRepository>(_context, listen: false));
+                Provider.of<RouteRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false));
           },
         ),
         Provider<Completer<GoogleMapController>>(

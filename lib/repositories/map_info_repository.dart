@@ -4,7 +4,7 @@ import 'package:strollog/domain/map_info.dart';
 
 /// マップ情報は頻繁に更新するわけではなく、ユーザー間で共有する場合も適宜リロードしてもらえば良いので
 /// Streamの購読は不要と考える
-class MapRepository {
+class MapInfoRepository {
   Future<MapInfo?> fetchMapByName(String name) async {
     var snapshot = await FirebaseFirestore.instance
         .collection('maps')
