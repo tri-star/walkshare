@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/point_add_form_store.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -45,12 +46,16 @@ class _MapPageState extends State<MapPage> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Column(children: [
-      Expanded(
-          child: MapView(_mapController, _state!.position!, _state!.strollRoute,
-              _state!.mapInfo)),
-      Text(_state!.strollRoute.routePoints.length.toString(),
-          textAlign: TextAlign.right),
-    ]);
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => PointAddFormStore()),
+        ],
+        child: Column(children: [
+          Expanded(
+              child: MapView(_mapController, _state!.position!,
+                  _state!.strollRoute, _state!.mapInfo)),
+          Text(_state!.strollRoute.routePoints.length.toString(),
+              textAlign: TextAlign.right),
+        ]));
   }
 }

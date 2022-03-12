@@ -25,6 +25,7 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<PointAddFormStore>(context, listen: false);
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
@@ -38,21 +39,17 @@ class MapView extends StatelessWidget {
           name: "map_long_pressed",
           parameters: {},
         );
+
         showModalBottomSheet(
             context: context,
             isScrollControlled: true,
             builder: (context) {
-              return Container(
-                  padding: EdgeInsets.all(10),
-                  child: MultiProvider(
-                    providers: [
-                      ChangeNotifierProvider<PointAddFormStore>(
-                        create: (_) => PointAddFormStore(),
-                      ),
-                    ],
-                    child:
-                        PointAddForm(), // TODO: 違う階層のコンポーネントなので、呼び方を検討する必要がある
-                  ));
+              return MultiProvider(
+                providers: [
+                  ListenableProvider<PointAddFormStore>.value(value: store),
+                ],
+                child: PointAddForm(), // TODO: 違う階層のコンポーネントなので、呼び方を検討する必要がある
+              );
             });
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
