@@ -28,7 +28,7 @@ class MapPoint {
     return {
       'title': title,
       'comment': comment,
-      'date': date.toIso8601String(),
+      'date': date,
       'point': GeoPoint(point.latitude, point.longitude),
       'score': score,
     };
