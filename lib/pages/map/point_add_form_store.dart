@@ -28,10 +28,24 @@ class PointAddFormStore extends ChangeNotifier {
   Future<void> save(MapInfo mapInfo, Position _position) async {
     var mapPoint = MapPoint(_title, _position, comment: _comment);
     await _mapInfoRepository.addPoint(mapInfo, mapPoint);
+    _title = '';
+    _comment = '';
     notifyListeners();
   }
 
   bool isValidInput() {
     return _title.length > 0;
   }
+
+  @override
+  operator ==(other) {
+    if (identical(this, other)) return true;
+
+    return other is PointAddFormStore &&
+        _title == other.title &&
+        _comment == other.comment;
+  }
+
+  @override
+  int get hashCode => hashValues(_title, _comment);
 }

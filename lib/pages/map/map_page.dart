@@ -31,6 +31,8 @@ class _MapPageState extends State<MapPage> {
   Widget _createMapView() {
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context);
+      // Listenさせるためにここで定義が必要
+      Provider.of<PointAddFormStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
         if (!_state!.locationRequested) {
