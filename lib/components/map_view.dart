@@ -8,19 +8,23 @@ import 'package:strollog/domain/stroll_route.dart';
 import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 
+typedef LongTapCallBack = Future<void> Function(Position position);
+
 class MapView extends StatelessWidget {
   final Position _initialPosition;
   final MapController _controller;
   final StrollRoute _strollRoute;
   final MapInfo? _mapInfo;
+  final LongTapCallBack? _longTapCallBack;
 
   const MapView(MapController controller, Position initialPosition,
       StrollRoute strollRoute, MapInfo? mapInfo,
-      {Key? key})
+      {LongTapCallBack? onLongTap, Key? key})
       : _controller = controller,
         _initialPosition = initialPosition,
         _strollRoute = strollRoute,
         _mapInfo = mapInfo,
+        _longTapCallBack = onLongTap,
         super(key: key);
 
   @override
@@ -35,22 +39,9 @@ class MapView extends StatelessWidget {
       myLocationEnabled: true, // 後でON/OFFできる必要がある
       onCameraMove: _onCameraMove,
       onLongPress: (LatLng newPos) {
-        FirebaseAnalytics.instance.logEvent(
-          name: "map_long_pressed",
-          parameters: {},
-        );
-
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) {
-              return MultiProvider(
-                providers: [
-                  ListenableProvider<PointAddFormStore>.value(value: store),
-                ],
-                child: PointAddForm(), // TODO: 違う階層のコンポーネントなので、呼び方を検討する必要がある
-              );
-            });
+        if (_longTapCallBack != null) {
+          _longTapCallBack!(Position(newPos.latitude, newPos.longitude));
+        }
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
       markers: _makeMarkers(_mapInfo?.points).toSet(),
