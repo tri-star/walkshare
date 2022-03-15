@@ -73,7 +73,7 @@ class _MapPageState extends State<MapPage> {
             providers: [
               ListenableProvider<PointAddFormStore>.value(value: store),
             ],
-            child: PointAddForm(),
+            child: PointAddForm(_state!.mapInfo!, position),
           );
         });
   }

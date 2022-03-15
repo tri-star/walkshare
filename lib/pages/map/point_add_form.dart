@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/position.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 
 class PointAddForm extends StatefulWidget {
+  final MapInfo _mapInfo;
+  final Position _position;
+
+  const PointAddForm(this._mapInfo, this._position, {Key? key})
+      : super(key: key);
+
   @override
-  _PointAddFormState createState() => _PointAddFormState();
+  _PointAddFormState createState() => _PointAddFormState(_mapInfo, _position);
 }
 
 class _PointAddFormState extends State<PointAddForm> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _commentController = TextEditingController();
+  final MapInfo _mapInfo;
+  final Position _position;
   PointAddFormStore? _state;
+
+  _PointAddFormState(this._mapInfo, this._position);
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +76,7 @@ class _PointAddFormState extends State<PointAddForm> {
   }
 
   Future<void> _saveForm() async {
-    await _state!.save();
+    await _state!.save(_mapInfo, _position);
     Navigator.pop(context);
   }
 }

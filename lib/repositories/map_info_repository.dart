@@ -22,6 +22,7 @@ class MapInfoRepository {
   }
 
   Future<void> addPoint(MapInfo map, MapPoint point) async {
+    map.points.add(point);
     await FirebaseFirestore.instance.collection('maps').doc(map.id).update({
       'points': FieldValue.arrayUnion([point.toJson()])
     });
