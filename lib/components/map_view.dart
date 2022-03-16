@@ -1,72 +1,50 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/stroll_route.dart';
+import 'package:strollog/pages/map/point_add_form.dart';
+import 'package:strollog/pages/map/point_add_form_store.dart';
+
+typedef LongTapCallBack = Future<void> Function(Position position);
 
 class MapView extends StatelessWidget {
   final Position _initialPosition;
   final MapController _controller;
   final StrollRoute _strollRoute;
+  final MapInfo? _mapInfo;
+  final LongTapCallBack? _longTapCallBack;
 
   const MapView(MapController controller, Position initialPosition,
-      StrollRoute strollRoute,
-      {Key? key})
+      StrollRoute strollRoute, MapInfo? mapInfo,
+      {LongTapCallBack? onLongTap, Key? key})
       : _controller = controller,
         _initialPosition = initialPosition,
         _strollRoute = strollRoute,
+        _mapInfo = mapInfo,
+        _longTapCallBack = onLongTap,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<PointAddFormStore>(context, listen: false);
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
         target: LatLng(_initialPosition.latitude, _initialPosition.longitude),
         zoom: 15,
       ),
+      myLocationEnabled: true, // 後でON/OFFできる必要がある
       onCameraMove: _onCameraMove,
       onLongPress: (LatLng newPos) {
-        FirebaseAnalytics.instance.logEvent(
-          name: "map_long_pressed",
-          parameters: {},
-        );
-        showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            builder: (context) {
-              return Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Text('コメント'),
-                        Expanded(child: TextField()),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        TextButton(onPressed: null, child: Text('OK')),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('CANCEL')),
-                      ],
-                    ),
-                    Padding(
-                        padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom)),
-                  ],
-                ),
-              );
-            });
+        if (_longTapCallBack != null) {
+          _longTapCallBack!(Position(newPos.latitude, newPos.longitude));
+        }
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
+      markers: _makeMarkers(_mapInfo?.points).toSet(),
     );
   }
 
@@ -86,6 +64,22 @@ class MapView extends StatelessWidget {
       color: Colors.red,
       width: 5,
     );
+  }
+
+  Set<Marker> _makeMarkers(List<MapPoint>? points) {
+    if (points == null) {
+      return {};
+    }
+    return points
+        .map((point) => Marker(
+              markerId: MarkerId(point.hashCode.toString()),
+              position: LatLng(point.point.latitude, point.point.longitude),
+              alpha: 0.7,
+              infoWindow: InfoWindow(
+                  title: point.title,
+                  snippet: "${point.date.toIso8601String()}\n${point.comment}"),
+            ))
+        .toSet();
   }
 }
 

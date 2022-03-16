@@ -1,10 +1,11 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
+import 'package:strollog/domain/position.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/point_add_form.dart';
+import 'package:strollog/pages/map/point_add_form_store.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -30,6 +31,8 @@ class _MapPageState extends State<MapPage> {
   Widget _createMapView() {
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context);
+      // Listenさせるためにここで定義が必要
+      Provider.of<PointAddFormStore>(context);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
         if (!_state!.locationRequested) {
@@ -49,10 +52,31 @@ class _MapPageState extends State<MapPage> {
 
     return Column(children: [
       Expanded(
-          child:
-              MapView(_mapController, _state!.position!, _state!.strollRoute)),
+          child: MapView(
+        _mapController,
+        _state!.position!,
+        _state!.strollRoute,
+        _state!.mapInfo,
+        onLongTap: _handleLongTap,
+      )),
       Text(_state!.strollRoute.routePoints.length.toString(),
           textAlign: TextAlign.right),
     ]);
+  }
+
+  Future<void> _handleLongTap(Position position) async {
+    PointAddFormStore store =
+        Provider.of<PointAddFormStore>(context, listen: false);
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return MultiProvider(
+            providers: [
+              ListenableProvider<PointAddFormStore>.value(value: store),
+            ],
+            child: PointAddForm(_state!.mapInfo!, position),
+          );
+        });
   }
 }
