@@ -33,9 +33,17 @@ class PointAddFormStore extends ChangeNotifier {
 
   Future<void> save(MapInfo mapInfo, Position _position) async {
     var mapPoint = MapPoint(_title, _position, comment: _comment);
+    var uploadedPhotos =
+        await _mapInfoRepository.uploadPhotos(mapInfo, _photos);
+
+    if (uploadedPhotos.length > 0) {
+      mapPoint.addPhotos(uploadedPhotos);
+    }
+
     await _mapInfoRepository.addPoint(mapInfo, mapPoint);
     _title = '';
     _comment = '';
+    _photos = [];
     notifyListeners();
   }
 
@@ -58,9 +66,10 @@ class PointAddFormStore extends ChangeNotifier {
 
     return other is PointAddFormStore &&
         _title == other.title &&
-        _comment == other.comment;
+        _comment == other.comment &&
+        _photos == other.photos;
   }
 
   @override
-  int get hashCode => hashValues(_title, _comment);
+  int get hashCode => hashValues(_title, _comment, _photos);
 }
