@@ -35,7 +35,6 @@ class LocationService {
       setting = const LocationSettings(
         accuracy: LocationAccuracy.best,
         distanceFilter: 10,
-        timeLimit: Duration(seconds: 5),
       );
     }
 
