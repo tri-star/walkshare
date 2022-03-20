@@ -6,6 +6,7 @@ import 'package:strollog/domain/position.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/point_info_form.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -58,6 +59,7 @@ class _MapPageState extends State<MapPage> {
         _state!.strollRoute,
         _state!.mapInfo,
         onLongTap: _handleLongTap,
+        onPointTap: _handleMapPointTap,
       )),
       Text(_state!.strollRoute.routePoints.length.toString(),
           textAlign: TextAlign.right),
@@ -78,5 +80,17 @@ class _MapPageState extends State<MapPage> {
             child: PointAddForm(_state!.mapInfo!, position),
           );
         });
+  }
+
+  void _handleMapPointTap(int index) {
+    MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => MultiProvider(
+              providers: [
+                ListenableProvider<MapPageStore>.value(value: store),
+              ],
+              child: PointInfoForm(index),
+            ));
   }
 }

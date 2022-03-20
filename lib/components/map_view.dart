@@ -9,6 +9,7 @@ import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 
 typedef LongTapCallBack = Future<void> Function(Position position);
+typedef MapPointTapCallBack = void Function(int index);
 
 class MapView extends StatelessWidget {
   final Position _initialPosition;
@@ -16,15 +17,17 @@ class MapView extends StatelessWidget {
   final StrollRoute _strollRoute;
   final MapInfo? _mapInfo;
   final LongTapCallBack? _longTapCallBack;
+  final MapPointTapCallBack? _mapPointTapCallBack;
 
   const MapView(MapController controller, Position initialPosition,
       StrollRoute strollRoute, MapInfo? mapInfo,
-      {LongTapCallBack? onLongTap, Key? key})
+      {LongTapCallBack? onLongTap, MapPointTapCallBack? onPointTap, Key? key})
       : _controller = controller,
         _initialPosition = initialPosition,
         _strollRoute = strollRoute,
         _mapInfo = mapInfo,
         _longTapCallBack = onLongTap,
+        _mapPointTapCallBack = onPointTap,
         super(key: key);
 
   @override
@@ -70,16 +73,25 @@ class MapView extends StatelessWidget {
     if (points == null) {
       return {};
     }
-    return points
-        .map((point) => Marker(
-              markerId: MarkerId(point.hashCode.toString()),
-              position: LatLng(point.point.latitude, point.point.longitude),
-              alpha: 0.7,
-              infoWindow: InfoWindow(
-                  title: point.title,
-                  snippet: "${point.date.toIso8601String()}\n${point.comment}"),
-            ))
-        .toSet();
+    int index = 0;
+    return points.map((point) {
+      var localIndex = index;
+      var marker = Marker(
+        markerId: MarkerId(point.hashCode.toString()),
+        position: LatLng(point.point.latitude, point.point.longitude),
+        alpha: 0.7,
+        onTap: () {
+          if (_mapPointTapCallBack != null) {
+            _mapPointTapCallBack!(localIndex);
+          }
+        },
+        infoWindow: InfoWindow(
+            title: point.title,
+            snippet: "${point.date.toIso8601String()}\n${point.comment}"),
+      );
+      index += 1;
+      return marker;
+    }).toSet();
   }
 }
 
