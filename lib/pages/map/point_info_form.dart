@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:strollog/domain/photo.dart';
+import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/services/image_loader.dart';
-
-typedef ImageTapCallBack = void Function(int index);
-typedef ImageLoadingCallBack = Widget Function(
-    BuildContext, Widget, ImageChunkEvent?);
-typedef ImageErrorCallBack = Widget Function(BuildContext, Object, StackTrace?);
 
 class PointInfoForm extends StatelessWidget {
   final int _index;
@@ -73,46 +68,5 @@ class PointInfoForm extends StatelessWidget {
       return ImageThumbnail(url, height: 100);
     }).toList();
     return Row(children: photos);
-  }
-}
-
-class ImageThumbnail extends StatelessWidget {
-  final String _url;
-
-  final double? _width;
-  final double? _height;
-  final ImageLoadingCallBack? _imageLoadingCallBack;
-  final ImageErrorCallBack? _imageErrorCallBack;
-
-  const ImageThumbnail(this._url,
-      {Key? key,
-      double? width,
-      double? height,
-      ImageLoadingCallBack? imageLoadingCallBack,
-      ImageErrorCallBack? imageErrorCallBack})
-      : _width = width,
-        _height = height,
-        _imageLoadingCallBack = imageLoadingCallBack,
-        _imageErrorCallBack = imageErrorCallBack,
-        super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    print(_url);
-    return GestureDetector(
-      onTap: () {},
-      child: Image.network(
-        _url,
-        width: _width,
-        height: _height,
-        loadingBuilder: _imageLoadingCallBack ??
-            (context, child, event) {
-              if (event == null) {
-                return child;
-              }
-              return const Center(child: CircularProgressIndicator());
-            },
-      ),
-    );
   }
 }
