@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
@@ -34,49 +37,86 @@ class _PointAddFormState extends State<PointAddForm> {
           .addListener(() => _state!.setComment(_commentController.text));
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
+    return Padding(
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text('タイトル'),
-            Expanded(
-                child: TextField(
-              controller: _titleController,
-            )),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Text('タイトル'),
+                  Expanded(
+                      child: TextField(
+                    controller: _titleController,
+                  )),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Text('コメント'),
+                  Expanded(
+                      child: TextField(
+                    controller: _commentController,
+                  )),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Text('写真'),
+                  IconButton(
+                    icon: Icon(Icons.photo),
+                    onPressed: () {
+                      _state!.pickImage();
+                    },
+                  ),
+                  _createImagePreview()
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                    onPressed: _state!.isValidInput() ? _saveForm : null,
+                    child: Text('登録')),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('キャンセル')),
+              ],
+            ),
+            Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom)),
           ],
-        ),
-        Row(
-          children: [
-            Text('コメント'),
-            Expanded(
-                child: TextField(
-              controller: _commentController,
-            )),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            TextButton(
-                onPressed: _state!.isValidInput() ? _saveForm : null,
-                child: Text('登録')),
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('キャンセル')),
-          ],
-        ),
-        Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom)),
-      ],
-    );
+        ));
   }
 
   Future<void> _saveForm() async {
     await _state!.save(_mapInfo, _position);
     Navigator.pop(context);
+  }
+
+  Widget _createImagePreview() {
+    if (_state!.photos.isEmpty) {
+      return Container(child: Expanded(child: Text('写真を選択')));
+    }
+
+    List<Image> imageList = _state!.photos.map((XFile file) {
+      return Image.file(File(file.path), height: 50);
+    }).toList();
+
+    return Row(
+      children: imageList,
+    );
   }
 }

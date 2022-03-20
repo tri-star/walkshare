@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
@@ -10,10 +11,15 @@ class PointAddFormStore extends ChangeNotifier {
 
   String _comment = '';
 
+  final ImagePicker _picker;
+
+  List<XFile> _photos = [];
+
   String get title => _title;
   String get comment => _comment;
+  List<XFile> get photos => _photos;
 
-  PointAddFormStore(this._mapInfoRepository);
+  PointAddFormStore(this._mapInfoRepository) : _picker = ImagePicker();
 
   void setTitle(String title) {
     _title = title;
@@ -27,14 +33,31 @@ class PointAddFormStore extends ChangeNotifier {
 
   Future<void> save(MapInfo mapInfo, Position _position) async {
     var mapPoint = MapPoint(_title, _position, comment: _comment);
+    var uploadedPhotos =
+        await _mapInfoRepository.uploadPhotos(mapInfo, _photos);
+
+    if (uploadedPhotos.length > 0) {
+      mapPoint.addPhotos(uploadedPhotos);
+    }
+
     await _mapInfoRepository.addPoint(mapInfo, mapPoint);
     _title = '';
     _comment = '';
+    _photos = [];
     notifyListeners();
   }
 
   bool isValidInput() {
     return _title.length > 0;
+  }
+
+  Future<void> pickImage() async {
+    List<XFile>? newPhotos = await _picker.pickMultiImage();
+    if (newPhotos == null) {
+      return;
+    }
+    _photos.addAll(newPhotos);
+    notifyListeners();
   }
 
   @override
@@ -43,9 +66,10 @@ class PointAddFormStore extends ChangeNotifier {
 
     return other is PointAddFormStore &&
         _title == other.title &&
-        _comment == other.comment;
+        _comment == other.comment &&
+        _photos == other.photos;
   }
 
   @override
-  int get hashCode => hashValues(_title, _comment);
+  int get hashCode => hashValues(_title, _comment, _photos);
 }

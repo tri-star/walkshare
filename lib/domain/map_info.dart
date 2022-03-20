@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 
 /// 地図上のスポット
@@ -13,16 +14,26 @@ class MapPoint {
 
   double score;
 
+  List<Photo> photos;
+
   MapPoint(this.title, this.point,
-      {this.comment = "", DateTime? newDate, this.score = 1.0})
-      : date = newDate ?? DateTime.now();
+      {this.comment = "",
+      DateTime? newDate,
+      this.score = 1.0,
+      List<Photo>? photos})
+      : date = newDate ?? DateTime.now(),
+        photos = photos ?? [];
 
   MapPoint.fromJson(Map<String, dynamic> json)
       : title = json['title'],
         comment = json['comment'],
         date = json['date'].toDate(),
         point = Position(json['point'].latitude, json['point'].longitude),
-        score = json['score'] + .0;
+        score = json['score'] + .0,
+        photos = json['photos'] != null
+            ? (json['photos'] as List<dynamic>)
+                .map((photo) => Photo.fromJson(photo)) as List<Photo>
+            : [];
 
   Map<String, Object?> toJson() {
     return {
@@ -31,7 +42,12 @@ class MapPoint {
       'date': date,
       'point': GeoPoint(point.latitude, point.longitude),
       'score': score,
+      'photos': photos.map((photo) => photo.toJson()).toList()
     };
+  }
+
+  void addPhotos(List<Photo> newPhotos) {
+    photos.addAll(newPhotos);
   }
 }
 
