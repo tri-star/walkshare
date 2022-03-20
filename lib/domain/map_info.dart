@@ -32,7 +32,8 @@ class MapPoint {
         score = json['score'] + .0,
         photos = json['photos'] != null
             ? (json['photos'] as List<dynamic>)
-                .map((photo) => Photo.fromJson(photo)) as List<Photo>
+                .map((photo) => Photo.fromJson(photo))
+                .toList() as List<Photo>
             : [];
 
   Map<String, Object?> toJson() {

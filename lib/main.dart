@@ -11,6 +11,7 @@ import 'package:strollog/pages/strollog_app.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
+import 'package:strollog/services/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
 
 Future<void> main() async {
@@ -54,6 +55,9 @@ class Application extends StatelessWidget {
           ),
           Provider<MapInfoRepository>(
             create: (_) => MapInfoRepository(),
+          ),
+          Provider<ImageLoader>(
+            create: (_) => ImageLoader(),
           ),
         ],
         child: StreamBuilder<User?>(

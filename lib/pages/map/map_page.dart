@@ -7,6 +7,7 @@ import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/map/point_info_form.dart';
+import 'package:strollog/services/image_loader.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -84,11 +85,13 @@ class _MapPageState extends State<MapPage> {
 
   void _handleMapPointTap(int index) {
     MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
+    ImageLoader loader = Provider.of<ImageLoader>(context, listen: false);
     showModalBottomSheet(
         context: context,
         builder: (context) => MultiProvider(
               providers: [
                 ListenableProvider<MapPageStore>.value(value: store),
+                Provider<ImageLoader>.value(value: loader)
               ],
               child: PointInfoForm(index),
             ));
