@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/point_edit_form.dart';
+import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class PointInfoForm extends StatelessWidget {
@@ -14,6 +16,8 @@ class PointInfoForm extends StatelessWidget {
     var store = Provider.of<MapPageStore>(context);
     var title = store.mapInfo!.points[_index].title;
     var date = store.mapInfo!.points[_index].date.toIso8601String();
+
+    var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -39,7 +43,18 @@ class PointInfoForm extends StatelessWidget {
             },
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            TextButton(onPressed: null, child: Text('編集')),
+            TextButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return MultiProvider(providers: [
+                          ListenableProvider<PointEditFormStore>.value(
+                              value: editFormStore)
+                        ], child: PointEditForm(store.mapInfo!, _index));
+                      });
+                },
+                child: Text('編集')),
             TextButton(
                 onPressed: () {
                   Navigator.pop(context);

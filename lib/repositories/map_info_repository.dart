@@ -33,6 +33,14 @@ class MapInfoRepository {
     });
   }
 
+  Future<void> updatePoint(MapInfo map, int index, MapPoint point) async {
+    map.points[index] = point;
+    await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(map.id)
+        .update({'points': map.points.map((p) => p.toJson()).toList()});
+  }
+
   Future<List<Photo>> uploadPhotos(MapInfo map, List<XFile> files) async {
     // CloudStorageにファイルをアップロードする
     // Photo形式に変換して返す
