@@ -30,7 +30,7 @@ class MapPoint {
         date = json['date'].toDate(),
         point = Position(json['point'].latitude, json['point'].longitude),
         score = json['score'] + .0,
-        photos = json.containsKey('json')
+        photos = json.containsKey('photos')
             ? (json['photos'] as List<dynamic>)
                 .map((photo) => Photo.fromJson(photo))
                 .toList()
