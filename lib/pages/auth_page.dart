@@ -41,7 +41,8 @@ class _AuthPageState extends State<AuthPage> {
                     children: [
                       Container(
                         margin: EdgeInsets.only(bottom: 20),
-                        child: Text('Strollog', style: TextStyle(fontSize: 40)),
+                        child:
+                            Text('WalkShare', style: TextStyle(fontSize: 40)),
                       ),
                       Center(
                           child: AnimatedSwitcher(
