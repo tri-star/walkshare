@@ -59,9 +59,9 @@ class MapPageStore extends ChangeNotifier {
       permission = await _locationService.requestPermission();
     }
 
-    listenLocation();
-    var user = _authService.getUser();
-    await _routeRepository.save(user, _strollRoute);
+    // listenLocation();
+    // var user = _authService.getUser();
+    // await _routeRepository.save(user, _strollRoute);
 
     notifyListeners();
     return permission;
