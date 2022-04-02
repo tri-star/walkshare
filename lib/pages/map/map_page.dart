@@ -25,7 +25,7 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Strollog'),
+        title: const Text('WalkShare'),
       ),
       body: _createMapView(),
     );
@@ -43,7 +43,9 @@ class _MapPageState extends State<MapPage> {
             if (permission == LocationPermissionResult.deniedForever) {
               return const Center(child: Text("位置情報の使用が拒否されています。"));
             }
-            //_state!.updateLocation();
+
+            // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
+            _state!.updateLocation();
           });
         }
       });
