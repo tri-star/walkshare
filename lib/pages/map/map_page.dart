@@ -86,7 +86,7 @@ class _MapPageState extends State<MapPage> {
         });
   }
 
-  void _handleMapPointTap(int index) {
+  void _handleMapPointTap(String spotId) {
     MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
     ImageLoader loader = Provider.of<ImageLoader>(context, listen: false);
     PointEditFormStore editFormStore =
@@ -100,7 +100,7 @@ class _MapPageState extends State<MapPage> {
                     value: editFormStore),
                 Provider<ImageLoader>.value(value: loader)
               ],
-              child: PointInfoForm(index),
+              child: PointInfoForm(spotId),
             ));
   }
 }

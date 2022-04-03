@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:ulid/ulid.dart';
 
 /// 地図上のスポット
-class MapPoint {
+class Spot {
+  String id;
+
   String title;
 
   String comment;
@@ -16,25 +19,27 @@ class MapPoint {
 
   List<Photo> photos;
 
-  MapPoint(this.title, this.point,
-      {this.comment = "",
+  Spot(this.title, this.point,
+      {String? id,
+      this.comment = "",
       DateTime? newDate,
       this.score = 1.0,
       List<Photo>? photos})
-      : date = newDate ?? DateTime.now(),
+      : id = id ?? Ulid().toString(),
+        date = newDate ?? DateTime.now(),
         photos = photos ?? [];
 
-  MapPoint.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
-        comment = json['comment'],
-        date = json['date'].toDate(),
-        point = Position(json['point'].latitude, json['point'].longitude),
-        score = json['score'] + .0,
-        photos = json.containsKey('photos')
-            ? (json['photos'] as List<dynamic>)
-                .map((photo) => Photo.fromJson(photo))
-                .toList()
-            : [];
+  // Spot.fromJson(Map<String, dynamic> json)
+  //     : title = json['title'],
+  //       comment = json['comment'],
+  //       date = json['date'].toDate(),
+  //       point = Position(json['point'].latitude, json['point'].longitude),
+  //       score = json['score'] + .0,
+  //       photos = json.containsKey('photos')
+  //           ? (json['photos'] as List<dynamic>)
+  //               .map((photo) => Photo.fromJson(photo))
+  //               .toList()
+  //           : [];
 
   Map<String, Object?> toJson() {
     return {
@@ -58,29 +63,25 @@ class MapInfo {
 
   String _name;
 
-  List<MapPoint> _points = [];
+  Map<String, Spot> _spots = {};
 
-  MapInfo(this._name, this._points, {String? id}) : _id = id;
+  MapInfo(this._name, this._spots, {String? id}) : _id = id;
 
   MapInfo.fromJson(String? id, Map<String, Object?> json)
       : _id = id,
-        _name = json['name'] as String,
-        _points = (json['points'] as List<dynamic>)
-            .map((dynamic p) => MapPoint.fromJson(p as Map<String, dynamic>))
-            .toList();
+        _name = json['name'] as String;
 
   String? get id => _id;
   String get name => _name;
-  List<MapPoint> get points => _points;
+  Map<String, Spot> get spots => _spots;
 
-  void addPoint(MapPoint point) {
-    _points.add(point);
+  void addSpot(Spot spot) {
+    _spots[spot.id] = spot;
   }
 
   Map<String, Object?> toJson() {
     return {
       'name': _name,
-      'points': _points.map((MapPoint p) => p.toJson()).toList(),
     };
   }
 }

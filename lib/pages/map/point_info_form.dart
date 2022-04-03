@@ -7,15 +7,15 @@ import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class PointInfoForm extends StatelessWidget {
-  final int _index;
+  final String _spotId;
 
-  const PointInfoForm(this._index, {Key? key}) : super(key: key);
+  const PointInfoForm(this._spotId, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
-    var title = store.mapInfo!.points[_index].title;
-    var date = store.mapInfo!.points[_index].date.toIso8601String();
+    var title = store.mapInfo!.spots[_spotId]!.title;
+    var date = store.mapInfo!.spots[_spotId]!.date.toIso8601String();
 
     var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
 
@@ -51,7 +51,7 @@ class PointInfoForm extends StatelessWidget {
                         return MultiProvider(providers: [
                           ListenableProvider<PointEditFormStore>.value(
                               value: editFormStore)
-                        ], child: PointEditForm(store.mapInfo!, _index));
+                        ], child: PointEditForm(store.mapInfo!, _spotId));
                       });
                 },
                 child: Text('編集')),
@@ -70,7 +70,7 @@ class PointInfoForm extends StatelessWidget {
     var store = Provider.of<MapPageStore>(context);
     var imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
-    var pendingUrls = store.mapInfo!.points[_index].photos.map((photo) {
+    var pendingUrls = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
       return imageLoader.getDownloadUrl(store.mapInfo!, photo);
     }).toList();
 
