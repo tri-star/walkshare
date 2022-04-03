@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
+import 'package:strollog/domain/position.dart';
+import 'package:ulid/ulid.dart';
 
 /// マップ情報は頻繁に更新するわけではなく、ユーザー間で共有する場合も適宜リロードしてもらえば良いので
 /// Streamの購読は不要と考える
@@ -23,22 +25,50 @@ class MapInfoRepository {
     if (!snapshot.docs.first.exists) {
       return null;
     }
-    return snapshot.docs.first.data();
+
+    var map = snapshot.docs.first.data();
+
+    var spots = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(map.id)
+        .collection('spots')
+        .get();
+    spots.docs.forEach((doc) {
+      var data = doc.data();
+      var spot = Spot(data['title'],
+          Position(data['point'].latitude, data['point'].longitude),
+          id: doc.id,
+          comment: data['comment'],
+          newDate: data['date'].toDate(),
+          score: data['score'] + .0,
+          photos: (data['photos'] as List<dynamic>)
+              .map((photo) => Photo.fromJson(photo))
+              .toList());
+      map.addSpot(spot);
+    });
+
+    return map;
   }
 
   Future<void> addSpot(MapInfo map, Spot spot) async {
-    map.spots.add(spot);
-    await FirebaseFirestore.instance.collection('maps').doc(map.id).update({
-      'points': FieldValue.arrayUnion([spot.toJson()])
-    });
-  }
-
-  Future<void> updatePoint(MapInfo map, int index, Spot point) async {
-    map.spots[index] = point;
+    map.spots[spot.id] = spot;
+    var id = spot.id;
     await FirebaseFirestore.instance
         .collection('maps')
         .doc(map.id)
-        .update({'points': map.spots.map((p) => p.toJson()).toList()});
+        .collection('spots')
+        .doc(id)
+        .set(spot.toJson());
+  }
+
+  Future<void> updatePoint(MapInfo map, String spotId, Spot spot) async {
+    map.spots[spotId] = spot;
+    await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(map.id)
+        .collection('spots')
+        .doc(spotId)
+        .set(spot.toJson());
   }
 
   Future<List<Photo>> uploadPhotos(MapInfo map, List<XFile> files) async {

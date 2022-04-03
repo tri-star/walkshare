@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:ulid/ulid.dart';
 
 /// 地図上のスポット
 class Spot {
+  String id;
+
   String title;
 
   String comment;
@@ -17,24 +20,26 @@ class Spot {
   List<Photo> photos;
 
   Spot(this.title, this.point,
-      {this.comment = "",
+      {String? id,
+      this.comment = "",
       DateTime? newDate,
       this.score = 1.0,
       List<Photo>? photos})
-      : date = newDate ?? DateTime.now(),
+      : id = id ?? Ulid().toString(),
+        date = newDate ?? DateTime.now(),
         photos = photos ?? [];
 
-  Spot.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
-        comment = json['comment'],
-        date = json['date'].toDate(),
-        point = Position(json['point'].latitude, json['point'].longitude),
-        score = json['score'] + .0,
-        photos = json.containsKey('photos')
-            ? (json['photos'] as List<dynamic>)
-                .map((photo) => Photo.fromJson(photo))
-                .toList()
-            : [];
+  // Spot.fromJson(Map<String, dynamic> json)
+  //     : title = json['title'],
+  //       comment = json['comment'],
+  //       date = json['date'].toDate(),
+  //       point = Position(json['point'].latitude, json['point'].longitude),
+  //       score = json['score'] + .0,
+  //       photos = json.containsKey('photos')
+  //           ? (json['photos'] as List<dynamic>)
+  //               .map((photo) => Photo.fromJson(photo))
+  //               .toList()
+  //           : [];
 
   Map<String, Object?> toJson() {
     return {
@@ -58,29 +63,25 @@ class MapInfo {
 
   String _name;
 
-  List<Spot> _spots = [];
+  Map<String, Spot> _spots = {};
 
   MapInfo(this._name, this._spots, {String? id}) : _id = id;
 
   MapInfo.fromJson(String? id, Map<String, Object?> json)
       : _id = id,
-        _name = json['name'] as String,
-        _spots = (json['points'] as List<dynamic>)
-            .map((dynamic p) => Spot.fromJson(p as Map<String, dynamic>))
-            .toList();
+        _name = json['name'] as String;
 
   String? get id => _id;
   String get name => _name;
-  List<Spot> get spots => _spots;
+  Map<String, Spot> get spots => _spots;
 
-  void addSpot(Spot point) {
-    _spots.add(point);
+  void addSpot(Spot spot) {
+    _spots[spot.id] = spot;
   }
 
   Map<String, Object?> toJson() {
     return {
       'name': _name,
-      'points': _spots.map((Spot p) => p.toJson()).toList(),
     };
   }
 }

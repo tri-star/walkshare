@@ -9,7 +9,7 @@ import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 
 typedef LongTapCallBack = Future<void> Function(Position position);
-typedef MapPointTapCallBack = void Function(int index);
+typedef MapPointTapCallBack = void Function(String spotId);
 
 class MapView extends StatelessWidget {
   final Position _initialPosition;
@@ -69,29 +69,28 @@ class MapView extends StatelessWidget {
     );
   }
 
-  Set<Marker> _makeMarkers(List<Spot>? spots) {
+  Set<Marker> _makeMarkers(Map<String, Spot>? spots) {
     if (spots == null) {
       return {};
     }
-    int index = 0;
-    return spots.map((spot) {
-      var localIndex = index;
+    List<Marker> result = [];
+    spots.forEach((spotId, spot) {
       var marker = Marker(
         markerId: MarkerId(spot.hashCode.toString()),
         position: LatLng(spot.point.latitude, spot.point.longitude),
         alpha: 0.7,
         onTap: () {
           if (_mapPointTapCallBack != null) {
-            _mapPointTapCallBack!(localIndex);
+            _mapPointTapCallBack!(spot.id);
           }
         },
         infoWindow: InfoWindow(
             title: spot.title,
             snippet: "${spot.date.toIso8601String()}\n${spot.comment}"),
       );
-      index += 1;
-      return marker;
-    }).toSet();
+      result.add(marker);
+    });
+    return result.toSet();
   }
 }
 

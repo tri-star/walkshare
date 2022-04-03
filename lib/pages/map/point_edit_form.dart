@@ -8,28 +8,29 @@ import 'package:strollog/pages/map/point_edit_form_store.dart';
 
 class PointEditForm extends StatefulWidget {
   final MapInfo _mapInfo;
-  final int _index;
+  final String _spotId;
 
-  const PointEditForm(this._mapInfo, this._index, {Key? key}) : super(key: key);
+  const PointEditForm(this._mapInfo, this._spotId, {Key? key})
+      : super(key: key);
 
   @override
-  _PointEditFormState createState() => _PointEditFormState(_mapInfo, _index);
+  _PointEditFormState createState() => _PointEditFormState(_mapInfo, _spotId);
 }
 
 class _PointEditFormState extends State<PointEditForm> {
   late final TextEditingController _titleController;
   late final TextEditingController _commentController;
   final MapInfo _mapInfo;
-  final int _index;
+  final String _spotId;
   PointEditFormStore? _store;
 
-  _PointEditFormState(this._mapInfo, this._index);
+  _PointEditFormState(this._mapInfo, this._spotId);
 
   @override
   Widget build(BuildContext context) {
     if (_store == null) {
       _store = Provider.of<PointEditFormStore>(context);
-      _store!.initByIndex(_mapInfo, _index);
+      _store!.initBySpotId(_mapInfo, _spotId);
       _titleController = TextEditingController(text: _store!.title);
       _commentController = TextEditingController(text: _store!.comment);
       _titleController

@@ -9,7 +9,7 @@ class PointEditFormStore extends ChangeNotifier {
 
   late MapInfo _mapInfo;
 
-  late int _index;
+  late String _spotId;
 
   String _title = '';
 
@@ -25,13 +25,13 @@ class PointEditFormStore extends ChangeNotifier {
 
   PointEditFormStore(this._mapInfoRepository) : _picker = ImagePicker();
 
-  Future<void> initByIndex(MapInfo mapInfo, int index) async {
+  Future<void> initBySpotId(MapInfo mapInfo, String spotId) async {
     _mapInfo = mapInfo;
-    _index = index;
+    _spotId = spotId;
 
-    var mapPoint = _mapInfo.spots[_index];
-    _title = mapPoint.title;
-    _comment = mapPoint.comment;
+    var spot = _mapInfo.spots[_spotId]!;
+    _title = spot.title;
+    _comment = spot.comment;
     _photos = [];
   }
 
@@ -46,10 +46,10 @@ class PointEditFormStore extends ChangeNotifier {
   }
 
   Future<void> save() async {
-    var point = _mapInfo.spots[_index].point;
-    var photos = _mapInfo.spots[_index].photos;
+    var point = _mapInfo.spots[_spotId]!.point;
+    var photos = _mapInfo.spots[_spotId]!.photos;
     var newMapPoint = Spot(_title, point,
-        comment: _comment, newDate: _mapInfo.spots[_index].date);
+        comment: _comment, newDate: _mapInfo.spots[_spotId]!.date);
     var uploadedPhotos =
         await _mapInfoRepository.uploadPhotos(_mapInfo, _photos);
 
@@ -58,7 +58,7 @@ class PointEditFormStore extends ChangeNotifier {
       newMapPoint.addPhotos(uploadedPhotos);
     }
 
-    await _mapInfoRepository.updatePoint(_mapInfo, _index, newMapPoint);
+    await _mapInfoRepository.updatePoint(_mapInfo, _spotId, newMapPoint);
     _title = '';
     _comment = '';
     _photos = [];
