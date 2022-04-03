@@ -14,8 +14,8 @@ class PointInfoForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
-    var title = store.mapInfo!.points[_index].title;
-    var date = store.mapInfo!.points[_index].date.toIso8601String();
+    var title = store.mapInfo!.spots[_index].title;
+    var date = store.mapInfo!.spots[_index].date.toIso8601String();
 
     var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
 
@@ -70,7 +70,7 @@ class PointInfoForm extends StatelessWidget {
     var store = Provider.of<MapPageStore>(context);
     var imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
-    var pendingUrls = store.mapInfo!.points[_index].photos.map((photo) {
+    var pendingUrls = store.mapInfo!.spots[_index].photos.map((photo) {
       return imageLoader.getDownloadUrl(store.mapInfo!, photo);
     }).toList();
 

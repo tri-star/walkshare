@@ -3,7 +3,7 @@ import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 
 /// 地図上のスポット
-class MapPoint {
+class Spot {
   String title;
 
   String comment;
@@ -16,7 +16,7 @@ class MapPoint {
 
   List<Photo> photos;
 
-  MapPoint(this.title, this.point,
+  Spot(this.title, this.point,
       {this.comment = "",
       DateTime? newDate,
       this.score = 1.0,
@@ -24,7 +24,7 @@ class MapPoint {
       : date = newDate ?? DateTime.now(),
         photos = photos ?? [];
 
-  MapPoint.fromJson(Map<String, dynamic> json)
+  Spot.fromJson(Map<String, dynamic> json)
       : title = json['title'],
         comment = json['comment'],
         date = json['date'].toDate(),
@@ -58,29 +58,29 @@ class MapInfo {
 
   String _name;
 
-  List<MapPoint> _points = [];
+  List<Spot> _spots = [];
 
-  MapInfo(this._name, this._points, {String? id}) : _id = id;
+  MapInfo(this._name, this._spots, {String? id}) : _id = id;
 
   MapInfo.fromJson(String? id, Map<String, Object?> json)
       : _id = id,
         _name = json['name'] as String,
-        _points = (json['points'] as List<dynamic>)
-            .map((dynamic p) => MapPoint.fromJson(p as Map<String, dynamic>))
+        _spots = (json['points'] as List<dynamic>)
+            .map((dynamic p) => Spot.fromJson(p as Map<String, dynamic>))
             .toList();
 
   String? get id => _id;
   String get name => _name;
-  List<MapPoint> get points => _points;
+  List<Spot> get spots => _spots;
 
-  void addPoint(MapPoint point) {
-    _points.add(point);
+  void addSpot(Spot point) {
+    _spots.add(point);
   }
 
   Map<String, Object?> toJson() {
     return {
       'name': _name,
-      'points': _points.map((MapPoint p) => p.toJson()).toList(),
+      'points': _spots.map((Spot p) => p.toJson()).toList(),
     };
   }
 }

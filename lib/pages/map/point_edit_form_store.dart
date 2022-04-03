@@ -29,7 +29,7 @@ class PointEditFormStore extends ChangeNotifier {
     _mapInfo = mapInfo;
     _index = index;
 
-    var mapPoint = _mapInfo.points[_index];
+    var mapPoint = _mapInfo.spots[_index];
     _title = mapPoint.title;
     _comment = mapPoint.comment;
     _photos = [];
@@ -46,10 +46,10 @@ class PointEditFormStore extends ChangeNotifier {
   }
 
   Future<void> save() async {
-    var point = _mapInfo.points[_index].point;
-    var photos = _mapInfo.points[_index].photos;
-    var newMapPoint = MapPoint(_title, point,
-        comment: _comment, newDate: _mapInfo.points[_index].date);
+    var point = _mapInfo.spots[_index].point;
+    var photos = _mapInfo.spots[_index].photos;
+    var newMapPoint = Spot(_title, point,
+        comment: _comment, newDate: _mapInfo.spots[_index].date);
     var uploadedPhotos =
         await _mapInfoRepository.uploadPhotos(_mapInfo, _photos);
 

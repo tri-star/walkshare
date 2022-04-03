@@ -26,19 +26,19 @@ class MapInfoRepository {
     return snapshot.docs.first.data();
   }
 
-  Future<void> addPoint(MapInfo map, MapPoint point) async {
-    map.points.add(point);
+  Future<void> addSpot(MapInfo map, Spot spot) async {
+    map.spots.add(spot);
     await FirebaseFirestore.instance.collection('maps').doc(map.id).update({
-      'points': FieldValue.arrayUnion([point.toJson()])
+      'points': FieldValue.arrayUnion([spot.toJson()])
     });
   }
 
-  Future<void> updatePoint(MapInfo map, int index, MapPoint point) async {
-    map.points[index] = point;
+  Future<void> updatePoint(MapInfo map, int index, Spot point) async {
+    map.spots[index] = point;
     await FirebaseFirestore.instance
         .collection('maps')
         .doc(map.id)
-        .update({'points': map.points.map((p) => p.toJson()).toList()});
+        .update({'points': map.spots.map((p) => p.toJson()).toList()});
   }
 
   Future<List<Photo>> uploadPhotos(MapInfo map, List<XFile> files) async {

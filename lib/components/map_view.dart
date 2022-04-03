@@ -47,7 +47,7 @@ class MapView extends StatelessWidget {
         }
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
-      markers: _makeMarkers(_mapInfo?.points).toSet(),
+      markers: _makeMarkers(_mapInfo?.spots).toSet(),
     );
   }
 
@@ -69,16 +69,16 @@ class MapView extends StatelessWidget {
     );
   }
 
-  Set<Marker> _makeMarkers(List<MapPoint>? points) {
-    if (points == null) {
+  Set<Marker> _makeMarkers(List<Spot>? spots) {
+    if (spots == null) {
       return {};
     }
     int index = 0;
-    return points.map((point) {
+    return spots.map((spot) {
       var localIndex = index;
       var marker = Marker(
-        markerId: MarkerId(point.hashCode.toString()),
-        position: LatLng(point.point.latitude, point.point.longitude),
+        markerId: MarkerId(spot.hashCode.toString()),
+        position: LatLng(spot.point.latitude, spot.point.longitude),
         alpha: 0.7,
         onTap: () {
           if (_mapPointTapCallBack != null) {
@@ -86,8 +86,8 @@ class MapView extends StatelessWidget {
           }
         },
         infoWindow: InfoWindow(
-            title: point.title,
-            snippet: "${point.date.toIso8601String()}\n${point.comment}"),
+            title: spot.title,
+            snippet: "${spot.date.toIso8601String()}\n${spot.comment}"),
       );
       index += 1;
       return marker;
