@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/photo_preview_page.dart';
 import 'package:strollog/pages/map/point_edit_form.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/services/image_loader.dart';
@@ -79,8 +80,18 @@ class PointInfoForm extends StatelessWidget {
   }
 
   Widget _buildPhotoList(BuildContext context, List<String> urls) {
-    List<Widget> photos = urls.map((url) {
-      return ImageThumbnail(url, height: 100);
+    var store = Provider.of<MapPageStore>(context);
+    List<Widget> photos = urls.asMap().entries.map((entry) {
+      var index = entry.key;
+      var url = entry.value;
+      return ImageThumbnail(url, height: 100, onTapCallBack: () {
+        var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
+        if (spotPhotos != null) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => PhotoPreviewPage(
+                  map: store.mapInfo!, photos: spotPhotos, index: index)));
+        }
+      });
     }).toList();
     return Row(children: photos);
   }
