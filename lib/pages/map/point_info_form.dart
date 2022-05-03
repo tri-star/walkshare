@@ -55,13 +55,14 @@ class PointInfoForm extends StatelessWidget {
                         ], child: PointEditForm(store.mapInfo!, _spotId));
                       });
                 },
-                child: Text('編集')),
+                child: const Text('編集')),
             TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('閉じる'))
+                child: const Text('閉じる'))
           ]),
+          Row(children: const [SizedBox(height: 30, child: null)]),
         ],
       ),
     );

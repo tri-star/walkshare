@@ -38,28 +38,42 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
       body: Container(
           child: Column(children: [
         Expanded(
-            child: FutureBuilder<String>(
-          future:
-              _imageLoader.getDownloadUrl(widget.map, widget.photos[_index]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return const Center(child: Text("画像のロードに失敗しました"));
-            }
-            if (!snapshot.hasData) {
-              return const Center(child: Text("画像が見つかりません"));
-            }
-            return PhotoView(
-              imageProvider: NetworkImage(snapshot.data!),
-              minScale: PhotoViewComputedScale.contained * 0.8,
-              initialScale: PhotoViewComputedScale.contained,
-              basePosition: Alignment.center,
-              backgroundDecoration: const BoxDecoration(color: Colors.black),
-            );
-          },
-        )),
+            child: GestureDetector(
+                onHorizontalDragEnd: (details) => {
+                      if (details.primaryVelocity! > 0)
+                        {
+                          if (_index > 0) {setState(() => _index--)}
+                        }
+                      else if (details.primaryVelocity! < 0)
+                        {
+                          if (_index < _photoCount - 1)
+                            {setState(() => _index++)}
+                        }
+                    },
+                onVerticalDragEnd: (details) => {Navigator.of(context).pop()},
+                child: FutureBuilder<String>(
+                  future: _imageLoader.getDownloadUrl(
+                      widget.map, widget.photos[_index]),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(child: Text("画像のロードに失敗しました"));
+                    }
+                    if (!snapshot.hasData) {
+                      return const Center(child: Text("画像が見つかりません"));
+                    }
+                    return PhotoView(
+                      imageProvider: NetworkImage(snapshot.data!),
+                      minScale: PhotoViewComputedScale.contained * 0.8,
+                      initialScale: PhotoViewComputedScale.contained,
+                      basePosition: Alignment.center,
+                      backgroundDecoration:
+                          const BoxDecoration(color: Colors.black),
+                    );
+                  },
+                ))),
         // Text()
         Row(children: [
           Expanded(
@@ -84,7 +98,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       : null,
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text("次"))),
-        ])
+        ]),
+        Row(children: const [SizedBox(height: 30, child: null)]),
       ])),
     );
   }
