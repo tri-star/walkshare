@@ -96,6 +96,7 @@ class _PointEditFormState extends State<PointEditForm> {
                     child: Text('キャンセル')),
               ],
             ),
+            Row(children: const [SizedBox(height: 30, child: null)]),
             Padding(
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom)),

@@ -84,7 +84,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       : null,
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text("次"))),
-        ])
+        ]),
+        Row(children: const [SizedBox(height: 30, child: null)]),
       ])),
     );
   }
