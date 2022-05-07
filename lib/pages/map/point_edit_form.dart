@@ -48,7 +48,7 @@ class _PointEditFormState extends State<PointEditForm> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
-                  Text('タイトル'),
+                  const Text('タイトル'),
                   Expanded(
                       child: TextField(
                     controller: _titleController,
@@ -60,7 +60,7 @@ class _PointEditFormState extends State<PointEditForm> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
-                  Text('コメント'),
+                  const Text('コメント'),
                   Expanded(
                       child: TextField(
                     controller: _commentController,
@@ -72,9 +72,9 @@ class _PointEditFormState extends State<PointEditForm> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
-                  Text('写真'),
+                  const Text('写真'),
                   IconButton(
-                    icon: Icon(Icons.photo),
+                    icon: const Icon(Icons.photo),
                     onPressed: () {
                       _store!.pickImage();
                     },
@@ -93,7 +93,7 @@ class _PointEditFormState extends State<PointEditForm> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('キャンセル')),
+                    child: const Text('キャンセル')),
               ],
             ),
             Row(children: const [SizedBox(height: 30, child: null)]),
@@ -111,7 +111,7 @@ class _PointEditFormState extends State<PointEditForm> {
 
   Widget _createImagePreview() {
     if (_store!.photos.isEmpty) {
-      return Container(child: Expanded(child: Text('写真を選択')));
+      return Container(child: const Expanded(child: Text('写真を選択')));
     }
 
     List<Image> imageList = _store!.photos.map((XFile file) {
