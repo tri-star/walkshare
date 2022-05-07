@@ -58,7 +58,7 @@ class _PointAddFormState extends State<PointAddForm> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
-                  Text('コメント'),
+                  const Text('コメント'),
                   Expanded(
                       child: TextField(
                     controller: _commentController,
@@ -70,9 +70,9 @@ class _PointAddFormState extends State<PointAddForm> {
               padding: const EdgeInsets.only(bottom: 10),
               child: Row(
                 children: [
-                  Text('写真'),
+                  const Text('写真'),
                   IconButton(
-                    icon: Icon(Icons.photo),
+                    icon: const Icon(Icons.photo),
                     onPressed: () {
                       _store!.pickImage();
                     },
@@ -85,13 +85,13 @@ class _PointAddFormState extends State<PointAddForm> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                    onPressed: _store!.isValidInput() ? _saveForm : null,
-                    child: Text('登録')),
+                    onPressed: _store!.canSave() ? _saveForm : null,
+                    child: Text(_store?.saving == true ? '保存中...' : '登録')),
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('キャンセル')),
+                    child: const Text('キャンセル')),
               ],
             ),
             Row(children: const [SizedBox(height: 30, child: null)]),
@@ -109,7 +109,7 @@ class _PointAddFormState extends State<PointAddForm> {
 
   Widget _createImagePreview() {
     if (_store!.photos.isEmpty) {
-      return Container(child: Expanded(child: Text('写真を選択')));
+      return Container(child: const Expanded(child: Text('写真を選択')));
     }
 
     List<Image> imageList = _store!.photos.map((XFile file) {
