@@ -23,18 +23,18 @@ class _PointAddFormState extends State<PointAddForm> {
   final TextEditingController _commentController = TextEditingController();
   final MapInfo _mapInfo;
   final Position _position;
-  PointAddFormStore? _state;
+  PointAddFormStore? _store;
 
   _PointAddFormState(this._mapInfo, this._position);
 
   @override
   Widget build(BuildContext context) {
-    if (_state == null) {
-      _state = Provider.of<PointAddFormStore>(context);
+    if (_store == null) {
+      _store = Provider.of<PointAddFormStore>(context);
       _titleController
-          .addListener(() => _state!.setTitle(_titleController.text));
+          .addListener(() => _store!.setTitle(_titleController.text));
       _commentController
-          .addListener(() => _state!.setComment(_commentController.text));
+          .addListener(() => _store!.setComment(_commentController.text));
     }
 
     return Padding(
@@ -74,7 +74,7 @@ class _PointAddFormState extends State<PointAddForm> {
                   IconButton(
                     icon: Icon(Icons.photo),
                     onPressed: () {
-                      _state!.pickImage();
+                      _store!.pickImage();
                     },
                   ),
                   _createImagePreview()
@@ -85,7 +85,7 @@ class _PointAddFormState extends State<PointAddForm> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                    onPressed: _state!.isValidInput() ? _saveForm : null,
+                    onPressed: _store!.isValidInput() ? _saveForm : null,
                     child: Text('登録')),
                 TextButton(
                     onPressed: () {
@@ -103,16 +103,16 @@ class _PointAddFormState extends State<PointAddForm> {
   }
 
   Future<void> _saveForm() async {
-    await _state!.save(_mapInfo, _position);
+    await _store!.save(_mapInfo, _position);
     Navigator.pop(context);
   }
 
   Widget _createImagePreview() {
-    if (_state!.photos.isEmpty) {
+    if (_store!.photos.isEmpty) {
       return Container(child: Expanded(child: Text('写真を選択')));
     }
 
-    List<Image> imageList = _state!.photos.map((XFile file) {
+    List<Image> imageList = _store!.photos.map((XFile file) {
       return Image.file(File(file.path), height: 50);
     }).toList();
 
