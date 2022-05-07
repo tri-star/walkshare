@@ -19,9 +19,12 @@ class PointEditFormStore extends ChangeNotifier {
 
   List<XFile> _photos = [];
 
+  bool _saving = false;
+
   String get title => _title;
   String get comment => _comment;
   List<XFile> get photos => _photos;
+  bool get saving => _saving;
 
   PointEditFormStore(this._mapInfoRepository) : _picker = ImagePicker();
 
@@ -50,6 +53,10 @@ class PointEditFormStore extends ChangeNotifier {
     var photos = _mapInfo.spots[_spotId]!.photos;
     var newMapPoint = Spot(_title, point,
         comment: _comment, newDate: _mapInfo.spots[_spotId]!.date);
+
+    _saving = true;
+    notifyListeners();
+
     var uploadedPhotos =
         await _mapInfoRepository.uploadPhotos(_mapInfo, _photos);
 
@@ -62,11 +69,16 @@ class PointEditFormStore extends ChangeNotifier {
     _title = '';
     _comment = '';
     _photos = [];
+    _saving = false;
     notifyListeners();
   }
 
   bool isValidInput() {
     return _title.length > 0;
+  }
+
+  bool canSave() {
+    return isValidInput() && !_saving;
   }
 
   Future<void> pickImage() async {

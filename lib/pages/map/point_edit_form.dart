@@ -87,8 +87,8 @@ class _PointEditFormState extends State<PointEditForm> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                    onPressed: _store!.isValidInput() ? _saveForm : null,
-                    child: Text('更新')),
+                    onPressed: _store!.canSave() ? _saveForm : null,
+                    child: Text(_store!.saving == true ? '保存中...' : '更新')),
                 TextButton(
                     onPressed: () {
                       Navigator.pop(context);
