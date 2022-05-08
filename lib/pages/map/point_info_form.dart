@@ -45,8 +45,8 @@ class PointInfoForm extends StatelessWidget {
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             TextButton(
-                onPressed: () {
-                  showModalBottomSheet(
+                onPressed: () async {
+                  var needReload = await showModalBottomSheet<bool>(
                       context: context,
                       builder: (context) {
                         return MultiProvider(providers: [
@@ -54,6 +54,9 @@ class PointInfoForm extends StatelessWidget {
                               value: editFormStore)
                         ], child: PointEditForm(store.mapInfo!, _spotId));
                       });
+                  if (needReload!) {
+                    store.reloadSpot(_spotId);
+                  }
                 },
                 child: const Text('編集')),
             TextButton(

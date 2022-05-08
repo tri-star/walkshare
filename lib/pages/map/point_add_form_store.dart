@@ -3,9 +3,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/services/auth_service.dart';
 
 class PointAddFormStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
+  final AuthService _authService;
 
   String _title = '';
 
@@ -22,7 +24,8 @@ class PointAddFormStore extends ChangeNotifier {
   List<XFile> get photos => _photos;
   bool get saving => _saving;
 
-  PointAddFormStore(this._mapInfoRepository) : _picker = ImagePicker();
+  PointAddFormStore(this._mapInfoRepository, this._authService)
+      : _picker = ImagePicker();
 
   void setTitle(String title) {
     _title = title;
@@ -40,14 +43,15 @@ class PointAddFormStore extends ChangeNotifier {
     _saving = true;
     notifyListeners();
 
+    var uid = _authService.getUser().id;
     var uploadedPhotos =
-        await _mapInfoRepository.uploadPhotos(mapInfo, _photos);
+        await _mapInfoRepository.uploadPhotos(mapInfo, uid, _photos);
 
     if (uploadedPhotos.length > 0) {
       spot.addPhotos(uploadedPhotos);
     }
 
-    await _mapInfoRepository.addSpot(mapInfo, spot);
+    await _mapInfoRepository.addSpot(mapInfo, _authService.getUser().id, spot);
     _title = '';
     _comment = '';
     _photos = [];

@@ -92,6 +92,12 @@ class MapPageStore extends ChangeNotifier {
     });
   }
 
+  Future<void> reloadSpot(String spotId) async {
+    var spot = await _mapInfoRepository.fetchSpot(mapInfo!, spotId);
+    mapInfo!.spots[spotId] = spot;
+    notifyListeners();
+  }
+
   @override
   operator ==(other) {
     if (identical(this, other)) return true;

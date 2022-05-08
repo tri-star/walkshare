@@ -6,18 +6,26 @@ class Photo {
 
   String extension;
 
-  Photo({this.key = '', this.extension = ''}) {
+  DateTime? date;
+
+  String? uid;
+
+  Photo(
+      {this.key = '', this.extension = '', this.date = null, this.uid = null}) {
     if (key == '') {
       key = Ulid().toString();
     }
   }
 
-  Photo.fromPath(String path, {String? key})
+  Photo.fromPath(String path, this.uid, {String? key, DateTime? date})
       : key = key ?? Ulid().toString(),
+        date = date ?? DateTime.now(),
         extension = p.extension(path);
 
   Photo.fromJson(Map<String, dynamic> json)
       : key = json['key'] ?? '',
+        date = json['date']?.toDate(),
+        uid = json['uid'],
         extension = json['extension'] ?? '';
 
   String getFileName() {
@@ -28,6 +36,8 @@ class Photo {
     return {
       'key': key,
       'extension': extension,
+      'date': date,
+      'uid': uid,
     };
   }
 }

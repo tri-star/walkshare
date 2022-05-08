@@ -9,3 +9,13 @@ class User {
   String get name => _name;
   String get icon => _icon;
 }
+
+class UserNameInfo {
+  final String _id;
+  final String _nickname;
+
+  UserNameInfo(this._id, this._nickname);
+
+  String get id => _id;
+  String get nickname => _nickname;
+}

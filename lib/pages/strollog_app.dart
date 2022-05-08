@@ -30,10 +30,13 @@ class StrollogApp extends StatelessWidget {
         ),
         ChangeNotifierProvider<PointAddFormStore>(
             create: (_context) => PointAddFormStore(
-                Provider.of<MapInfoRepository>(_context, listen: false))),
+                  Provider.of<MapInfoRepository>(_context, listen: false),
+                  Provider.of<AuthService>(_context, listen: false),
+                )),
         ChangeNotifierProvider<PointEditFormStore>(
             create: (_context) => PointEditFormStore(
-                Provider.of<MapInfoRepository>(_context, listen: false))),
+                Provider.of<MapInfoRepository>(_context, listen: false),
+                Provider.of<AuthService>(_context, listen: false))),
         Provider<Completer<GoogleMapController>>(
           create: (_context) => Completer(),
         ),

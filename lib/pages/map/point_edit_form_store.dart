@@ -3,9 +3,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/services/auth_service.dart';
 
 class PointEditFormStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
+  final AuthService _authService;
+
+  Spot? _originalSpot;
 
   late MapInfo _mapInfo;
 
@@ -26,15 +30,16 @@ class PointEditFormStore extends ChangeNotifier {
   List<XFile> get photos => _photos;
   bool get saving => _saving;
 
-  PointEditFormStore(this._mapInfoRepository) : _picker = ImagePicker();
+  PointEditFormStore(this._mapInfoRepository, this._authService)
+      : _picker = ImagePicker();
 
   Future<void> initBySpotId(MapInfo mapInfo, String spotId) async {
     _mapInfo = mapInfo;
     _spotId = spotId;
 
-    var spot = _mapInfo.spots[_spotId]!;
-    _title = spot.title;
-    _comment = spot.comment;
+    _originalSpot = await _mapInfoRepository.fetchSpot(mapInfo, spotId);
+    _title = _originalSpot!.title;
+    _comment = _originalSpot!.comment;
     _photos = [];
   }
 
@@ -49,16 +54,19 @@ class PointEditFormStore extends ChangeNotifier {
   }
 
   Future<void> save() async {
-    var point = _mapInfo.spots[_spotId]!.point;
-    var photos = _mapInfo.spots[_spotId]!.photos;
+    var point = _originalSpot!.point;
+    var photos = _originalSpot!.photos;
     var newMapPoint = Spot(_title, point,
-        comment: _comment, newDate: _mapInfo.spots[_spotId]!.date);
+        comment: _comment,
+        newDate: _originalSpot!.date,
+        userNameInfo: _originalSpot!.userNameInfo);
 
     _saving = true;
     notifyListeners();
 
+    var uid = _authService.getUser().id;
     var uploadedPhotos =
-        await _mapInfoRepository.uploadPhotos(_mapInfo, _photos);
+        await _mapInfoRepository.uploadPhotos(_mapInfo, uid, _photos);
 
     newMapPoint.photos = photos;
     if (uploadedPhotos.length > 0) {
