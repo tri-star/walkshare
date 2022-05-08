@@ -43,8 +43,9 @@ class PointAddFormStore extends ChangeNotifier {
     _saving = true;
     notifyListeners();
 
+    var uid = _authService.getUser().id;
     var uploadedPhotos =
-        await _mapInfoRepository.uploadPhotos(mapInfo, _photos);
+        await _mapInfoRepository.uploadPhotos(mapInfo, uid, _photos);
 
     if (uploadedPhotos.length > 0) {
       spot.addPhotos(uploadedPhotos);

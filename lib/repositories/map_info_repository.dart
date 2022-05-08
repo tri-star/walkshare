@@ -75,13 +75,14 @@ class MapInfoRepository {
         .set(_makeSpotJson(spot, spot.userNameInfo?.id));
   }
 
-  Future<List<Photo>> uploadPhotos(MapInfo map, List<XFile> files) async {
+  Future<List<Photo>> uploadPhotos(
+      MapInfo map, String uid, List<XFile> files) async {
     // CloudStorageにファイルをアップロードする
     // Photo形式に変換して返す
     List<Photo> photos = [];
     for (var file in files) {
       try {
-        var photo = Photo.fromPath(file.path);
+        var photo = Photo.fromPath(file.path, uid);
         var path = "maps/${map.name}/${photo.getFileName()}";
         await FirebaseStorage.instance.ref(path).putFile(File(file.path));
 
