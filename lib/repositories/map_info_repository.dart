@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:strollog/domain/user.dart';
 import 'package:ulid/ulid.dart';
 
 /// マップ情報は頻繁に更新するわけではなく、ユーザー間で共有する場合も適宜リロードしてもらえば良いので
@@ -35,12 +36,16 @@ class MapInfoRepository {
         .get();
     spots.docs.forEach((doc) {
       var data = doc.data();
+      var userNameInfo = data['uid'] != null
+          ? UserNameInfo(data['uid']['id'], data['uid']['nickname'])
+          : null;
       var spot = Spot(data['title'],
           Position(data['point'].latitude, data['point'].longitude),
           id: doc.id,
           comment: data['comment'],
           newDate: data['date'].toDate(),
           score: data['score'] + .0,
+          userNameInfo: userNameInfo,
           photos: (data['photos'] as List<dynamic>)
               .map((photo) => Photo.fromJson(photo))
               .toList());
@@ -50,7 +55,7 @@ class MapInfoRepository {
     return map;
   }
 
-  Future<void> addSpot(MapInfo map, Spot spot) async {
+  Future<void> addSpot(MapInfo map, String uid, Spot spot) async {
     map.spots[spot.id] = spot;
     var id = spot.id;
     await FirebaseFirestore.instance
@@ -58,7 +63,7 @@ class MapInfoRepository {
         .doc(map.id)
         .collection('spots')
         .doc(id)
-        .set(spot.toJson());
+        .set(_makeSpotJson(spot, uid));
   }
 
   Future<void> updatePoint(MapInfo map, String spotId, Spot spot) async {
@@ -68,7 +73,7 @@ class MapInfoRepository {
         .doc(map.id)
         .collection('spots')
         .doc(spotId)
-        .set(spot.toJson());
+        .set(_makeSpotJson(spot, spot.userNameInfo?.id));
   }
 
   Future<List<Photo>> uploadPhotos(MapInfo map, List<XFile> files) async {
@@ -92,5 +97,19 @@ class MapInfoRepository {
   String _createPhotoPath(String mapName, Photo photo) {
     var fileName = photo.getFileName();
     return 'maps/$mapName/$fileName';
+  }
+
+  Map<String, dynamic> _makeSpotJson(Spot spot, String? uid) {
+    return {
+      'title': spot.title,
+      'comment': spot.comment,
+      'date': spot.date,
+      'uid': uid != null
+          ? FirebaseFirestore.instance.collection('users').doc(uid)
+          : null,
+      'point': GeoPoint(spot.point.latitude, spot.point.longitude),
+      'score': spot.score,
+      'photos': spot.photos.map((photo) => photo.toJson()).toList()
+    };
   }
 }

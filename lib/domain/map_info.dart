@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:strollog/domain/user.dart';
 import 'package:ulid/ulid.dart';
 
 /// 地図上のスポット
@@ -13,6 +16,8 @@ class Spot {
 
   DateTime date;
 
+  UserNameInfo? userNameInfo;
+
   Position point;
 
   double score;
@@ -24,33 +29,11 @@ class Spot {
       this.comment = "",
       DateTime? newDate,
       this.score = 1.0,
+      this.userNameInfo,
       List<Photo>? photos})
       : id = id ?? Ulid().toString(),
         date = newDate ?? DateTime.now(),
         photos = photos ?? [];
-
-  // Spot.fromJson(Map<String, dynamic> json)
-  //     : title = json['title'],
-  //       comment = json['comment'],
-  //       date = json['date'].toDate(),
-  //       point = Position(json['point'].latitude, json['point'].longitude),
-  //       score = json['score'] + .0,
-  //       photos = json.containsKey('photos')
-  //           ? (json['photos'] as List<dynamic>)
-  //               .map((photo) => Photo.fromJson(photo))
-  //               .toList()
-  //           : [];
-
-  Map<String, Object?> toJson() {
-    return {
-      'title': title,
-      'comment': comment,
-      'date': date,
-      'point': GeoPoint(point.latitude, point.longitude),
-      'score': score,
-      'photos': photos.map((photo) => photo.toJson()).toList()
-    };
-  }
 
   void addPhotos(List<Photo> newPhotos) {
     photos.addAll(newPhotos);
