@@ -7,6 +7,8 @@ import 'package:strollog/repositories/map_info_repository.dart';
 class PointEditFormStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
 
+  Spot? _originalSpot;
+
   late MapInfo _mapInfo;
 
   late String _spotId;
@@ -32,9 +34,9 @@ class PointEditFormStore extends ChangeNotifier {
     _mapInfo = mapInfo;
     _spotId = spotId;
 
-    var spot = _mapInfo.spots[_spotId]!;
-    _title = spot.title;
-    _comment = spot.comment;
+    _originalSpot = await _mapInfoRepository.fetchSpot(mapInfo, spotId);
+    _title = _originalSpot!.title;
+    _comment = _originalSpot!.comment;
     _photos = [];
   }
 
@@ -49,12 +51,12 @@ class PointEditFormStore extends ChangeNotifier {
   }
 
   Future<void> save() async {
-    var point = _mapInfo.spots[_spotId]!.point;
-    var photos = _mapInfo.spots[_spotId]!.photos;
+    var point = _originalSpot!.point;
+    var photos = _originalSpot!.photos;
     var newMapPoint = Spot(_title, point,
         comment: _comment,
-        newDate: _mapInfo.spots[_spotId]!.date,
-        userNameInfo: _mapInfo.spots[_spotId]!.userNameInfo);
+        newDate: _originalSpot!.date,
+        userNameInfo: _originalSpot!.userNameInfo);
 
     _saving = true;
     notifyListeners();
