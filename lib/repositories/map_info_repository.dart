@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,11 +35,13 @@ class MapInfoRepository {
         .doc(map.id)
         .collection('spots')
         .get();
-    spots.docs.forEach((doc) {
+    spots.docs.forEach((doc) async {
       var data = doc.data();
-      var userNameInfo = data['uid'] != null
-          ? UserNameInfo(data['uid']['id'], data['uid']['nickname'])
-          : null;
+      var userNameInfo = null;
+      if (data['uid'] != null) {
+        var userInfoData = (await data['uid'].get()).data();
+        userNameInfo = UserNameInfo(data['uid'].id!, userInfoData['nickname']!);
+      }
       var spot = Spot(data['title'],
           Position(data['point'].latitude, data['point'].longitude),
           id: doc.id,

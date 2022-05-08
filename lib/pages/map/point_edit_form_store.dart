@@ -52,7 +52,9 @@ class PointEditFormStore extends ChangeNotifier {
     var point = _mapInfo.spots[_spotId]!.point;
     var photos = _mapInfo.spots[_spotId]!.photos;
     var newMapPoint = Spot(_title, point,
-        comment: _comment, newDate: _mapInfo.spots[_spotId]!.date);
+        comment: _comment,
+        newDate: _mapInfo.spots[_spotId]!.date,
+        userNameInfo: _mapInfo.spots[_spotId]!.userNameInfo);
 
     _saving = true;
     notifyListeners();
