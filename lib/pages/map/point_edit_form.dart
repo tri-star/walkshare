@@ -91,7 +91,7 @@ class _PointEditFormState extends State<PointEditForm> {
                     child: Text(_store!.saving == true ? '保存中...' : '更新')),
                 TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context, false);
                     },
                     child: const Text('キャンセル')),
               ],
@@ -106,7 +106,7 @@ class _PointEditFormState extends State<PointEditForm> {
 
   Future<void> _saveForm() async {
     await _store!.save();
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   Widget _createImagePreview() {

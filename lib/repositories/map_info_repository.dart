@@ -36,26 +36,22 @@ class MapInfoRepository {
         .collection('spots')
         .get();
     spots.docs.forEach((doc) async {
-      var data = doc.data();
-      var userNameInfo = null;
-      if (data['uid'] != null) {
-        var userInfoData = (await data['uid'].get()).data();
-        userNameInfo = UserNameInfo(data['uid'].id!, userInfoData['nickname']!);
-      }
-      var spot = Spot(data['title'],
-          Position(data['point'].latitude, data['point'].longitude),
-          id: doc.id,
-          comment: data['comment'],
-          newDate: data['date'].toDate(),
-          score: data['score'] + .0,
-          userNameInfo: userNameInfo,
-          photos: (data['photos'] as List<dynamic>)
-              .map((photo) => Photo.fromJson(photo))
-              .toList());
+      var spot = await _makeSpot(doc);
       map.addSpot(spot);
     });
 
     return map;
+  }
+
+  Future<Spot> fetchSpot(MapInfo map, String spotId) async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(map.id)
+        .collection('spots')
+        .doc(spotId)
+        .get();
+
+    return _makeSpot(snapshot);
   }
 
   Future<void> addSpot(MapInfo map, String uid, Spot spot) async {
@@ -114,5 +110,26 @@ class MapInfoRepository {
       'score': spot.score,
       'photos': spot.photos.map((photo) => photo.toJson()).toList()
     };
+  }
+
+  Future<Spot> _makeSpot(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) async {
+    var data = snapshot.data()!;
+    var userNameInfo = null;
+    if (data['uid'] != null) {
+      var userInfoData = (await data['uid'].get()).data();
+      userNameInfo = UserNameInfo(data['uid'].id!, userInfoData['nickname']!);
+    }
+    var spot = Spot(data['title'],
+        Position(data['point'].latitude, data['point'].longitude),
+        id: snapshot.id,
+        comment: data['comment'],
+        newDate: data['date'].toDate(),
+        score: data['score'] + .0,
+        userNameInfo: userNameInfo,
+        photos: (data['photos'] as List<dynamic>)
+            .map((photo) => Photo.fromJson(photo))
+            .toList());
+    return spot;
   }
 }
