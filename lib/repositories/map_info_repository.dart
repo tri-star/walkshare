@@ -24,7 +24,7 @@ class MapInfoRepository {
         .where('name', isEqualTo: name)
         .get();
 
-    if (!snapshot.docs.first.exists) {
+    if (snapshot.size == 0 || !snapshot.docs.first.exists) {
       return null;
     }
 
