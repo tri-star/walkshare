@@ -1,4 +1,4 @@
-package net.urban_theory.strollog
+package net.urban_theory.walkshare
 
 import io.flutter.embedding.android.FlutterActivity
 
