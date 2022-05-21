@@ -21,8 +21,18 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def googleMapsApiKey = localProperties.getProperty('google.maps_api_key')
-logger.warn('Key info: ' + googleMapsApiKey)
+
+def dartEnvironmentVariables = [:];
+if (project.hasProperty('dart-defines')) {
+    dartEnvironmentVariables = dartEnvironmentVariables + project.property('dart-defines')
+        .split(',')
+        .collectEntries { entry ->
+            def pair = new String(entry.decodeBase64(), 'UTF-8').split('=')
+            [(pair.first()): pair.last()]
+        }
+}
+
+def googleMapsApiKey = localProperties.getProperty("google.maps_api_key_${dartEnvironmentVariables.FLAVOR}")
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -57,6 +67,12 @@ android {
             googleMapsApiKey: "$googleMapsApiKey"
         ]
         multiDexEnabled true
+
+        if (dartEnvironmentVariables.FLAVOR != 'prod') {
+            applicationIdSuffix ".${dartEnvironmentVariables.FLAVOR}"
+        }
+        resValue "string", "app_name", "WalkShare" + 
+            (dartEnvironmentVariables.FLAVOR == 'prod' ? '' : ".${dartEnvironmentVariables.FLAVOR}")
     }
 
     buildTypes {
