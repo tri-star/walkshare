@@ -48,3 +48,6 @@ app.*.map.json
 # Firebase
 google-services.json
 GoogleService-Info.plist
+
+# iOS Build
+**/ios/Flutter/DartDefines.xcconfig

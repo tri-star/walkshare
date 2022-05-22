@@ -7,13 +7,19 @@
         {
             "name": "strollog",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--dart-define=FLAVOR=dev"
+            ]
         },
         {
             "name": "strollog (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define=FLAVOR=dev"
+            ]
         }
     ]
 }
