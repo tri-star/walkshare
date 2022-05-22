@@ -34,6 +34,17 @@ if (project.hasProperty('dart-defines')) {
 
 def googleMapsApiKey = localProperties.getProperty("google.maps_api_key_${dartEnvironmentVariables.FLAVOR}")
 
+task selectGoogleServicesJson(type: Copy) {
+    from "src/flavors/${dartEnvironmentVariables.FLAVOR}/google-services.json"
+    into './'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'processDebugGoogleServices' || task.name == 'processReleaseGoogleServices') {
+        task.dependsOn selectGoogleServicesJson
+    }
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
