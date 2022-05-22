@@ -22,6 +22,6 @@ do
         # FLAVORの値(=の右側)
         value=${item#*=}
         # FLAVORに対応したXCConfigファイルをincludeさせる
-        echo "#include \"$value.xcconfig\"" >> $OUTPUT_FILE
+        echo "#include \"../flavors/$value/$value.xcconfig\"" >> $OUTPUT_FILE
     fi
 done
