@@ -33,6 +33,7 @@ jobs:
         run: |
           cd ios
           echo "${GOOGLE_SERVICES_INFO_PLIST}" > flavors/prod/GoogleService-Info.plist
+          echo "${GOOGLE_SERVICES_INFO_PLIST}" > Runner/GoogleService-Info.plist
         env:
           GOOGLE_SERVICES_INFO_PLIST: ${{ secrets.GOOGLE_SERVICES_INFO_PLIST }}
 
