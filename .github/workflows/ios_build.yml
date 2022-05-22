@@ -32,14 +32,17 @@ jobs:
       - name: GoogleService-Info.plist
         run: |
           cd ios
-          echo "${GOOGLE_SERVICES_INFO_PLIST}" > Runner/GoogleService-Info.plist
+          echo "${GOOGLE_SERVICES_INFO_PLIST}" > flavors/prod/GoogleService-Info.plist
         env:
           GOOGLE_SERVICES_INFO_PLIST: ${{ secrets.GOOGLE_SERVICES_INFO_PLIST }}
+
+      - name: set shell script permission
+        run: chmod 755 ios/scripts/retrieve_dart_defines.sh
 
       - name: Flutter build
         run: |
           flutter pub get
-          flutter build ios --release --no-codesign --build-number=${GITHUB_RUN_NUMBER}
+          flutter build ios --release --no-codesign --dart-define=FLAVOR=prod --build-number=${GITHUB_RUN_NUMBER}
 
       - name: cat Podfile
         run: |
