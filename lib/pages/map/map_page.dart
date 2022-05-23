@@ -27,7 +27,7 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(
         title: const Text('WalkShare'),
       ),
-      body: _createMapView(),
+      body: SafeArea(child: _createMapView()),
     );
   }
 
@@ -65,8 +65,6 @@ class _MapPageState extends State<MapPage> {
         onLongTap: _handleLongTap,
         onPointTap: _handleMapPointTap,
       )),
-      Text(_state!.strollRoute.routePoints.length.toString(),
-          textAlign: TextAlign.right),
     ]);
   }
 
