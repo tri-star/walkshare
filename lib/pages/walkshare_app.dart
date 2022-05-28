@@ -12,8 +12,8 @@ import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
-class StrollogApp extends StatelessWidget {
-  const StrollogApp({Key? key}) : super(key: key);
+class WalkShareApp extends StatelessWidget {
+  const WalkShareApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

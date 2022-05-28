@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/auth_page.dart';
-import 'package:strollog/pages/strollog_app.dart';
+import 'package:strollog/pages/walkshare_app.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
@@ -64,7 +64,7 @@ class Application extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const StrollogApp();
+              return const WalkShareApp();
             } else {
               return AuthPage();
             }
