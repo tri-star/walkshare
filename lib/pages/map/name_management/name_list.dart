@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:strollog/layouts/default_layout.dart';
 
 class NameListPage extends StatefulWidget {
+  const NameListPage({Key? key}) : super(key: key);
+
   @override
   NameListPageState createState() => NameListPageState();
 }
@@ -8,6 +11,10 @@ class NameListPage extends StatefulWidget {
 class NameListPageState extends State<NameListPage> {
   @override
   Widget build(BuildContext context) {
-    return Container(child: null);
+    return DefaultLayout(Container(child: null),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () => {Navigator.pop(context)},
+        ));
   }
 }

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:strollog/pages/map/name_management/name_list.dart';
 
 class DefaultLayout extends StatelessWidget {
-  Widget content;
+  final Widget _content;
+  final Widget? _floatingActionButton;
 
-  DefaultLayout(this.content, {Key? key}) : super(key: key);
+  const DefaultLayout(Widget child, {Widget? floatingActionButton, Key? key})
+      : _content = child,
+        _floatingActionButton = floatingActionButton,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,8 @@ class DefaultLayout extends StatelessWidget {
         title: const Text('WalkShare'),
       ),
       drawer: _buildDrawer(context),
-      body: SafeArea(child: content),
+      body: SafeArea(child: _content),
+      floatingActionButton: _floatingActionButton,
     );
   }
 
