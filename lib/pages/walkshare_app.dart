@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/map/map_page.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/name_management/name_list.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
@@ -45,7 +46,32 @@ class WalkShareApp extends StatelessWidget {
           appBar: AppBar(
             title: const Text('WalkShare'),
           ),
+          drawer: _buildDrawer(context),
           body: const SafeArea(child: MapPage()),
         ));
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          const ListTile(
+            title: Text('現在表示中のマップ'),
+            subtitle: Text('猫'),
+          ),
+          ListTile(
+            title: const Text('名前の管理'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NameListPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
