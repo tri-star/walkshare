@@ -19,59 +19,30 @@ class WalkShareApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<MapPageStore>(
-            create: (_context) {
-              return MapPageStore(
-                  Provider.of<AuthService>(_context, listen: false),
-                  Provider.of<LocationService>(_context, listen: false),
-                  Provider.of<RouteRepository>(_context, listen: false),
-                  Provider.of<MapInfoRepository>(_context, listen: false));
-            },
-          ),
-          ChangeNotifierProvider<PointAddFormStore>(
-              create: (_context) => PointAddFormStore(
-                    Provider.of<MapInfoRepository>(_context, listen: false),
-                    Provider.of<AuthService>(_context, listen: false),
-                  )),
-          ChangeNotifierProvider<PointEditFormStore>(
-              create: (_context) => PointEditFormStore(
+      providers: [
+        ChangeNotifierProvider<MapPageStore>(
+          create: (_context) {
+            return MapPageStore(
+                Provider.of<AuthService>(_context, listen: false),
+                Provider.of<LocationService>(_context, listen: false),
+                Provider.of<RouteRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false));
+          },
+        ),
+        ChangeNotifierProvider<PointAddFormStore>(
+            create: (_context) => PointAddFormStore(
                   Provider.of<MapInfoRepository>(_context, listen: false),
-                  Provider.of<AuthService>(_context, listen: false))),
-          Provider<Completer<GoogleMapController>>(
-            create: (_context) => Completer(),
-          ),
-        ],
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('WalkShare'),
-          ),
-          drawer: _buildDrawer(context),
-          body: const SafeArea(child: MapPage()),
-        ));
-  }
-
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: <Widget>[
-          const ListTile(
-            title: Text('現在表示中のマップ'),
-            subtitle: Text('猫'),
-          ),
-          ListTile(
-            title: const Text('名前の管理'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NameListPage(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+                  Provider.of<AuthService>(_context, listen: false),
+                )),
+        ChangeNotifierProvider<PointEditFormStore>(
+            create: (_context) => PointEditFormStore(
+                Provider.of<MapInfoRepository>(_context, listen: false),
+                Provider.of<AuthService>(_context, listen: false))),
+        Provider<Completer<GoogleMapController>>(
+          create: (_context) => Completer(),
+        ),
+      ],
+      child: const MapPage(),
     );
   }
 }

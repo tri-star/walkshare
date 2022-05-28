@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
@@ -23,7 +24,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _createMapView();
+    return DefaultLayout(_createMapView());
   }
 
   Widget _createMapView() {
