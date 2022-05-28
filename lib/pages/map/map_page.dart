@@ -23,12 +23,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('WalkShare'),
-      ),
-      body: SafeArea(child: _createMapView()),
-    );
+    return _createMapView();
   }
 
   Widget _createMapView() {

@@ -18,30 +18,34 @@ class StrollogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<MapPageStore>(
-          create: (_context) {
-            return MapPageStore(
-                Provider.of<AuthService>(_context, listen: false),
-                Provider.of<LocationService>(_context, listen: false),
-                Provider.of<RouteRepository>(_context, listen: false),
-                Provider.of<MapInfoRepository>(_context, listen: false));
-          },
-        ),
-        ChangeNotifierProvider<PointAddFormStore>(
-            create: (_context) => PointAddFormStore(
-                  Provider.of<MapInfoRepository>(_context, listen: false),
+        providers: [
+          ChangeNotifierProvider<MapPageStore>(
+            create: (_context) {
+              return MapPageStore(
                   Provider.of<AuthService>(_context, listen: false),
-                )),
-        ChangeNotifierProvider<PointEditFormStore>(
-            create: (_context) => PointEditFormStore(
-                Provider.of<MapInfoRepository>(_context, listen: false),
-                Provider.of<AuthService>(_context, listen: false))),
-        Provider<Completer<GoogleMapController>>(
-          create: (_context) => Completer(),
-        ),
-      ],
-      child: const MapPage(),
-    );
+                  Provider.of<LocationService>(_context, listen: false),
+                  Provider.of<RouteRepository>(_context, listen: false),
+                  Provider.of<MapInfoRepository>(_context, listen: false));
+            },
+          ),
+          ChangeNotifierProvider<PointAddFormStore>(
+              create: (_context) => PointAddFormStore(
+                    Provider.of<MapInfoRepository>(_context, listen: false),
+                    Provider.of<AuthService>(_context, listen: false),
+                  )),
+          ChangeNotifierProvider<PointEditFormStore>(
+              create: (_context) => PointEditFormStore(
+                  Provider.of<MapInfoRepository>(_context, listen: false),
+                  Provider.of<AuthService>(_context, listen: false))),
+          Provider<Completer<GoogleMapController>>(
+            create: (_context) => Completer(),
+          ),
+        ],
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('WalkShare'),
+          ),
+          body: const SafeArea(child: MapPage()),
+        ));
   }
 }
