@@ -90,13 +90,15 @@ class PointInfoForm extends StatelessWidget {
       var index = entry.key;
       var url = entry.value;
       return OpenContainer(
+          transitionType: ContainerTransitionType.fadeThrough,
+          transitionDuration: const Duration(milliseconds: 500),
           openBuilder: (context, closeContainer) {
             var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
             return PhotoPreviewPage(
                 map: store.mapInfo!, photos: spotPhotos ?? [], index: index);
           },
           closedElevation: 2.0,
-          closedShape: ContinuousRectangleBorder(
+          closedShape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(0),
           ),
           closedBuilder: (context, openContainer) {
