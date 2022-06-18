@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
@@ -85,18 +86,48 @@ class PointInfoForm extends StatelessWidget {
 
   Widget _buildPhotoList(BuildContext context, List<String> urls) {
     var store = Provider.of<MapPageStore>(context);
-    List<Widget> photos = urls.asMap().entries.map((entry) {
+    final List<Widget> photos = urls.asMap().entries.map((entry) {
       var index = entry.key;
       var url = entry.value;
-      return ImageThumbnail(url, height: 100, onTapCallBack: () {
-        var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
-        if (spotPhotos != null) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => PhotoPreviewPage(
-                  map: store.mapInfo!, photos: spotPhotos, index: index)));
-        }
-      });
+      return OpenContainer(
+          openBuilder: (context, closeContainer) {
+            var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
+            return PhotoPreviewPage(
+                map: store.mapInfo!, photos: spotPhotos ?? [], index: index);
+          },
+          closedElevation: 2.0,
+          closedShape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          closedBuilder: (context, openContainer) {
+            return Padding(
+                padding: const EdgeInsets.all(3),
+                child: ImageThumbnail(url, height: 100,
+                    imageLoadingCallBack: (context, child, event) {
+                  if (event == null) {
+                    return child;
+                  }
+
+                  return const SizedBox(
+                    width: 75,
+                    height: 100,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }, onTapCallBack: () {
+                  openContainer();
+                }));
+          });
     }).toList();
-    return Row(children: photos);
+    return Row(children: [
+      Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: photos)
+      ]))
+    ]);
   }
 }
