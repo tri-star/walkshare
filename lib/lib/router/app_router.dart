@@ -52,7 +52,7 @@ class AppRouterDelegate extends RouterDelegate<AppLocation>
   @override
   Widget build(BuildContext context) {
     return Navigator(
-      pages: _buildPages(routerState),
+      pages: _buildPages(context, routerState),
       onPopPage: (route, result) {
         if (!route.didPop(result)) {
           return false;
@@ -68,7 +68,7 @@ class AppRouterDelegate extends RouterDelegate<AppLocation>
     );
   }
 
-  List<Page> _buildPages(RouterState state) {
+  List<Page> _buildPages(BuildContext context, RouterState state) {
     var initialPath = initialLocation.toPath();
     List<Page> pages = [routeDefinition.entries[initialPath]!.pageBuilder()];
 
@@ -78,7 +78,17 @@ class AppRouterDelegate extends RouterDelegate<AppLocation>
       if (!result.success) {
         continue;
       }
-      pages.add(routeDefinition.entries[pathSignature]!.pageBuilder());
+
+      var entry = routeDefinition.entries[pathSignature]!;
+
+      if (entry.guard != null) {
+        final guardedLocation = entry.guard!.invoke(context);
+        if (guardedLocation != null) {
+          entry = routeDefinition.entries[guardedLocation.toPath()]!;
+        }
+      }
+
+      pages.add(entry.pageBuilder());
     }
 
     return pages;

@@ -35,9 +35,7 @@ class DefaultLayout extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => NameListPage(),
-                ),
+                MaterialPageRoute(builder: (context) => const NameListPage()),
               );
             },
           ),

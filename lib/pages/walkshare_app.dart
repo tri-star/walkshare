@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/map/map_page.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/name_management/name_list.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
@@ -13,11 +13,14 @@ import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/location_service.dart';
 
-class WalkShareApp extends StatelessWidget {
-  const WalkShareApp({Key? key}) : super(key: key);
-
+class WalkShareApp extends AppPage {
   @override
-  Widget build(BuildContext context) {
+  Widget buildPage(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    if (!authService.isSignedIn()) {
+      return const CircularProgressIndicator();
+    }
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<MapPageStore>(
