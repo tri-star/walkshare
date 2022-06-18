@@ -15,6 +15,23 @@ class AppLocationMap extends AppLocation {
   String toPath() => '/map';
 }
 
+class AppLocationNameManagement extends AppLocation {
+  final String mapId;
+
+  AppLocationNameManagement({required this.mapId}) {
+    pathSegments = ['map', ':mapId', 'names'];
+    parameters = {
+      'mapId': mapId,
+    };
+  }
+
+  @override
+  String get signature => '/map/:mapId/names';
+
+  @override
+  String toPath() => UriPathBuilder.build(signature, parameters: parameters);
+}
+
 class AppLocationPhotoPreview extends AppLocation {
   final String mapId;
   final String spotId;

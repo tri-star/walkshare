@@ -69,6 +69,7 @@ class _ApplicationState extends State<Application> {
         Provider<ImageLoader>(
           create: (_) => ImageLoader(),
         ),
+        ChangeNotifierProvider<RouterState>.value(value: routerState),
       ],
       child: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -80,15 +81,16 @@ class _ApplicationState extends State<Application> {
           } else {
             authService.setUser(null);
           }
-          return MaterialApp.router(
-            title: 'WalkShare',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            routerDelegate: router.routerDelegate,
-            routeInformationParser: router.routeInformationParser,
-          );
+          return Consumer<RouterState>(
+              builder: (context, value, child) => MaterialApp.router(
+                    title: 'WalkShare',
+                    theme: ThemeData(
+                      primarySwatch: Colors.blue,
+                      visualDensity: VisualDensity.adaptivePlatformDensity,
+                    ),
+                    routerDelegate: router.routerDelegate,
+                    routeInformationParser: router.routeInformationParser,
+                  ));
         },
       ),
     );

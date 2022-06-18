@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:strollog/pages/map/name_management/name_list.dart';
+import 'package:provider/provider.dart';
+import 'package:strollog/lib/router/router_state.dart';
+import 'package:strollog/pages/map/name_management/name_list_page.dart';
+import 'package:strollog/router/app_location.dart';
 
 class DefaultLayout extends StatelessWidget {
   final Widget _content;
@@ -33,10 +36,9 @@ class DefaultLayout extends StatelessWidget {
           ListTile(
             title: const Text('名前の管理'),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NameListPage()),
-              );
+              Provider.of<RouterState>(context, listen: false).pushRoute(
+                  // TODO: 現在選択中のマップのIDを渡す必要がある
+                  AppLocationNameManagement(mapId: 'xxxx'));
             },
           ),
         ],

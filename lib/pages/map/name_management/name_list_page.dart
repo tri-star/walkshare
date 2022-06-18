@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:strollog/layouts/default_layout.dart';
+import 'package:strollog/pages/app_page.dart';
 
-class NameListPage extends StatefulWidget {
-  const NameListPage({Key? key}) : super(key: key);
-
+class NameListPage extends AppPage {
   @override
-  NameListPageState createState() => NameListPageState();
+  Widget buildPage(BuildContext context) {
+    return const NameList();
+  }
 }
 
-class NameListPageState extends State<NameListPage> {
+class NameList extends StatefulWidget {
+  const NameList({Key? key}) : super(key: key);
+
+  @override
+  NameListState createState() => NameListState();
+}
+
+class NameListState extends State<NameList> {
   @override
   Widget build(BuildContext context) {
     return DefaultLayout(Container(child: null),
