@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/router_state.dart';
-import 'package:strollog/pages/map/name_management/name_list_page.dart';
 import 'package:strollog/router/app_location.dart';
 
 class DefaultLayout extends StatelessWidget {
@@ -16,19 +15,46 @@ class DefaultLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('WalkShare'),
-      ),
-      drawer: _buildDrawer(context),
-      body: SafeArea(child: _content),
-      floatingActionButton: _floatingActionButton,
+        appBar: AppBar(
+          title: const Text('WalkShare'),
+        ),
+        bottomNavigationBar: _buildBottomAppBar(context),
+        body: SafeArea(child: _content),
+        floatingActionButton: _floatingActionButton,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.centerDocked);
+  }
+
+  Widget _buildBottomAppBar(BuildContext context) {
+    return BottomAppBar(
+      elevation: 2,
+      shape: const CircularNotchedRectangle(),
+      notchMargin: 6,
+      color: Theme.of(context).primaryColor,
+      child: Container(
+          padding: const EdgeInsets.all(16),
+          height: kToolbarHeight,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                onTap: () {
+                  showBottomDrawer(context);
+                },
+                child: Icon(Icons.menu,
+                    color: Theme.of(context).colorScheme.onPrimary),
+              )
+            ],
+          )),
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: <Widget>[
+  void showBottomDrawer(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(mainAxisSize: MainAxisSize.min, children: [
           const ListTile(
             title: Text('現在表示中のマップ'),
             subtitle: Text('猫'),
@@ -41,8 +67,8 @@ class DefaultLayout extends StatelessWidget {
                   AppLocationNameManagement(mapId: 'xxxx'));
             },
           ),
-        ],
-      ),
+        ]);
+      },
     );
   }
 }
