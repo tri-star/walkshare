@@ -67,6 +67,9 @@ class DefaultLayout extends StatelessWidget {
                   AppLocationNameManagement(mapId: 'xxxx'));
             },
           ),
+          const SizedBox(
+            height: kBottomNavigationBarHeight,
+          ),
         ]);
       },
     );
