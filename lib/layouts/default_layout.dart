@@ -60,11 +60,13 @@ class DefaultLayout extends StatelessWidget {
       builder: (context) {
         return Column(mainAxisSize: MainAxisSize.min, children: [
           const ListTile(
+            leading: Icon(Icons.map),
             title: Text('現在表示中のマップ'),
             subtitle: Text('猫'),
           ),
           ListTile(
-            title: const Text('名前の管理'),
+            leading: const Icon(Icons.menu_book),
+            title: const Text('図鑑'),
             onTap: () {
               Provider.of<RouterState>(context, listen: false).pushRoute(
                   // TODO: 現在選択中のマップのIDを渡す必要がある
