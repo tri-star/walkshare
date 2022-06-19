@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 typedef ImageTapCallBack = void Function(int index);
@@ -8,7 +10,7 @@ typedef ImageErrorCallBack = Widget Function(BuildContext, Object, StackTrace?);
 typedef OnTapCallBack = void Function();
 
 class ImageThumbnail extends StatelessWidget {
-  final String _url;
+  final File _imageFile;
 
   final double? _width;
   final double? _height;
@@ -16,7 +18,7 @@ class ImageThumbnail extends StatelessWidget {
   final ImageErrorCallBack? _imageErrorCallBack;
   final OnTapCallBack? _onTapCallBack;
 
-  const ImageThumbnail(this._url,
+  const ImageThumbnail(this._imageFile,
       {Key? key,
       double? width,
       double? height,
@@ -36,17 +38,10 @@ class ImageThumbnail extends StatelessWidget {
       onTap: () {
         _onTapCallBack?.call();
       },
-      child: Image.network(
-        _url,
+      child: Image.file(
+        _imageFile,
         width: _width,
         height: _height,
-        loadingBuilder: _imageLoadingCallBack ??
-            (context, child, event) {
-              if (event == null) {
-                return child;
-              }
-              return const Center(child: CircularProgressIndicator());
-            },
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +36,8 @@ class PointInfoForm extends StatelessWidget {
             const SizedBox(width: 100, child: Text('タイトル')),
             Text(title),
           ]),
-          FutureBuilder<List<String>>(
-            future: _loadImageUrls(context),
+          FutureBuilder<List<File>>(
+            future: _loadImages(context),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return _buildPhotoList(context, snapshot.data!);
@@ -72,23 +74,22 @@ class PointInfoForm extends StatelessWidget {
     );
   }
 
-  Future<List<String>> _loadImageUrls(BuildContext context) async {
-    var store = Provider.of<MapPageStore>(context);
-    var imageLoader = Provider.of<ImageLoader>(context, listen: false);
+  Future<List<File>> _loadImages(BuildContext context) async {
+    final store = Provider.of<MapPageStore>(context);
+    final imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
-    var pendingUrls = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
-      return imageLoader.getDownloadUrl(store.mapInfo!, photo);
+    final pendingImageFile = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
+      return imageLoader.loadImageWithCache(store.mapInfo!, photo);
     }).toList();
 
-    return await Future.wait(pendingUrls);
-    // return [];
+    return await Future.wait(pendingImageFile);
   }
 
-  Widget _buildPhotoList(BuildContext context, List<String> urls) {
+  Widget _buildPhotoList(BuildContext context, List<File> imageFiles) {
     var store = Provider.of<MapPageStore>(context);
-    final List<Widget> photos = urls.asMap().entries.map((entry) {
+    final List<Widget> photos = imageFiles.asMap().entries.map((entry) {
       var index = entry.key;
-      var url = entry.value;
+      var imageFile = entry.value;
       return OpenContainer(
           transitionType: ContainerTransitionType.fadeThrough,
           transitionDuration: const Duration(milliseconds: 500),
@@ -104,7 +105,7 @@ class PointInfoForm extends StatelessWidget {
           closedBuilder: (context, openContainer) {
             return Padding(
                 padding: const EdgeInsets.all(3),
-                child: ImageThumbnail(url, height: 100,
+                child: ImageThumbnail(imageFile, height: 100,
                     imageLoadingCallBack: (context, child, event) {
                   if (event == null) {
                     return child;
