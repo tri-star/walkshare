@@ -5,15 +5,23 @@ import 'package:flutter/services.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:strollog/pages/app_page.dart';
 
-class AuthPage extends StatefulWidget {
-  AuthPage({Key? key}) : super(key: key);
+class AuthPage extends AppPage {
+  @override
+  Widget buildPage(BuildContext context) {
+    return _AuthPage();
+  }
+}
+
+class _AuthPage extends StatefulWidget {
+  _AuthPage({Key? key}) : super(key: key);
 
   @override
   _AuthPageState createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
+class _AuthPageState extends State<_AuthPage> {
   bool _isLoading = false;
   String _errorMessage = '';
 

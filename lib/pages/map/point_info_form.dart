@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
@@ -16,7 +20,8 @@ class PointInfoForm extends StatelessWidget {
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
     var title = store.mapInfo!.spots[_spotId]!.title;
-    var date = store.mapInfo!.spots[_spotId]!.date.toIso8601String();
+    var date = store.mapInfo!.spots[_spotId]!.date;
+    final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
     var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
 
@@ -27,14 +32,14 @@ class PointInfoForm extends StatelessWidget {
         children: [
           Row(children: [
             const SizedBox(width: 100, child: Text('日付')),
-            Text(date),
+            Text(dateString),
           ]),
           Row(children: [
             const SizedBox(width: 100, child: Text('タイトル')),
             Text(title),
           ]),
-          FutureBuilder<List<String>>(
-            future: _loadImageUrls(context),
+          FutureBuilder<List<File>>(
+            future: _loadImages(context),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return _buildPhotoList(context, snapshot.data!);
@@ -71,32 +76,63 @@ class PointInfoForm extends StatelessWidget {
     );
   }
 
-  Future<List<String>> _loadImageUrls(BuildContext context) async {
-    var store = Provider.of<MapPageStore>(context);
-    var imageLoader = Provider.of<ImageLoader>(context, listen: false);
+  Future<List<File>> _loadImages(BuildContext context) async {
+    final store = Provider.of<MapPageStore>(context);
+    final imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
-    var pendingUrls = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
-      return imageLoader.getDownloadUrl(store.mapInfo!, photo);
+    final pendingImageFile = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
+      return imageLoader.loadImageWithCache(store.mapInfo!, photo);
     }).toList();
 
-    return await Future.wait(pendingUrls);
-    // return [];
+    return await Future.wait(pendingImageFile);
   }
 
-  Widget _buildPhotoList(BuildContext context, List<String> urls) {
+  Widget _buildPhotoList(BuildContext context, List<File> imageFiles) {
     var store = Provider.of<MapPageStore>(context);
-    List<Widget> photos = urls.asMap().entries.map((entry) {
+    final List<Widget> photos = imageFiles.asMap().entries.map((entry) {
       var index = entry.key;
-      var url = entry.value;
-      return ImageThumbnail(url, height: 100, onTapCallBack: () {
-        var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
-        if (spotPhotos != null) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => PhotoPreviewPage(
-                  map: store.mapInfo!, photos: spotPhotos, index: index)));
-        }
-      });
+      var imageFile = entry.value;
+      return OpenContainer(
+          transitionType: ContainerTransitionType.fadeThrough,
+          transitionDuration: const Duration(milliseconds: 500),
+          openBuilder: (context, closeContainer) {
+            var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
+            return PhotoPreviewPage(
+                map: store.mapInfo!, photos: spotPhotos ?? [], index: index);
+          },
+          closedElevation: 2.0,
+          closedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          closedBuilder: (context, openContainer) {
+            return Padding(
+                padding: const EdgeInsets.all(3),
+                child: ImageThumbnail(imageFile, height: 100,
+                    imageLoadingCallBack: (context, child, event) {
+                  if (event == null) {
+                    return child;
+                  }
+
+                  return const SizedBox(
+                    width: 75,
+                    height: 100,
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }, onTapCallBack: () {
+                  openContainer();
+                }));
+          });
     }).toList();
-    return Row(children: photos);
+    return Row(children: [
+      Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: photos)
+      ]))
+    ]);
   }
 }

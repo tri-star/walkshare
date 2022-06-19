@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/position.dart';
+import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
@@ -23,15 +24,13 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('WalkShare'),
-      ),
-      body: _createMapView(),
-    );
+    return DefaultLayout(_createMapView());
   }
 
-  Widget _createMapView() {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context);
       // Listenさせるためにここで定義が必要
@@ -41,7 +40,8 @@ class _MapPageState extends State<MapPage> {
         if (!_state!.locationRequested) {
           _state!.requestLocationPermission().then((permission) {
             if (permission == LocationPermissionResult.deniedForever) {
-              return const Center(child: Text("位置情報の使用が拒否されています。"));
+              //return const Center(child: Text("位置情報の使用が拒否されています。"));
+              return;
             }
 
             // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
@@ -50,6 +50,27 @@ class _MapPageState extends State<MapPage> {
         }
       });
     }
+  }
+
+  Widget _createMapView() {
+    // if (_state == null) {
+    //   _state = Provider.of<MapPageStore>(context);
+    //   // Listenさせるためにここで定義が必要
+    //   Provider.of<PointAddFormStore>(context);
+    //   _state!.setMapController(_mapController);
+    //   _state!.init().then((_) {
+    //     if (!_state!.locationRequested) {
+    //       _state!.requestLocationPermission().then((permission) {
+    //         if (permission == LocationPermissionResult.deniedForever) {
+    //           return const Center(child: Text("位置情報の使用が拒否されています。"));
+    //         }
+
+    //         // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
+    //         _state!.updateLocation();
+    //       });
+    //     }
+    //   });
+    // }
 
     if (_state!.position == null) {
       return const Center(child: CircularProgressIndicator());
@@ -65,8 +86,6 @@ class _MapPageState extends State<MapPage> {
         onLongTap: _handleLongTap,
         onPointTap: _handleMapPointTap,
       )),
-      Text(_state!.strollRoute.routePoints.length.toString(),
-          textAlign: TextAlign.right),
     ]);
   }
 

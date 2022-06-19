@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:strollog/domain/map_info.dart';
@@ -51,8 +53,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                         }
                     },
                 onVerticalDragEnd: (details) => {Navigator.of(context).pop()},
-                child: FutureBuilder<String>(
-                  future: _imageLoader.getDownloadUrl(
+                child: FutureBuilder<File>(
+                  future: _imageLoader.loadImageWithCache(
                       widget.map, widget.photos[_index]),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
@@ -65,7 +67,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       return const Center(child: Text("画像が見つかりません"));
                     }
                     return PhotoView(
-                      imageProvider: NetworkImage(snapshot.data!),
+                      imageProvider: FileImage(snapshot.data!),
                       minScale: PhotoViewComputedScale.contained * 0.8,
                       initialScale: PhotoViewComputedScale.contained,
                       basePosition: Alignment.center,
