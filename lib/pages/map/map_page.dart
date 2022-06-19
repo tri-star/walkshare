@@ -28,25 +28,28 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _state = Provider.of<MapPageStore>(context);
-    // Listenさせるためにここで定義が必要
-    Provider.of<PointAddFormStore>(context);
-    _state!.setMapController(_mapController);
-    _state!.init().then((_) {
-      if (!_state!.locationRequested) {
-        _state!.requestLocationPermission().then((permission) {
-          if (permission == LocationPermissionResult.deniedForever) {
-            //return const Center(child: Text("位置情報の使用が拒否されています。"));
-            return;
-          }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-          // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
-          _state!.updateLocation();
-        });
-      }
-    });
+    if (_state == null) {
+      _state = Provider.of<MapPageStore>(context);
+      // Listenさせるためにここで定義が必要
+      Provider.of<PointAddFormStore>(context);
+      _state!.setMapController(_mapController);
+      _state!.init().then((_) {
+        if (!_state!.locationRequested) {
+          _state!.requestLocationPermission().then((permission) {
+            if (permission == LocationPermissionResult.deniedForever) {
+              //return const Center(child: Text("位置情報の使用が拒否されています。"));
+              return;
+            }
+
+            // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
+            _state!.updateLocation();
+          });
+        }
+      });
+    }
   }
 
   Widget _createMapView() {
