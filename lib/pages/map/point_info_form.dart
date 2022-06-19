@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
@@ -19,7 +20,8 @@ class PointInfoForm extends StatelessWidget {
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
     var title = store.mapInfo!.spots[_spotId]!.title;
-    var date = store.mapInfo!.spots[_spotId]!.date.toIso8601String();
+    var date = store.mapInfo!.spots[_spotId]!.date;
+    final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
     var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
 
@@ -30,7 +32,7 @@ class PointInfoForm extends StatelessWidget {
         children: [
           Row(children: [
             const SizedBox(width: 100, child: Text('日付')),
-            Text(date),
+            Text(dateString),
           ]),
           Row(children: [
             const SizedBox(width: 100, child: Text('タイトル')),

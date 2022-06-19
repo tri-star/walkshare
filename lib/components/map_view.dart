@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
@@ -86,7 +87,8 @@ class MapView extends StatelessWidget {
         },
         infoWindow: InfoWindow(
             title: spot.title,
-            snippet: "${spot.date.toIso8601String()}\n${spot.comment}"),
+            snippet:
+                "${DateFormat('yyyy-MM-dd HH:mm').format(spot.date)}\n${spot.comment}"),
       );
       result.add(marker);
     });
