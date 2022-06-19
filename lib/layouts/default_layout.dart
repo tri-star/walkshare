@@ -38,13 +38,17 @@ class DefaultLayout extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               InkWell(
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
-                onTap: () {
-                  showBottomDrawer(context);
-                },
-                child: Icon(Icons.menu,
-                    color: Theme.of(context).colorScheme.onPrimary),
-              )
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  onTap: () {
+                    showBottomDrawer(context);
+                  },
+                  child: Row(children: [
+                    Icon(Icons.menu,
+                        color: Theme.of(context).colorScheme.onPrimary),
+                    Text('メニュー',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary)),
+                  ]))
             ],
           )),
     );
