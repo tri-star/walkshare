@@ -38,11 +38,8 @@ class ImageThumbnail extends StatelessWidget {
       onTap: () {
         _onTapCallBack?.call();
       },
-      child: Image.file(
-        _imageFile,
-        width: _width,
-        height: _height,
-      ),
+      child: Image.file(_imageFile,
+          width: _width, height: _height, fit: BoxFit.cover),
     );
   }
 }

@@ -107,7 +107,7 @@ class PointInfoForm extends StatelessWidget {
           closedBuilder: (context, openContainer) {
             return Padding(
                 padding: const EdgeInsets.all(3),
-                child: ImageThumbnail(imageFile, height: 100,
+                child: ImageThumbnail(imageFile, width: 75, height: 100,
                     imageLoadingCallBack: (context, child, event) {
                   if (event == null) {
                     return child;
