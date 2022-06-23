@@ -15,6 +15,7 @@ import 'package:strollog/router/route_definition.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
+import 'package:strollog/theme/light_theme_builder.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
@@ -84,10 +85,7 @@ class _ApplicationState extends State<Application> {
           return Consumer<RouterState>(
               builder: (context, value, child) => MaterialApp.router(
                     title: 'WalkShare',
-                    theme: ThemeData(
-                      primarySwatch: Colors.blue,
-                      visualDensity: VisualDensity.adaptivePlatformDensity,
-                    ),
+                    theme: LightThemeBuilder().build(),
                     routerDelegate: router.routerDelegate,
                     routeInformationParser: router.routeInformationParser,
                   ));

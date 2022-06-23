@@ -10,18 +10,15 @@ class WSButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      style: ButtonStyle(
-        backgroundColor:
-            MaterialStateProperty.all(Theme.of(context).backgroundColor),
-        elevation: MaterialStateProperty.all(2),
-      ),
-      child: Row(children: [
-        icon ?? Container(),
-        const SizedBox(
-          width: 5,
-        ),
-        Text(title)
+    var theme = Theme.of(context);
+
+    return ElevatedButton.icon(
+      style: theme.elevatedButtonTheme.style,
+      icon: icon!,
+      label: Row(children: [
+        Text(
+          title,
+        )
       ]),
       onPressed: () => onTap?.call(),
     );
