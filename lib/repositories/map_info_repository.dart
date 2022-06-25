@@ -22,7 +22,7 @@ class MapInfoRepository {
                 MapInfo.fromJson(snapshot.id, snapshot.data()!),
             toFirestore: (MapInfo mapInfo, _) => mapInfo.toJson())
         .where('name', isEqualTo: name)
-        .get();
+        .get(const GetOptions(source: Source.server));
 
     if (snapshot.size == 0 || !snapshot.docs.first.exists) {
       return null;

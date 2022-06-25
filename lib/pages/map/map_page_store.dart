@@ -47,7 +47,7 @@ class MapPageStore extends ChangeNotifier {
 
   Future<void> init() async {
     var user = _authService.getUser();
-    await _routeRepository.save(user, _strollRoute);
+    //await _routeRepository.save(user, _strollRoute);
     _mapInfo = await _mapInfoRepository.fetchMapByName('cats');
   }
 

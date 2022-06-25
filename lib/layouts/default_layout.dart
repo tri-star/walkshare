@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/router_state.dart';
+import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/router/app_location.dart';
 
 class DefaultLayout extends StatelessWidget {
@@ -55,9 +56,11 @@ class DefaultLayout extends StatelessWidget {
   }
 
   void showBottomDrawer(BuildContext context) {
+    final routerState = Provider.of<RouterState>(context, listen: false);
+    var mapId = Provider.of<AppStore>(context, listen: false).currentMap?.id;
     showModalBottomSheet(
       context: context,
-      builder: (context) {
+      builder: (_context) {
         return Column(mainAxisSize: MainAxisSize.min, children: [
           const ListTile(
             leading: Icon(Icons.map),
@@ -68,9 +71,7 @@ class DefaultLayout extends StatelessWidget {
             leading: const Icon(Icons.menu_book),
             title: const Text('図鑑'),
             onTap: () {
-              Provider.of<RouterState>(context, listen: false).pushRoute(
-                  // TODO: 現在選択中のマップのIDを渡す必要がある
-                  AppLocationNameManagement(mapId: 'xxxx'));
+              routerState.pushRoute(AppLocationNameManagement(mapId: mapId!));
             },
           ),
           const SizedBox(

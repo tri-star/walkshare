@@ -6,9 +6,13 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
+import 'package:strollog/pages/app_store.dart';
+import 'package:strollog/pages/map/name_management/name_add_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/router/route_definition.dart';
@@ -67,21 +71,22 @@ class _ApplicationState extends State<Application> {
         Provider<MapInfoRepository>(
           create: (_) => MapInfoRepository(),
         ),
+        Provider<NameRepository>(
+          create: (_) => NameRepository(),
+        ),
         Provider<ImageLoader>(
           create: (_) => ImageLoader(),
         ),
         ChangeNotifierProvider<RouterState>.value(value: routerState),
+        ChangeNotifierProvider<AppStore>(
+            create: (_context) => AppStore(
+                Provider.of<MapInfoRepository>(_context, listen: false))),
+        ChangeNotifierProvider<NameAddPageStore>(
+            create: (_context) => NameAddPageStore(
+                Provider.of<NameRepository>(_context, listen: false))),
       ],
-      child: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          var authService = Provider.of<AuthService>(context);
-          if (snapshot.hasData) {
-            // return const WalkShareApp();
-            authService.setUser(snapshot.data);
-          } else {
-            authService.setUser(null);
-          }
+      child: _handleSignin(context, () {
+        return _handleinitializeMapInfo(context, () {
           return Consumer<RouterState>(
               builder: (context, value, child) => MaterialApp.router(
                     title: 'WalkShare',
@@ -89,8 +94,40 @@ class _ApplicationState extends State<Application> {
                     routerDelegate: router.routerDelegate,
                     routeInformationParser: router.routeInformationParser,
                   ));
-        },
-      ),
+        });
+      }),
+    );
+  }
+
+  Widget _handleSignin(BuildContext context, Widget Function() callback) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        var authService = Provider.of<AuthService>(context);
+        if (snapshot.hasData) {
+          // return const WalkShareApp();
+          authService.setUser(snapshot.data);
+        } else {
+          authService.setUser(null);
+        }
+        return callback.call();
+      },
+    );
+  }
+
+  Widget _handleinitializeMapInfo(
+      BuildContext context, Widget Function() callback) {
+    return Consumer<AppStore>(
+      builder: (context, appStore, child) {
+        if (appStore.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (appStore.currentMap == null) {
+          appStore.loadMapInfo();
+          return const Center(child: CircularProgressIndicator());
+        }
+        return callback.call();
+      },
     );
   }
 }

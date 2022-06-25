@@ -20,7 +20,7 @@ class WSButton extends StatelessWidget {
           title,
         )
       ]),
-      onPressed: () => onTap?.call(),
+      onPressed: onTap,
     );
   }
 }
