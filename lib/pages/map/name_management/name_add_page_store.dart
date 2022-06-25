@@ -6,7 +6,6 @@ class NameAddPageStore with ChangeNotifier {
   String mapId;
   Name name;
   bool initialized = false;
-  bool canSave;
   bool saving;
   NameRepository nameRepository;
 
@@ -14,42 +13,44 @@ class NameAddPageStore with ChangeNotifier {
       : mapId = '',
         name = Name(name: '', pronounce: ''),
         initialized = false,
-        canSave = false,
         saving = false;
 
-  Future<void> initialize(String mapId, VoidCallback onInitialize) async {
-    if (initialized) {
-      return;
-    }
+  Future<void> initialize(String mapId) async {
     initialized = true;
     this.mapId = mapId;
     name = Name(name: '', pronounce: '');
-
-    onInitialize.call();
   }
 
-  void setName(String newName) {
-    name.name = newName;
-    validate();
-  }
-
-  void setPronounce(String newPronounce) {
-    name.pronounce = newPronounce;
-    validate();
-  }
-
-  Future<void> validate() async {
-    if (name.name == '') {
-      canSave = false;
-    } else if (name.pronounce == '') {
-      canSave = false;
-    } else {
-      canSave = true;
+  FormFieldValidator<String>? getValidator(String field) {
+    switch (field) {
+      case 'name':
+        return validateName;
+      case 'pronounce':
+        return validatePronounce;
+      default:
+        return null;
     }
-    notifyListeners();
+  }
+
+  String? validateName(String? value) {
+    if (value == null || value == '') {
+      return '名前を入力してください';
+    }
+    return null;
+  }
+
+  String? validatePronounce(String? value) {
+    if (value == null || value == '') {
+      return '読みを入力してください';
+    }
+    return null;
   }
 
   Future<void> save() async {
+    saving = true;
+    notifyListeners();
     nameRepository.save(null, mapId, name);
+    saving = false;
+    notifyListeners();
   }
 }

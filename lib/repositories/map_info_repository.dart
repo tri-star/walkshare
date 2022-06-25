@@ -34,7 +34,7 @@ class MapInfoRepository {
         .collection('maps')
         .doc(map.id)
         .collection('spots')
-        .get();
+        .get(const GetOptions(source: Source.server));
     spots.docs.forEach((doc) async {
       var spot = await _makeSpot(doc);
       map.addSpot(spot);

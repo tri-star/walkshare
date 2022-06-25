@@ -9,6 +9,7 @@ class NameRepository {
       'pronounce': name.pronounce,
       'place': name.place,
       'memo': name.memo,
+      'created': name.created
     };
     await FirebaseFirestore.instance
         .collection('maps')
