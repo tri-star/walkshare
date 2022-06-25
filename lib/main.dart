@@ -11,6 +11,7 @@ import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/name_management/name_add_page_store.dart';
+import 'package:strollog/pages/map/name_management/name_list_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
@@ -83,6 +84,9 @@ class _ApplicationState extends State<Application> {
                 Provider.of<MapInfoRepository>(_context, listen: false))),
         ChangeNotifierProvider<NameAddPageStore>(
             create: (_context) => NameAddPageStore(
+                Provider.of<NameRepository>(_context, listen: false))),
+        ChangeNotifierProvider<NameListPageStore>(
+            create: (_context) => NameListPageStore(
                 Provider.of<NameRepository>(_context, listen: false))),
       ],
       child: _handleSignin(context, () {

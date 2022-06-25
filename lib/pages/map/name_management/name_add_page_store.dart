@@ -5,19 +5,20 @@ import 'package:strollog/repositories/name_repository.dart';
 class NameAddPageStore with ChangeNotifier {
   String mapId;
   Name name;
-  bool initialized = false;
+  bool interacted;
   bool saving;
   NameRepository nameRepository;
 
   NameAddPageStore(this.nameRepository)
       : mapId = '',
         name = Name(name: '', pronounce: ''),
-        initialized = false,
+        interacted = false,
         saving = false;
 
   Future<void> initialize(String mapId) async {
-    initialized = true;
     this.mapId = mapId;
+    interacted = false;
+    saving = false;
     name = Name(name: '', pronounce: '');
   }
 
@@ -44,6 +45,11 @@ class NameAddPageStore with ChangeNotifier {
       return '読みを入力してください';
     }
     return null;
+  }
+
+  void setInteracted(bool value) {
+    interacted = value;
+    notifyListeners();
   }
 
   Future<void> save() async {

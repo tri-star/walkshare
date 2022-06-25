@@ -5,6 +5,7 @@ import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/name_management/name_add_page_store.dart';
+import 'package:strollog/pages/map/name_management/name_list_page_store.dart';
 
 class NameAdd extends StatefulWidget {
   const NameAdd({Key? key}) : super(key: key);
@@ -35,6 +36,9 @@ class _NameAddState extends State<NameAdd> {
             padding: const EdgeInsets.all(16),
             child: Form(
                 key: _formKey,
+                onChanged: () {
+                  store.setInteracted(true);
+                },
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,8 +74,7 @@ class _NameAddState extends State<NameAdd> {
                         const SizedBox(height: 20),
                         const WsFormLabel(w: 100, text: '建物/場所'),
                         TextFormField(
-                          onSaved: (value) =>
-                              {store.name.pronounce = value ?? ''},
+                          onSaved: (value) => {store.name.place = value ?? ''},
                         ),
                       ]),
                   Column(
@@ -82,8 +85,7 @@ class _NameAddState extends State<NameAdd> {
                         TextFormField(
                           maxLines: 3,
                           minLines: 3,
-                          onSaved: (value) =>
-                              {store.name.pronounce = value ?? ''},
+                          onSaved: (value) => {store.name.memo = value ?? ''},
                         ),
                       ]),
                   const SizedBox(height: 40),
@@ -95,7 +97,11 @@ class _NameAddState extends State<NameAdd> {
                           icon: const Icon(Icons.save),
                           onTap: _canSave()
                               ? () async {
+                                  _formKey.currentState!.save();
                                   await store.save();
+                                  Provider.of<NameListPageStore>(context,
+                                          listen: false)
+                                      .loadList();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('名前を登録しました。')),
                                   );
@@ -116,7 +122,13 @@ class _NameAddState extends State<NameAdd> {
   bool _canSave() {
     var store = Provider.of<NameAddPageStore>(context, listen: false);
 
-    if (!(_formKey.currentState?.validate() ?? false)) {
+    if (_formKey.currentState == null) {
+      return false;
+    }
+    if (!store.interacted) {
+      return false;
+    }
+    if (!_formKey.currentState!.validate()) {
       return false;
     }
     if (store.saving) {
