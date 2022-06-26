@@ -1,8 +1,8 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/components/cat_face_placeholder.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -80,15 +80,7 @@ class NameListState extends State<NameList> {
     return InkWell(
         onTap: () {},
         child: ListTile(
-            leading: Container(
-                color: Theme.of(context).dividerColor,
-                child: SizedBox(
-                  child: Center(
-                      child: SvgPicture.asset('assets/noface.svg',
-                          width: 50, height: 50)),
-                  width: 60,
-                  height: 60,
-                )),
+            leading: const CatFacePlaceholder(width: 60),
             title: Text(name.name, style: theme.textTheme.headline5),
             subtitle: Column(children: [
               Row(children: [
