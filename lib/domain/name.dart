@@ -1,3 +1,4 @@
+import 'package:strollog/domain/face_photo.dart';
 import 'package:ulid/ulid.dart';
 
 class Name {
@@ -6,6 +7,7 @@ class Name {
   String pronounce;
   String place;
   String memo;
+  FacePhoto? facePhoto;
   DateTime created;
 
   Name(
@@ -14,6 +16,7 @@ class Name {
       required this.pronounce,
       this.place = '',
       this.memo = '',
+      this.facePhoto,
       DateTime? created})
       : id = id ?? Ulid().toString(),
         created = created ?? DateTime.now();

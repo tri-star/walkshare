@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:strollog/domain/face_photo.dart';
 import 'package:strollog/domain/name.dart';
+import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
 
 class NameAddPageStore with ChangeNotifier {
@@ -11,8 +15,9 @@ class NameAddPageStore with ChangeNotifier {
   bool interacted;
   bool saving;
   final NameRepository nameRepository;
+  final MapInfoRepository mapInfoRepository;
 
-  NameAddPageStore(this.nameRepository)
+  NameAddPageStore(this.nameRepository, this.mapInfoRepository)
       : mapId = '',
         name = Name(name: '', pronounce: ''),
         interacted = false,
@@ -74,6 +79,17 @@ class NameAddPageStore with ChangeNotifier {
   Future<void> save() async {
     saving = true;
     notifyListeners();
+
+    var mapInfo = await mapInfoRepository.fetchMapMetaById(mapId);
+    if (mapInfo == null) {
+      throw UnsupportedError('無効なマップが指定されました。id:${mapId}');
+    }
+
+    if (croppedPhoto != null) {
+      name.facePhoto =
+          await nameRepository.uploadPhoto(mapInfo, File(croppedPhoto!.path));
+    }
+
     nameRepository.save(null, mapId, name);
     saving = false;
     notifyListeners();

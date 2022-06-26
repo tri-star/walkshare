@@ -76,7 +76,7 @@ class _ApplicationState extends State<Application> {
           create: (_) => NameRepository(),
         ),
         Provider<ImageLoader>(
-          create: (_) => ImageLoader(),
+          create: (_) => ImageLoader(PhotoType.photo),
         ),
         ChangeNotifierProvider<RouterState>.value(value: routerState),
         ChangeNotifierProvider<AppStore>(
@@ -84,10 +84,12 @@ class _ApplicationState extends State<Application> {
                 Provider.of<MapInfoRepository>(_context, listen: false))),
         ChangeNotifierProvider<NameAddPageStore>(
             create: (_context) => NameAddPageStore(
-                Provider.of<NameRepository>(_context, listen: false))),
+                Provider.of<NameRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false))),
         ChangeNotifierProvider<NameListPageStore>(
             create: (_context) => NameListPageStore(
-                Provider.of<NameRepository>(_context, listen: false))),
+                Provider.of<NameRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false))),
       ],
       child: _handleSignin(context, () {
         return _handleinitializeMapInfo(context, () {

@@ -1,14 +1,18 @@
+import 'dart:io';
+
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/cat_face_placeholder.dart';
+import 'package:strollog/domain/face_photo.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/map/name_management/name_add_page.dart';
 import 'package:strollog/pages/map/name_management/name_list_page_store.dart';
+import 'package:strollog/services/image_loader.dart';
 
 class NameListPage extends AppPage {
   @override
@@ -80,7 +84,9 @@ class NameListState extends State<NameList> {
     return InkWell(
         onTap: () {},
         child: ListTile(
-            leading: const CatFacePlaceholder(width: 60),
+            leading: name.facePhoto != null
+                ? _buildFacePhoto(context, name)
+                : const CatFacePlaceholder(width: 60),
             title: Text(name.name, style: theme.textTheme.headline5),
             subtitle: Column(children: [
               Row(children: [
@@ -102,5 +108,21 @@ class NameListState extends State<NameList> {
                 )
               ]),
             ])));
+  }
+
+  Widget _buildFacePhoto(BuildContext context, Name name) {
+    var imageLoader = ImageLoader(PhotoType.face);
+    var store = Provider.of<NameListPageStore>(context, listen: false);
+
+    return FutureBuilder<File>(
+      future: imageLoader.loadImageWithCache(
+          store.mapInfo!, name.facePhoto!.getFileName()),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const CatFacePlaceholder(width: 60);
+        }
+        return Image.file(snapshot.data!, width: 60);
+      },
+    );
   }
 }

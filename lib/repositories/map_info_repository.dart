@@ -43,6 +43,23 @@ class MapInfoRepository {
     return map;
   }
 
+  Future<MapInfo?> fetchMapMetaById(String mapId) async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(mapId)
+        .withConverter<MapInfo>(
+            fromFirestore: (snapshot, _) =>
+                MapInfo.fromJson(snapshot.id, snapshot.data()!),
+            toFirestore: (MapInfo mapInfo, _) => mapInfo.toJson())
+        .get(const GetOptions(source: Source.server));
+
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    return snapshot.data();
+  }
+
   Future<Spot> fetchSpot(MapInfo map, String spotId) async {
     var snapshot = await FirebaseFirestore.instance
         .collection('maps')
