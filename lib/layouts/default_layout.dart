@@ -62,18 +62,23 @@ class DefaultLayout extends StatelessWidget {
       context: context,
       builder: (_context) {
         return Column(mainAxisSize: MainAxisSize.min, children: [
-          const ListTile(
-            leading: Icon(Icons.map),
-            title: Text('現在表示中のマップ'),
-            subtitle: Text('猫'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.menu_book),
-            title: const Text('図鑑'),
-            onTap: () {
-              routerState.pushRoute(AppLocationNameManagement(mapId: mapId!));
-            },
-          ),
+          InkWell(
+              onTap: () {
+                routerState.pushRoute(AppLocationHome());
+              },
+              child: const ListTile(
+                leading: Icon(Icons.map),
+                title: Text('マップ'),
+                subtitle: Text('現在表示中: 猫'),
+              )),
+          InkWell(
+              onTap: () {
+                routerState.pushRoute(AppLocationNameManagement(mapId: mapId!));
+              },
+              child: const ListTile(
+                leading: Icon(Icons.menu_book),
+                title: Text('図鑑'),
+              )),
           const SizedBox(
             height: kBottomNavigationBarHeight,
           ),
