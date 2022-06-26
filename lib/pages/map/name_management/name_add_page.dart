@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/components/cat_face_placeholder.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/layouts/default_layout.dart';
@@ -43,6 +46,22 @@ class _NameAddState extends State<NameAdd> {
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const WsFormLabel(
+                          text: '顔写真',
+                        ),
+                        Center(
+                            child: InkWell(
+                                child: store.croppedPhoto == null
+                                    ? const CatFacePlaceholder(width: 80)
+                                    : _buildPhotoPreview(context, store),
+                                onTap: () {
+                                  store.pickImage();
+                                })),
+                      ]),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
                         const WsFormLabel(
                           text: '名前',
                           required: true,
@@ -116,6 +135,13 @@ class _NameAddState extends State<NameAdd> {
                   ),
                 ])));
       }),
+    );
+  }
+
+  Widget _buildPhotoPreview(BuildContext context, NameAddPageStore store) {
+    return Image.file(
+      File(store.croppedPhoto!.path),
+      width: 80,
     );
   }
 

@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/repositories/name_repository.dart';
 
 class NameAddPageStore with ChangeNotifier {
   String mapId;
   Name name;
+  CroppedFile? croppedPhoto;
   bool interacted;
   bool saving;
-  NameRepository nameRepository;
+  final NameRepository nameRepository;
 
   NameAddPageStore(this.nameRepository)
       : mapId = '',
@@ -19,7 +22,34 @@ class NameAddPageStore with ChangeNotifier {
     this.mapId = mapId;
     interacted = false;
     saving = false;
+    croppedPhoto = null;
     name = Name(name: '', pronounce: '');
+  }
+
+  Future<void> pickImage() async {
+    var pickedPhoto =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedPhoto == null) {
+      return;
+    }
+
+    var cropped = await ImageCropper().cropImage(
+        sourcePath: pickedPhoto.path,
+        compressFormat: ImageCompressFormat.png,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        maxWidth: 500,
+        maxHeight: 500,
+        uiSettings: [
+          AndroidUiSettings(toolbarTitle: '写真の切り抜き', lockAspectRatio: true),
+          IOSUiSettings(title: '写真の切り抜き', aspectRatioLockEnabled: true),
+        ]);
+
+    if (cropped == null) {
+      return;
+    }
+
+    croppedPhoto = cropped;
+    notifyListeners();
   }
 
   String? validateName(String? value) {
