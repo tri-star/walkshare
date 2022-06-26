@@ -1,28 +1,33 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:strollog/domain/map_info.dart';
-import 'package:strollog/domain/photo.dart';
 import 'package:http/http.dart' as http;
 
+enum PhotoType { photo, face }
+
 class ImageLoader {
-  Future<String> getDownloadUrl(MapInfo map, Photo photo) async {
-    var path = 'maps/${map.name}/${photo.getFileName()}';
+  final PhotoType type;
+
+  ImageLoader(this.type);
+
+  Future<String> getDownloadUrl(MapInfo map, String fileName) async {
+    var prefix = _photoDirPrefix(map, type);
+    var path = '$prefix/$fileName';
     return await FirebaseStorage.instance.ref(path).getDownloadURL();
   }
 
-  Future<File> loadImageWithCache(MapInfo map, Photo photo) async {
+  Future<File> loadImageWithCache(MapInfo map, String fileName) async {
     // ローカルに画像があればそれをロードして返す
-    final cachePath = await _localCachePath(map, photo);
+    final cachePath = await _localCachePath(map, fileName);
 
     if (await File(cachePath).exists()) {
       return File(cachePath);
     }
 
     // ローカルにダウンロードする
-    final downloadUrl = await getDownloadUrl(map, photo);
+    final downloadUrl = await getDownloadUrl(map, fileName);
     final response = await http.get(Uri.parse(downloadUrl));
     late File file;
     if (response.statusCode == 200) {
@@ -37,17 +42,27 @@ class ImageLoader {
     return file;
   }
 
-  Future<String> _localCachePath(MapInfo map, Photo photo) async {
+  Future<String> _localCachePath(MapInfo map, String fileName) async {
     final directory = await getTemporaryDirectory();
 
-    final cacheFileName = File(photo.getFileName());
+    var prefix = _photoDirPrefix(map, type);
+    final cacheFileName = File(fileName);
     final String cacheDir =
-        '${directory.path}/image_cache/maps/${map.id}/${cacheFileName.parent}';
+        '${directory.path}/image_cache/${prefix}/${cacheFileName.parent}';
     if (!(await Directory(cacheDir).exists())) {
       await Directory(cacheDir).create(recursive: true);
     }
 
-    final cachePath = '$cacheDir/${photo.getFileName()}';
+    final cachePath = '$cacheDir/$fileName';
     return cachePath;
+  }
+
+  String _photoDirPrefix(MapInfo map, PhotoType type) {
+    switch (type) {
+      case PhotoType.photo:
+        return 'maps/${map.name}';
+      case PhotoType.face:
+        return 'maps/${map.name}/faces';
+    }
   }
 }

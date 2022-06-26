@@ -81,7 +81,8 @@ class PointInfoForm extends StatelessWidget {
     final imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
     final pendingImageFile = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
-      return imageLoader.loadImageWithCache(store.mapInfo!, photo);
+      return imageLoader.loadImageWithCache(
+          store.mapInfo!, photo.getFileName());
     }).toList();
 
     return await Future.wait(pendingImageFile);

@@ -22,7 +22,7 @@ class PhotoPreviewPage extends StatefulWidget {
 class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   late int _index;
   late int _photoCount;
-  final ImageLoader _imageLoader = ImageLoader();
+  final ImageLoader _imageLoader = ImageLoader(PhotoType.photo);
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                 onVerticalDragEnd: (details) => {Navigator.of(context).pop()},
                 child: FutureBuilder<File>(
                   future: _imageLoader.loadImageWithCache(
-                      widget.map, widget.photos[_index]),
+                      widget.map, widget.photos[_index].getFileName()),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return const Center(child: CircularProgressIndicator());

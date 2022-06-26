@@ -37,7 +37,7 @@ class _PointAddFormState extends State<PointAddForm> {
           .addListener(() => _store!.setComment(_commentController.text));
     }
 
-    return Padding(
+    return Container(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,

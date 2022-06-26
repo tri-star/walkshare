@@ -69,8 +69,7 @@ class AppRouterDelegate extends RouterDelegate<AppLocation>
   }
 
   List<Page> _buildPages(BuildContext context, RouterState state) {
-    var initialPath = initialLocation.toPath();
-    List<Page> pages = [routeDefinition.entries[initialPath]!.pageBuilder()];
+    List<Page> pages = [];
 
     for (final pathSignature in routeDefinition.entries.keys) {
       var result = UriPathParser.parse(

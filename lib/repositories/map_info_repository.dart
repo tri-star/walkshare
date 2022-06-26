@@ -22,7 +22,7 @@ class MapInfoRepository {
                 MapInfo.fromJson(snapshot.id, snapshot.data()!),
             toFirestore: (MapInfo mapInfo, _) => mapInfo.toJson())
         .where('name', isEqualTo: name)
-        .get();
+        .get(const GetOptions(source: Source.server));
 
     if (snapshot.size == 0 || !snapshot.docs.first.exists) {
       return null;
@@ -34,13 +34,30 @@ class MapInfoRepository {
         .collection('maps')
         .doc(map.id)
         .collection('spots')
-        .get();
+        .get(const GetOptions(source: Source.server));
     spots.docs.forEach((doc) async {
       var spot = await _makeSpot(doc);
       map.addSpot(spot);
     });
 
     return map;
+  }
+
+  Future<MapInfo?> fetchMapMetaById(String mapId) async {
+    var snapshot = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(mapId)
+        .withConverter<MapInfo>(
+            fromFirestore: (snapshot, _) =>
+                MapInfo.fromJson(snapshot.id, snapshot.data()!),
+            toFirestore: (MapInfo mapInfo, _) => mapInfo.toJson())
+        .get(const GetOptions(source: Source.server));
+
+    if (!snapshot.exists) {
+      return null;
+    }
+
+    return snapshot.data();
   }
 
   Future<Spot> fetchSpot(MapInfo map, String spotId) async {
