@@ -22,17 +22,6 @@ class NameAddPageStore with ChangeNotifier {
     name = Name(name: '', pronounce: '');
   }
 
-  FormFieldValidator<String>? getValidator(String field) {
-    switch (field) {
-      case 'name':
-        return validateName;
-      case 'pronounce':
-        return validatePronounce;
-      default:
-        return null;
-    }
-  }
-
   String? validateName(String? value) {
     if (value == null || value == '') {
       return '名前を入力してください';
