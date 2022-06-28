@@ -10,8 +10,8 @@ import 'package:strollog/domain/name.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
-import 'package:strollog/pages/map/name_management/name_add_page.dart';
-import 'package:strollog/pages/map/name_management/name_list_page_store.dart';
+import 'package:strollog/pages/name_management/name_add_page.dart';
+import 'package:strollog/pages/name_management/name_list_page_store.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class NameListPage extends AppPage {

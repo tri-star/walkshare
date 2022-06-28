@@ -7,8 +7,8 @@ import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
-import 'package:strollog/pages/map/name_management/name_add_page_store.dart';
-import 'package:strollog/pages/map/name_management/name_list_page_store.dart';
+import 'package:strollog/pages/name_management/name_add_page_store.dart';
+import 'package:strollog/pages/name_management/name_list_page_store.dart';
 
 class NameAdd extends StatefulWidget {
   const NameAdd({Key? key}) : super(key: key);
