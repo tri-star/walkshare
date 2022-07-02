@@ -12,6 +12,7 @@ import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/name_management/name_add_page.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
+import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class NameListPage extends AppPage {
@@ -73,16 +74,19 @@ class NameListState extends State<NameList> {
 
         return ListView(
             children: store.names.map((name) {
-          return _buildRow(context, name);
+          return _buildRow(context, store, name);
         }).toList());
       },
     );
   }
 
-  Widget _buildRow(BuildContext context, Name name) {
+  Widget _buildRow(BuildContext context, NameListPageStore store, Name name) {
     var theme = Theme.of(context);
     return InkWell(
-        onTap: () {},
+        onTap: () {
+          Provider.of<RouterState>(context, listen: false).pushRoute(
+              AppLocationNameDetail(mapId: store.mapId, nameId: name.id));
+        },
         child: ListTile(
             leading: name.facePhoto != null
                 ? _buildFacePhoto(context, name)
