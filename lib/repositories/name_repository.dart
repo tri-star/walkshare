@@ -54,6 +54,21 @@ class NameRepository {
     return result;
   }
 
+  Future<Name?> fetchNameById(String mapId, String nameId) async {
+    var document = await FirebaseFirestore.instance
+        .collection('maps')
+        .doc(mapId)
+        .collection('names')
+        .doc(nameId)
+        .get(const GetOptions(source: Source.server));
+
+    if (!document.exists) {
+      return null;
+    }
+
+    return _makeName(document.id, document.data()!);
+  }
+
   Name _makeName(String id, Map<String, dynamic> json) {
     return Name(
       id: id,

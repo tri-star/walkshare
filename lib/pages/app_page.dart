@@ -10,9 +10,9 @@ enum PageTransition {
 }
 
 abstract class AppPage extends Page {
-  final PageTransition transition;
+  PageTransition transition;
 
-  const AppPage({
+  AppPage({
     this.transition = PageTransition.horizontal,
   });
 
