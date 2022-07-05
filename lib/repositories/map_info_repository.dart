@@ -138,6 +138,13 @@ class MapInfoRepository {
       var userInfoData = (await data['uid'].get()).data();
       userNameInfo = UserNameInfo(data['uid'].id!, userInfoData['nickname']!);
     }
+
+    List<Photo> photos = [];
+    await Future.forEach(data['photos'], (dynamic doc) async {
+      var photoSnapShot = await doc.get();
+      photos.add(Photo.fromJson(photoSnapShot.data()));
+    });
+
     var spot = Spot(data['title'],
         Position(data['point'].latitude, data['point'].longitude),
         id: snapshot.id,
@@ -145,9 +152,7 @@ class MapInfoRepository {
         newDate: data['date'].toDate(),
         score: data['score'] + .0,
         userNameInfo: userNameInfo,
-        photos: (data['photos'] as List<dynamic>)
-            .map((photo) => Photo.fromJson(photo))
-            .toList());
+        photos: photos);
     return spot;
   }
 }
