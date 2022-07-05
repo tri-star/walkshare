@@ -1,6 +1,5 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import { ulid } from 'ulid';
 
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -36,7 +35,7 @@ export const migratePhoto = functions.pubsub.topic('aaa').onPublish(async (messa
         const migratedPhotos: object[] = [];
         
         for(const p of photos) {
-            const photoId = ulid().toLowerCase();
+            const photoId = p.key;
             const photo = {
                 date: p.date,
                 extension: p.extension,
