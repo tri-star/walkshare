@@ -7,6 +7,8 @@ class AppLocation {
 
   Map<String, String> parameters = {};
 
+  Map<String, String> query = {};
+
   String get signature => toPath();
 
   AppLocation();
@@ -39,18 +41,21 @@ class ParseResult {
   bool success;
   List<String> segments;
   Map<String, String> parameters;
+  Map<String, String> queries;
 
-  ParseResult(
-      this.success, List<String>? segments, Map<String, String>? parameters)
+  ParseResult(this.success, List<String>? segments,
+      Map<String, String>? parameters, Map<String, String>? queries)
       : segments = segments ?? [],
-        parameters = parameters ?? {};
+        parameters = parameters ?? {},
+        queries = queries ?? {};
 }
 
 /// URIを/a/b/:id のようなプレースホルダを考慮してパースし、解析できたか、
 /// 解析したパラメータは何だったかを返す。
 class UriPathParser {
   static ParseResult parse(String pathDefinition, Uri uri) {
-    var result = ParseResult(false, [], {});
+    var result = ParseResult(false, [], {}, {});
+    result.queries = uri.queryParameters;
     var normalizedPathDefinition = _normalizePath(pathDefinition);
     var definitionSegments = normalizedPathDefinition
         .split('/')
@@ -67,7 +72,7 @@ class UriPathParser {
         result.parameters[_parameterName(definitionSegments[i])] = uriSegment;
       } else {
         if (definitionSegments[i] != uriSegment) {
-          return ParseResult(false, [], {});
+          return ParseResult(false, [], {}, {});
         }
       }
       result.segments.add(uriSegment);
@@ -93,7 +98,8 @@ class UriPathParser {
 }
 
 class UriPathBuilder {
-  static String build(String signature, {Map<String, String>? parameters}) {
+  static String build(String signature,
+      {Map<String, String>? parameters, Map<String, String>? queries}) {
     var segments = signature.split('/');
     var formattedSegments = [];
     for (final segment in segments) {
@@ -107,7 +113,18 @@ class UriPathBuilder {
         formattedSegments.add(segment);
       }
     }
-    return segments.join('/');
+
+    var uri = segments.join('/');
+
+    var queryStrings = [];
+    if (queries != null && queries.isNotEmpty) {
+      for (var q in queries.entries) {
+        queryStrings.add('${q.key}=${q.value}');
+      }
+      uri += '?' + queryStrings.join('&');
+    }
+
+    return uri;
   }
 
   static bool _isParameterSegment(String segment) {
