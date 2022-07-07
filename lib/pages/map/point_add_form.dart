@@ -19,11 +19,13 @@ class PointAddPage extends AppPage {
   @override
   Widget buildPage(BuildContext context) {
     var route = Provider.of<RouterState>(context, listen: false).currentRoute;
-    final String mapId = route.parameters['mapId']!;
-    final Position position = Position(
-        double.parse(route.query['x']!), double.parse(route.query['y']!));
+    final String mapId = route.parameters['mapId'] ?? '';
+    final Position position = Position(double.parse(route.query['x'] ?? '0'),
+        double.parse(route.query['y'] ?? '0'));
 
-    return DefaultLayout(PointAddForm(mapId, position));
+    return DefaultLayout(mapId == ''
+        ? const CircularProgressIndicator()
+        : PointAddForm(mapId, position));
   }
 }
 
@@ -38,16 +40,17 @@ class PointAddForm extends StatefulWidget {
 }
 
 class _PointAddFormState extends State<PointAddForm> {
-  MapInfo? _mapInfo;
-  PointAddFormStore? _store;
+  late MapInfo _mapInfo;
+  late PointAddFormStore _store;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
     _store = Provider.of<PointAddFormStore>(context, listen: false);
+    _store.initialize();
     _mapInfo =
-        Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId);
+        Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId)!;
   }
 
   @override
@@ -62,6 +65,7 @@ class _PointAddFormState extends State<PointAddForm> {
             onChanged: () {
               store.setInteracted(true);
             },
+            autovalidateMode: AutovalidateMode.always,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const SizedBox(height: 20),
@@ -84,14 +88,17 @@ class _PointAddFormState extends State<PointAddForm> {
                   onSaved: (value) => {store.comment = value ?? ''},
                 ),
               ]),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const SizedBox(height: 20),
+                const WsFormLabel(text: '写真'),
+                Center(
+                  child: _createImagePreview(),
+                ),
+              ]),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  const WsFormLabel(text: '写真'),
-                  Center(
-                    child: _createImagePreview(),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -101,7 +108,7 @@ class _PointAddFormState extends State<PointAddForm> {
                           onTap: _canSave()
                               ? () async {
                                   _formKey.currentState!.save();
-                                  await store.save(_mapInfo!, widget.position);
+                                  await store.save(_mapInfo, widget.position);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('名前を登録しました。')),
                                   );
@@ -135,20 +142,20 @@ class _PointAddFormState extends State<PointAddForm> {
     if (_formKey.currentState == null) {
       return false;
     }
-    if (!_store!.interacted) {
+    if (!_store.interacted) {
       return false;
     }
     if (!_formKey.currentState!.validate()) {
       return false;
     }
-    if (_store!.saving) {
+    if (_store.saving) {
       return false;
     }
     return true;
   }
 
   Widget _createImagePreview() {
-    List<Widget> imageList = _store!.photos.map((XFile file) {
+    List<Widget> imageList = _store.photos.map((XFile file) {
       return Card(
           elevation: 2,
           child: Padding(
@@ -184,7 +191,7 @@ class _PointAddFormState extends State<PointAddForm> {
             child: InkWell(
               child: const CatFacePlaceholder(width: 100, height: 100),
               onTap: () {
-                _store!.pickImage();
+                _store.pickImage();
               },
             )));
 

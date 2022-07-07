@@ -34,6 +34,7 @@ class PointAddFormStore extends ChangeNotifier {
 
   void setInteracted(bool value) {
     _interacted = value;
+    notifyListeners();
   }
 
   Future<void> save(MapInfo mapInfo, Position _position) async {
