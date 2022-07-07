@@ -23,22 +23,10 @@ class WalkShareApp extends AppPage {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<MapPageStore>(
-          create: (_context) {
-            return MapPageStore(
-                Provider.of<AuthService>(_context, listen: false),
-                Provider.of<LocationService>(_context, listen: false),
-                Provider.of<RouteRepository>(_context, listen: false),
-                Provider.of<MapInfoRepository>(_context, listen: false));
-          },
-        ),
         ChangeNotifierProvider<PointEditFormStore>(
             create: (_context) => PointEditFormStore(
                 Provider.of<MapInfoRepository>(_context, listen: false),
                 Provider.of<AuthService>(_context, listen: false))),
-        Provider<Completer<GoogleMapController>>(
-          create: (_context) => Completer(),
-        ),
       ],
       child: const MapPage(),
     );
