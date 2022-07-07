@@ -9,36 +9,35 @@ class PointAddFormStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
   final AuthService _authService;
 
-  String _title = '';
-
-  String _comment = '';
+  String title = '';
+  String comment = '';
 
   final ImagePicker _picker;
 
   List<XFile> _photos = [];
 
+  bool _interacted = false;
   bool _saving = false;
 
-  String get title => _title;
-  String get comment => _comment;
   List<XFile> get photos => _photos;
+  bool get interacted => _interacted;
   bool get saving => _saving;
 
   PointAddFormStore(this._mapInfoRepository, this._authService)
       : _picker = ImagePicker();
 
-  void setTitle(String title) {
-    _title = title;
-    notifyListeners();
+  void initialize() {
+    title = '';
+    comment = '';
+    _photos = [];
   }
 
-  void setComment(String comment) {
-    _comment = comment;
-    notifyListeners();
+  void setInteracted(bool value) {
+    _interacted = value;
   }
 
   Future<void> save(MapInfo mapInfo, Position _position) async {
-    var spot = Spot(_title, _position, comment: _comment);
+    var spot = Spot(title, _position, comment: comment);
 
     _saving = true;
     notifyListeners();
@@ -52,20 +51,23 @@ class PointAddFormStore extends ChangeNotifier {
     }
 
     await _mapInfoRepository.addSpot(mapInfo, _authService.getUser().id, spot);
-    _title = '';
-    _comment = '';
+    title = '';
+    comment = '';
     _photos = [];
     _saving = false;
 
     notifyListeners();
   }
 
-  bool isValidInput() {
-    return _title.length > 0;
+  String? validateTitle(String? value) {
+    if (value == null || value == '') {
+      return 'タイトルを入力してください';
+    }
+    return null;
   }
 
   bool canSave() {
-    return isValidInput() && !_saving;
+    return _interacted && !_saving;
   }
 
   Future<void> pickImage() async {
@@ -82,11 +84,11 @@ class PointAddFormStore extends ChangeNotifier {
     if (identical(this, other)) return true;
 
     return other is PointAddFormStore &&
-        _title == other.title &&
-        _comment == other.comment &&
+        title == other.title &&
+        comment == other.comment &&
         _photos == other.photos;
   }
 
   @override
-  int get hashCode => hashValues(_title, _comment, _photos);
+  int get hashCode => hashValues(title, comment, _photos);
 }

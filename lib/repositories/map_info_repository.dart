@@ -9,7 +9,6 @@ import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/user.dart';
-import 'package:ulid/ulid.dart';
 
 /// マップ情報は頻繁に更新するわけではなく、ユーザー間で共有する場合も適宜リロードしてもらえば良いので
 /// Streamの購読は不要と考える
@@ -60,6 +59,24 @@ class MapInfoRepository {
     return snapshot.data();
   }
 
+  Future<Map<String, MapInfo>> fetchMapMetaList() async {
+    var collectionRef = await FirebaseFirestore.instance
+        .collection('maps')
+        .withConverter<MapInfo>(
+            fromFirestore: (snapshot, _) =>
+                MapInfo.fromJson(snapshot.id, snapshot.data()!),
+            toFirestore: (MapInfo mapInfo, _) => mapInfo.toJson())
+        .get(const GetOptions(source: Source.server));
+
+    final Map<String, MapInfo> list = {};
+
+    collectionRef.docs.forEach((snapshot) {
+      final mapInfo = snapshot.data();
+      list[mapInfo.id!] = mapInfo;
+    });
+    return list;
+  }
+
   Future<Spot> fetchSpot(MapInfo map, String spotId) async {
     var snapshot = await FirebaseFirestore.instance
         .collection('maps')
@@ -79,7 +96,7 @@ class MapInfoRepository {
         .doc(map.id)
         .collection('spots')
         .doc(id)
-        .set(_makeSpotJson(spot, uid));
+        .set(_makeSpotJson(map, spot, uid));
   }
 
   Future<void> updatePoint(MapInfo map, String spotId, Spot spot) async {
@@ -89,7 +106,7 @@ class MapInfoRepository {
         .doc(map.id)
         .collection('spots')
         .doc(spotId)
-        .set(_makeSpotJson(spot, spot.userNameInfo?.id));
+        .set(_makeSpotJson(map, spot, spot.userNameInfo?.id));
   }
 
   Future<List<Photo>> uploadPhotos(
@@ -116,7 +133,7 @@ class MapInfoRepository {
     return 'maps/$mapName/$fileName';
   }
 
-  Map<String, dynamic> _makeSpotJson(Spot spot, String? uid) {
+  Map<String, dynamic> _makeSpotJson(MapInfo map, Spot spot, String? uid) {
     return {
       'title': spot.title,
       'comment': spot.comment,
@@ -126,7 +143,13 @@ class MapInfoRepository {
           : null,
       'point': GeoPoint(spot.point.latitude, spot.point.longitude),
       'score': spot.score,
-      'photos': spot.photos.map((photo) => photo.toJson()).toList()
+      'photos': spot.photos
+          .map((photo) => FirebaseFirestore.instance
+              .collection('maps')
+              .doc(map.name)
+              .collection('photos')
+              .doc(photo.key))
+          .toList()
     };
   }
 

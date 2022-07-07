@@ -32,11 +32,6 @@ class WalkShareApp extends AppPage {
                 Provider.of<MapInfoRepository>(_context, listen: false));
           },
         ),
-        ChangeNotifierProvider<PointAddFormStore>(
-            create: (_context) => PointAddFormStore(
-                  Provider.of<MapInfoRepository>(_context, listen: false),
-                  Provider.of<AuthService>(_context, listen: false),
-                )),
         ChangeNotifierProvider<PointEditFormStore>(
             create: (_context) => PointEditFormStore(
                 Provider.of<MapInfoRepository>(_context, listen: false),

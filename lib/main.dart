@@ -6,10 +6,10 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_store.dart';
+import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/name_management/name_add_page_store.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
@@ -83,6 +83,11 @@ class _ApplicationState extends State<Application> {
         ChangeNotifierProvider<AppStore>(
             create: (_context) => AppStore(
                 Provider.of<MapInfoRepository>(_context, listen: false))),
+        ChangeNotifierProvider<PointAddFormStore>(
+            create: (_context) => PointAddFormStore(
+                  Provider.of<MapInfoRepository>(_context, listen: false),
+                  Provider.of<AuthService>(_context, listen: false),
+                )),
         ChangeNotifierProvider<NameAddPageStore>(
             create: (_context) => NameAddPageStore(
                 Provider.of<NameRepository>(_context, listen: false),
