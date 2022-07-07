@@ -1,17 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/map/map_page.dart';
-import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
-import 'package:strollog/repositories/route_repository.dart';
+import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
-import 'package:strollog/services/location_service.dart';
 
 class WalkShareApp extends AppPage {
   @override
@@ -26,6 +20,7 @@ class WalkShareApp extends AppPage {
         ChangeNotifierProvider<PointEditFormStore>(
             create: (_context) => PointEditFormStore(
                 Provider.of<MapInfoRepository>(_context, listen: false),
+                Provider.of<PhotoRepository>(_context, listen: false),
                 Provider.of<AuthService>(_context, listen: false))),
       ],
       child: const MapPage(),

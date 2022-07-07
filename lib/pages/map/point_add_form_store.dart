@@ -3,10 +3,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 
 class PointAddFormStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
+  final PhotoRepository _photoRepository;
   final AuthService _authService;
 
   String title = '';
@@ -23,7 +25,8 @@ class PointAddFormStore extends ChangeNotifier {
   bool get interacted => _interacted;
   bool get saving => _saving;
 
-  PointAddFormStore(this._mapInfoRepository, this._authService)
+  PointAddFormStore(
+      this._mapInfoRepository, this._photoRepository, this._authService)
       : _picker = ImagePicker();
 
   void initialize() {
@@ -37,7 +40,7 @@ class PointAddFormStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> save(MapInfo mapInfo, Position _position) async {
+  Future<Spot> save(MapInfo mapInfo, Position _position) async {
     var spot = Spot(title, _position, comment: comment);
 
     _saving = true;
@@ -45,9 +48,9 @@ class PointAddFormStore extends ChangeNotifier {
 
     var uid = _authService.getUser().id;
     var uploadedPhotos =
-        await _mapInfoRepository.uploadPhotos(mapInfo, uid, _photos);
+        await _photoRepository.uploadPhotos(mapInfo, uid, _photos);
 
-    if (uploadedPhotos.length > 0) {
+    if (uploadedPhotos.isNotEmpty) {
       spot.addPhotos(uploadedPhotos);
     }
 
@@ -58,6 +61,8 @@ class PointAddFormStore extends ChangeNotifier {
     _saving = false;
 
     notifyListeners();
+
+    return spot;
   }
 
   String? validateTitle(String? value) {

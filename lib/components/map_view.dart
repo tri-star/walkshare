@@ -77,7 +77,7 @@ class MapView extends StatelessWidget {
     List<Marker> result = [];
     spots.forEach((spotId, spot) {
       var marker = Marker(
-        markerId: MarkerId(spot.hashCode.toString()),
+        markerId: MarkerId(spot.id),
         position: LatLng(spot.point.latitude, spot.point.longitude),
         alpha: 0.7,
         onTap: () {

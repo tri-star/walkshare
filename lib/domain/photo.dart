@@ -36,6 +36,7 @@ class Photo {
     return {
       'key': key,
       'extension': extension,
+      'name': null,
       'date': date,
       'uid': uid,
     };

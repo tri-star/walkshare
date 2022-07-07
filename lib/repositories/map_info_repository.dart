@@ -1,10 +1,4 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
@@ -109,30 +103,6 @@ class MapInfoRepository {
         .set(_makeSpotJson(map, spot, spot.userNameInfo?.id));
   }
 
-  Future<List<Photo>> uploadPhotos(
-      MapInfo map, String uid, List<XFile> files) async {
-    // CloudStorageにファイルをアップロードする
-    // Photo形式に変換して返す
-    List<Photo> photos = [];
-    for (var file in files) {
-      try {
-        var photo = Photo.fromPath(file.path, uid);
-        var path = "maps/${map.name}/${photo.getFileName()}";
-        await FirebaseStorage.instance.ref(path).putFile(File(file.path));
-
-        photos.add(photo);
-      } on FirebaseException catch (e) {
-        FirebaseCrashlytics.instance.recordError(e, e.stackTrace);
-      }
-    }
-    return photos;
-  }
-
-  String _createPhotoPath(String mapName, Photo photo) {
-    var fileName = photo.getFileName();
-    return 'maps/$mapName/$fileName';
-  }
-
   Map<String, dynamic> _makeSpotJson(MapInfo map, Spot spot, String? uid) {
     return {
       'title': spot.title,
@@ -146,7 +116,7 @@ class MapInfoRepository {
       'photos': spot.photos
           .map((photo) => FirebaseFirestore.instance
               .collection('maps')
-              .doc(map.name)
+              .doc(map.id)
               .collection('photos')
               .doc(photo.key))
           .toList()

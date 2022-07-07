@@ -13,6 +13,7 @@ import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
+import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 
 class PointAddPage extends AppPage {
@@ -108,10 +109,14 @@ class _PointAddFormState extends State<PointAddForm> {
                           onTap: _canSave()
                               ? () async {
                                   _formKey.currentState!.save();
-                                  await store.save(_mapInfo, widget.position);
+                                  var spot = await store.save(
+                                      _mapInfo, widget.position);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('名前を登録しました。')),
                                   );
+                                  Provider.of<MapPageStore>(context,
+                                          listen: false)
+                                      .reloadSpot(spot.id);
                                   Provider.of<RouterState>(context,
                                           listen: false)
                                       .popRoute();
