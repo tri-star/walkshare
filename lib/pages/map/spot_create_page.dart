@@ -14,9 +14,9 @@ import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 
-class PointAddPage extends AppPage {
+class SpotCreatePage extends AppPage {
   @override
   Widget buildPage(BuildContext context) {
     var route = Provider.of<RouterState>(context, listen: false).currentRoute;
@@ -26,29 +26,29 @@ class PointAddPage extends AppPage {
 
     return DefaultLayout(mapId == ''
         ? const CircularProgressIndicator()
-        : PointAddForm(mapId, position));
+        : SpotCreateForm(mapId, position));
   }
 }
 
-class PointAddForm extends StatefulWidget {
+class SpotCreateForm extends StatefulWidget {
   final String mapId;
   final Position position;
 
-  const PointAddForm(this.mapId, this.position, {Key? key}) : super(key: key);
+  const SpotCreateForm(this.mapId, this.position, {Key? key}) : super(key: key);
 
   @override
-  _PointAddFormState createState() => _PointAddFormState();
+  _SpotCreateFormState createState() => _SpotCreateFormState();
 }
 
-class _PointAddFormState extends State<PointAddForm> {
+class _SpotCreateFormState extends State<SpotCreateForm> {
   late MapInfo _mapInfo;
-  late PointAddFormStore _store;
+  late SpotCreatePageStore _store;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    _store = Provider.of<PointAddFormStore>(context, listen: false);
+    _store = Provider.of<SpotCreatePageStore>(context, listen: false);
     _store.initialize();
     _mapInfo =
         Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId)!;
@@ -59,7 +59,7 @@ class _PointAddFormState extends State<PointAddForm> {
     return SingleChildScrollView(
         child: Container(
       padding: const EdgeInsets.all(16),
-      child: Consumer<PointAddFormStore>(
+      child: Consumer<SpotCreatePageStore>(
         builder: (context, store, child) {
           return Form(
             key: _formKey,

@@ -11,7 +11,7 @@ import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/pages/name_management/name_add_page_store.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
@@ -89,8 +89,8 @@ class _ApplicationState extends State<Application> {
         ChangeNotifierProvider<AppStore>(
             create: (_context) => AppStore(
                 Provider.of<MapInfoRepository>(_context, listen: false))),
-        ChangeNotifierProvider<PointAddFormStore>(
-            create: (_context) => PointAddFormStore(
+        ChangeNotifierProvider<SpotCreatePageStore>(
+            create: (_context) => SpotCreatePageStore(
                   Provider.of<MapInfoRepository>(_context, listen: false),
                   Provider.of<PhotoRepository>(_context, listen: false),
                   Provider.of<AuthService>(_context, listen: false),

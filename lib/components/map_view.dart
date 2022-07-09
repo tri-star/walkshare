@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/stroll_route.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 
 typedef LongTapCallBack = Future<void> Function(Position position);
 typedef MapPointTapCallBack = void Function(String spotId);
@@ -33,7 +33,7 @@ class MapView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<PointAddFormStore>(context, listen: false);
+    final store = Provider.of<SpotCreatePageStore>(context, listen: false);
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(

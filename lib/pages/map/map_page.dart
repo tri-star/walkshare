@@ -7,7 +7,7 @@ import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/pages/map/point_info_form.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
@@ -38,7 +38,7 @@ class _MapPageState extends State<MapPage> {
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context, listen: false);
       // Listenさせるためにここで定義が必要
-      Provider.of<PointAddFormStore>(context, listen: false);
+      Provider.of<SpotCreatePageStore>(context, listen: false);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
         if (!_state!.locationRequested) {
