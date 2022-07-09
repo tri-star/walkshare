@@ -12,7 +12,7 @@ import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
-import 'package:strollog/pages/map/point_edit_form_store.dart';
+import 'package:strollog/pages/map/spot_edit_page_store.dart';
 
 class SpotEditPage extends AppPage {
   @override
@@ -23,28 +23,28 @@ class SpotEditPage extends AppPage {
 
     return DefaultLayout(mapId == ''
         ? const CircularProgressIndicator()
-        : PointEditForm(mapId, spotId));
+        : SpotEditForm(mapId, spotId));
   }
 }
 
-class PointEditForm extends StatefulWidget {
+class SpotEditForm extends StatefulWidget {
   final String mapId;
   final String spotId;
 
-  const PointEditForm(this.mapId, this.spotId, {Key? key}) : super(key: key);
+  const SpotEditForm(this.mapId, this.spotId, {Key? key}) : super(key: key);
 
   @override
-  _PointEditFormState createState() => _PointEditFormState();
+  _SpotEditFormState createState() => _SpotEditFormState();
 }
 
-class _PointEditFormState extends State<PointEditForm> {
+class _SpotEditFormState extends State<SpotEditForm> {
   final _formKey = GlobalKey<FormState>();
   late final MapInfo mapInfo;
 
   @override
   void initState() {
     super.initState();
-    var store = Provider.of<PointEditFormStore>(context, listen: false);
+    var store = Provider.of<SpotEditPageStore>(context, listen: false);
     mapInfo =
         Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId)!;
     store.init(mapInfo, widget.spotId);
@@ -52,7 +52,7 @@ class _PointEditFormState extends State<PointEditForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PointEditFormStore>(
+    return Consumer<SpotEditPageStore>(
       builder: (context, store, child) {
         if (!store.initialized) {
           return const Center(child: CircularProgressIndicator());
@@ -149,7 +149,7 @@ class _PointEditFormState extends State<PointEditForm> {
     );
   }
 
-  bool _canSave(PointEditFormStore store) {
+  bool _canSave(SpotEditPageStore store) {
     if (_formKey.currentState == null) {
       return false;
     }
@@ -165,7 +165,7 @@ class _PointEditFormState extends State<PointEditForm> {
     return true;
   }
 
-  Widget _createImagePreview(PointEditFormStore store) {
+  Widget _createImagePreview(SpotEditPageStore store) {
     List<Widget> imageList = store.photos.map((XFile file) {
       return Card(
           elevation: 2,

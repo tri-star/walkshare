@@ -7,8 +7,8 @@ import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
-import 'package:strollog/pages/map/point_edit_form_store.dart';
-import 'package:strollog/pages/map/point_info_form.dart';
+import 'package:strollog/pages/map/spot_edit_page_store.dart';
+import 'package:strollog/pages/map/spot_detail_page.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
@@ -90,18 +90,18 @@ class _MapPageState extends State<MapPage> {
   void _handleMapPointTap(String spotId) {
     MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
     ImageLoader loader = Provider.of<ImageLoader>(context, listen: false);
-    PointEditFormStore editFormStore =
-        Provider.of<PointEditFormStore>(context, listen: false);
+    SpotEditPageStore editFormStore =
+        Provider.of<SpotEditPageStore>(context, listen: false);
     showModalBottomSheet(
         context: context,
         builder: (context) => MultiProvider(
               providers: [
                 ListenableProvider<MapPageStore>.value(value: store),
-                ListenableProvider<PointEditFormStore>.value(
+                ListenableProvider<SpotEditPageStore>.value(
                     value: editFormStore),
                 Provider<ImageLoader>.value(value: loader)
               ],
-              child: PointInfoForm(spotId),
+              child: SpotDetailPage(spotId),
             ));
   }
 }

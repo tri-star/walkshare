@@ -5,7 +5,7 @@ import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 
-class PointEditFormStore extends ChangeNotifier {
+class SpotEditPageStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
   final PhotoRepository _photoRepository;
   final AuthService _authService;
@@ -31,7 +31,7 @@ class PointEditFormStore extends ChangeNotifier {
   bool get interacted => _interacted;
   bool get saving => _saving;
 
-  PointEditFormStore(
+  SpotEditPageStore(
       this._mapInfoRepository, this._photoRepository, this._authService)
       : _picker = ImagePicker();
 
@@ -98,7 +98,7 @@ class PointEditFormStore extends ChangeNotifier {
   operator ==(other) {
     if (identical(this, other)) return true;
 
-    return other is PointEditFormStore &&
+    return other is SpotEditPageStore &&
         title == other.title &&
         comment == other.comment &&
         photos == other.photos;
