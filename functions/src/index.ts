@@ -37,11 +37,11 @@ export const migratePhoto = functions.pubsub.topic('aaa').onPublish(async (messa
         for(const p of photos) {
             const photoId = p.key;
             const photo = {
-                date: p.date,
+                date: p.date ?? null,
                 extension: p.extension,
                 name: null,
                 key: p.key,
-                uid: p.uid,
+                uid: p.uid ?? null,
             }
             functions.logger.info(`写真を移植: key: ${p.key}`, {key: p.key});
             const photoReference = admin.firestore().collection("maps").doc(mapId).collection('photos').doc(photoId);

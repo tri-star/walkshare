@@ -112,7 +112,8 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
                                   var spot = await store.save(
                                       _mapInfo, widget.position);
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('名前を登録しました。')),
+                                    const SnackBar(
+                                        content: Text('スポットを登録しました。')),
                                   );
                                   Provider.of<RouterState>(context,
                                           listen: false)
