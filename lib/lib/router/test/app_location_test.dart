@@ -64,5 +64,37 @@ void main() {
         });
       });
     });
+
+    group('クエリ文字列', () {
+      var tests = {
+        'クエリ文字列がない場合は空であること': {
+          'pathDefinition': '/a/b',
+          'uri': Uri.parse('/a/b'),
+          'expected': <String, String>{},
+        },
+        'クエリ文字列を取得できること': {
+          'pathDefinition': '/a/b',
+          'uri': Uri.parse('/a/b?c=1&d=2'),
+          'expected': {
+            'c': '1',
+            'd': '2',
+          },
+        },
+      };
+
+      tests.forEach((title, t) {
+        test(title, () {
+          var pathDefinition = t['pathDefinition'] as String;
+          var uri = t['uri'] as Uri;
+          var expected = t['expected'] as Map<String, String>;
+          var result = UriPathParser.parse(pathDefinition, uri);
+
+          var capturedQueries = result.queries
+              .map((key, value) => MapEntry<String, String>(key, value));
+
+          expect(capturedQueries, expected);
+        });
+      });
+    });
   });
 }

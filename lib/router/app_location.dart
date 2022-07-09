@@ -1,3 +1,4 @@
+import 'package:strollog/domain/position.dart';
 import 'package:strollog/lib/router/app_location.dart';
 
 class AppLocationHome extends AppLocation {
@@ -64,6 +65,46 @@ class AppLocationPhotoPreview extends AppLocation {
 
   @override
   String get signature => '/photo/:mapId/:spotId/:index';
+
+  @override
+  String toPath() {
+    return UriPathBuilder.build(signature, parameters: parameters);
+  }
+}
+
+class AppLocationSpotCreate extends AppLocation {
+  final String mapId;
+  final Position position;
+
+  AppLocationSpotCreate({required this.mapId, required this.position}) {
+    pathSegments = ['map', ':mapId', 'spot', 'create'];
+    parameters = {'mapId': mapId};
+    query = {
+      'x': position.latitude.toString(),
+      'y': position.longitude.toString(),
+    };
+  }
+
+  @override
+  String get signature => '/map/:mapId/spot/create';
+
+  @override
+  String toPath() {
+    return UriPathBuilder.build(signature, parameters: parameters);
+  }
+}
+
+class AppLocationSpotEdit extends AppLocation {
+  final String mapId;
+  final String spotId;
+
+  AppLocationSpotEdit({required this.mapId, required this.spotId}) {
+    pathSegments = ['map', ':mapId', 'spot', 'edit', ':spotId'];
+    parameters = {'mapId': mapId, 'spotId': spotId};
+  }
+
+  @override
+  String get signature => '/map/:mapId/spot/edit/:spotId';
 
   @override
   String toPath() {

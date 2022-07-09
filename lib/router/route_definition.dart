@@ -1,5 +1,7 @@
 import 'package:strollog/lib/router/base_route_definitions.dart';
 import 'package:strollog/pages/auth_page.dart';
+import 'package:strollog/pages/map/spot_edit_page.dart';
+import 'package:strollog/pages/map/spot_create_page.dart';
 import 'package:strollog/pages/name_management/name_detail_page.dart';
 import 'package:strollog/pages/name_management/name_list_page.dart';
 import 'package:strollog/pages/walkshare_app.dart';
@@ -15,6 +17,11 @@ class RouteDefinition extends BaseRouteDefinition {
       route(
           path: '/map/:mapId/names/:nameId',
           pageBuilder: () => NameDetailPage());
+      route(
+          path: '/map/:mapId/spot/create', pageBuilder: () => SpotCreatePage());
+      route(
+          path: '/map/:mapId/spot/edit/:spotId',
+          pageBuilder: () => SpotEditPage());
     });
   }
 }

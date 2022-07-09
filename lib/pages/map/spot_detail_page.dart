@@ -5,16 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
+import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/photo_preview_page.dart';
-import 'package:strollog/pages/map/point_edit_form.dart';
-import 'package:strollog/pages/map/point_edit_form_store.dart';
+import 'package:strollog/pages/map/spot_edit_page_store.dart';
+import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
-class PointInfoForm extends StatelessWidget {
+class SpotDetailPage extends StatelessWidget {
   final String _spotId;
 
-  const PointInfoForm(this._spotId, {Key? key}) : super(key: key);
+  const SpotDetailPage(this._spotId, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class PointInfoForm extends StatelessWidget {
     var date = store.mapInfo!.spots[_spotId]!.date;
     final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
-    var editFormStore = Provider.of<PointEditFormStore>(context, listen: false);
+    var editFormStore = Provider.of<SpotEditPageStore>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -50,18 +51,10 @@ class PointInfoForm extends StatelessWidget {
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             TextButton(
-                onPressed: () async {
-                  var needReload = await showModalBottomSheet<bool>(
-                      context: context,
-                      builder: (context) {
-                        return MultiProvider(providers: [
-                          ListenableProvider<PointEditFormStore>.value(
-                              value: editFormStore)
-                        ], child: PointEditForm(store.mapInfo!, _spotId));
-                      });
-                  if (needReload!) {
-                    store.reloadSpot(_spotId);
-                  }
+                onPressed: () {
+                  Provider.of<RouterState>(context, listen: false).pushRoute(
+                      AppLocationSpotEdit(
+                          mapId: store.mapInfo!.id!, spotId: _spotId));
                 },
                 child: const Text('編集')),
             TextButton(

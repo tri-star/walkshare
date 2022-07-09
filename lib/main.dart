@@ -5,16 +5,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_store.dart';
+import 'package:strollog/pages/map/map_page_store.dart';
+import 'package:strollog/pages/map/spot_edit_page_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/pages/name_management/name_add_page_store.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
+import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/router/route_definition.dart';
@@ -73,6 +77,9 @@ class _ApplicationState extends State<Application> {
         Provider<MapInfoRepository>(
           create: (_) => MapInfoRepository(),
         ),
+        Provider<PhotoRepository>(
+          create: (_) => PhotoRepository(),
+        ),
         Provider<NameRepository>(
           create: (_) => NameRepository(),
         ),
@@ -83,6 +90,17 @@ class _ApplicationState extends State<Application> {
         ChangeNotifierProvider<AppStore>(
             create: (_context) => AppStore(
                 Provider.of<MapInfoRepository>(_context, listen: false))),
+        ChangeNotifierProvider<SpotCreatePageStore>(
+            create: (_context) => SpotCreatePageStore(
+                  Provider.of<MapInfoRepository>(_context, listen: false),
+                  Provider.of<PhotoRepository>(_context, listen: false),
+                  Provider.of<AuthService>(_context, listen: false),
+                )),
+        ChangeNotifierProvider<SpotEditPageStore>(
+            create: (_context) => SpotEditPageStore(
+                Provider.of<MapInfoRepository>(_context, listen: false),
+                Provider.of<PhotoRepository>(_context, listen: false),
+                Provider.of<AuthService>(_context, listen: false))),
         ChangeNotifierProvider<NameAddPageStore>(
             create: (_context) => NameAddPageStore(
                 Provider.of<NameRepository>(_context, listen: false),
@@ -95,6 +113,18 @@ class _ApplicationState extends State<Application> {
             create: (_context) => NameDetailPageStore(
                 Provider.of<NameRepository>(_context, listen: false),
                 Provider.of<MapInfoRepository>(_context, listen: false))),
+        ChangeNotifierProvider<MapPageStore>(
+          create: (_context) {
+            return MapPageStore(
+                Provider.of<AuthService>(_context, listen: false),
+                Provider.of<LocationService>(_context, listen: false),
+                Provider.of<RouteRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false));
+          },
+        ),
+        Provider<Completer<GoogleMapController>>(
+          create: (_context) => Completer(),
+        ),
       ],
       child: _handleSignin(context, () {
         return _handleinitializeMapInfo(context, () {

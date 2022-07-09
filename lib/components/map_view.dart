@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -6,8 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/domain/stroll_route.dart';
-import 'package:strollog/pages/map/point_add_form.dart';
-import 'package:strollog/pages/map/point_add_form_store.dart';
+import 'package:strollog/pages/map/spot_create_page_store.dart';
 
 typedef LongTapCallBack = Future<void> Function(Position position);
 typedef MapPointTapCallBack = void Function(String spotId);
@@ -19,21 +17,23 @@ class MapView extends StatelessWidget {
   final MapInfo? _mapInfo;
   final LongTapCallBack? _longTapCallBack;
   final MapPointTapCallBack? _mapPointTapCallBack;
+  final Map<String, Spot>? _spots;
 
   const MapView(MapController controller, Position initialPosition,
-      StrollRoute strollRoute, MapInfo? mapInfo,
+      StrollRoute strollRoute, MapInfo? mapInfo, Map<String, Spot>? spots,
       {LongTapCallBack? onLongTap, MapPointTapCallBack? onPointTap, Key? key})
       : _controller = controller,
         _initialPosition = initialPosition,
         _strollRoute = strollRoute,
         _mapInfo = mapInfo,
+        _spots = spots,
         _longTapCallBack = onLongTap,
         _mapPointTapCallBack = onPointTap,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<PointAddFormStore>(context, listen: false);
+    final store = Provider.of<SpotCreatePageStore>(context, listen: false);
     return GoogleMap(
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
@@ -48,7 +48,7 @@ class MapView extends StatelessWidget {
         }
       },
       polylines: [_makePolyLines(_strollRoute.routePoints)].toSet(),
-      markers: _makeMarkers(_mapInfo?.spots).toSet(),
+      markers: _makeMarkers().toSet(),
     );
   }
 
@@ -70,12 +70,13 @@ class MapView extends StatelessWidget {
     );
   }
 
-  Set<Marker> _makeMarkers(Map<String, Spot>? spots) {
-    if (spots == null) {
+  Set<Marker> _makeMarkers() {
+    if (_spots == null) {
       return {};
     }
+
     List<Marker> result = [];
-    spots.forEach((spotId, spot) {
+    _spots?.forEach((spotId, spot) {
       var marker = Marker(
         markerId: MarkerId(spot.hashCode.toString()),
         position: LatLng(spot.point.latitude, spot.point.longitude),
