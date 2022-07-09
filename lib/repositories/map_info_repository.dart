@@ -82,6 +82,24 @@ class MapInfoRepository {
     return _makeSpot(snapshot);
   }
 
+  Stream<Map<String, Spot>> subscribeSpotStream(MapInfo map) {
+    return FirebaseFirestore.instance
+        .collection('maps')
+        .doc(map.id)
+        .collection('spots')
+        .snapshots()
+        .asyncMap((querySnapshot) async {
+      var result = <String, Spot>{};
+      await Future.forEach(querySnapshot.docs, (element) async {
+        var documentSnapshot =
+            element as DocumentSnapshot<Map<String, dynamic>>;
+        result[documentSnapshot.id] = await _makeSpot(documentSnapshot);
+      });
+
+      return result;
+    });
+  }
+
   Future<void> addSpot(MapInfo map, String uid, Spot spot) async {
     map.spots[spot.id] = spot;
     var id = spot.id;

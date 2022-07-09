@@ -114,9 +114,6 @@ class _PointAddFormState extends State<PointAddForm> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text('名前を登録しました。')),
                                   );
-                                  Provider.of<MapPageStore>(context,
-                                          listen: false)
-                                      .reloadSpot(spot.id);
                                   Provider.of<RouterState>(context,
                                           listen: false)
                                       .popRoute();

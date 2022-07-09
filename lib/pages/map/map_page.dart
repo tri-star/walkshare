@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
 import 'package:strollog/domain/location_permission_result.dart';
+import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -9,6 +10,7 @@ import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/point_add_form_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 import 'package:strollog/pages/map/point_info_form.dart';
+import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
@@ -25,7 +27,8 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultLayout(_createMapView());
+    return DefaultLayout(Consumer<MapPageStore>(
+        builder: (context, store, child) => _createMapView(store)));
   }
 
   @override
@@ -33,9 +36,9 @@ class _MapPageState extends State<MapPage> {
     super.didChangeDependencies();
 
     if (_state == null) {
-      _state = Provider.of<MapPageStore>(context);
+      _state = Provider.of<MapPageStore>(context, listen: false);
       // Listenさせるためにここで定義が必要
-      Provider.of<PointAddFormStore>(context);
+      Provider.of<PointAddFormStore>(context, listen: false);
       _state!.setMapController(_mapController);
       _state!.init().then((_) {
         if (!_state!.locationRequested) {
@@ -53,21 +56,29 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  Widget _createMapView() {
-    if (_state!.position == null) {
+  Widget _createMapView(MapPageStore store) {
+    if (store.position == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
     return Column(children: [
       Expanded(
-          child: MapView(
-        _mapController,
-        _state!.position!,
-        _state!.strollRoute,
-        _state!.mapInfo,
-        onLongTap: _handleLongTap,
-        onPointTap: _handleMapPointTap,
-      )),
+        child: StreamBuilder<Map<String, Spot>>(
+          stream: Provider.of<MapInfoRepository>(context, listen: false)
+              .subscribeSpotStream(store.mapInfo!),
+          builder: (context, snapshot) {
+            return MapView(
+              _mapController,
+              store.position!,
+              store.strollRoute,
+              store.mapInfo,
+              snapshot.data,
+              onLongTap: _handleLongTap,
+              onPointTap: _handleMapPointTap,
+            );
+          },
+        ),
+      ),
     ]);
   }
 
