@@ -3,137 +3,216 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/components/cat_face_placeholder.dart';
+import 'package:strollog/components/image_thumbnail.dart';
+import 'package:strollog/components/ws_button.dart';
+import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/layouts/default_layout.dart';
+import 'package:strollog/lib/router/router_state.dart';
+import 'package:strollog/pages/app_page.dart';
+import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/point_edit_form_store.dart';
 
-class PointEditForm extends StatefulWidget {
-  final MapInfo _mapInfo;
-  final String _spotId;
+class SpotEditPage extends AppPage {
+  @override
+  Widget buildPage(BuildContext context) {
+    var route = Provider.of<RouterState>(context, listen: false).currentRoute;
+    final String mapId = route.parameters['mapId'] ?? '';
+    final String spotId = route.parameters['spotId'] ?? '';
 
-  const PointEditForm(this._mapInfo, this._spotId, {Key? key})
-      : super(key: key);
+    return DefaultLayout(mapId == ''
+        ? const CircularProgressIndicator()
+        : PointEditForm(mapId, spotId));
+  }
+}
+
+class PointEditForm extends StatefulWidget {
+  final String mapId;
+  final String spotId;
+
+  const PointEditForm(this.mapId, this.spotId, {Key? key}) : super(key: key);
 
   @override
-  _PointEditFormState createState() => _PointEditFormState(_mapInfo, _spotId);
+  _PointEditFormState createState() => _PointEditFormState();
 }
 
 class _PointEditFormState extends State<PointEditForm> {
-  bool _initialized = false;
-  late final TextEditingController _titleController;
-  late final TextEditingController _commentController;
-  final MapInfo _mapInfo;
-  final String _spotId;
-  PointEditFormStore? _store;
+  final _formKey = GlobalKey<FormState>();
+  late final MapInfo mapInfo;
 
-  _PointEditFormState(this._mapInfo, this._spotId);
+  @override
+  void initState() {
+    super.initState();
+    var store = Provider.of<PointEditFormStore>(context, listen: false);
+    mapInfo =
+        Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId)!;
+    store.init(mapInfo, widget.spotId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    _store ??= Provider.of<PointEditFormStore>(context);
-
-    return FutureBuilder<bool>(
-        future: _initForm(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Padding(
-              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
+    return Consumer<PointEditFormStore>(
+      builder: (context, store, child) {
+        if (!store.initialized) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return SingleChildScrollView(
+          child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                onChanged: () {
+                  store.setInteracted(true);
+                },
+                autovalidateMode: AutovalidateMode.always,
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('タイトル'),
-                        Expanded(
-                            child: TextField(
-                          controller: _titleController,
-                        )),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        const Text('コメント'),
-                        Expanded(
-                            child: TextField(
-                          controller: _commentController,
-                        )),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        const Text('写真'),
-                        IconButton(
-                          icon: const Icon(Icons.photo),
-                          onPressed: () {
-                            _store!.pickImage();
-                          },
+                        const SizedBox(height: 20),
+                        const WsFormLabel(
+                          text: 'タイトル',
+                          required: true,
                         ),
-                        _createImagePreview()
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        TextFormField(
+                          initialValue: store.title,
+                          validator: store.validateTitle,
+                          autovalidateMode: AutovalidateMode.always,
+                          onSaved: (value) => {store.title = value ?? ''},
+                        ),
+                      ]),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const WsFormLabel(text: 'コメント'),
+                        TextFormField(
+                          initialValue: store.comment,
+                          validator: null,
+                          autovalidateMode: AutovalidateMode.always,
+                          onSaved: (value) => {store.comment = value ?? ''},
+                        ),
+                      ]),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const WsFormLabel(text: '写真'),
+                        Center(
+                          child: _createImagePreview(store),
+                        ),
+                      ]),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TextButton(
-                          onPressed: _store!.canSave() ? _saveForm : null,
-                          child:
-                              Text(_store!.saving == true ? '保存中...' : '更新')),
-                      TextButton(
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-                          child: const Text('キャンセル')),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          WSButton(
+                              title: '保存',
+                              icon: const Icon(Icons.save),
+                              onTap: _canSave(store)
+                                  ? () async {
+                                      _formKey.currentState!.save();
+                                      var spot = await store.save();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('スポット情報を更新しました。')),
+                                      );
+                                      Provider.of<RouterState>(context,
+                                              listen: false)
+                                          .popRoute();
+                                    }
+                                  : null),
+                          WSButton(
+                            title: 'キャンセル',
+                            icon: const Icon(Icons.cancel),
+                            onTap: () =>
+                                Provider.of<RouterState>(context, listen: false)
+                                    .popRoute(),
+                          )
+                        ],
+                      ),
+                      Padding(
+                          padding: EdgeInsets.only(
+                              bottom:
+                                  MediaQuery.of(context).viewInsets.bottom)),
                     ],
-                  ),
-                  Row(children: const [SizedBox(height: 30, child: null)]),
-                  Padding(
-                      padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).viewInsets.bottom)),
-                ],
-              ));
-        });
+                  )
+                ]),
+              )),
+        );
+      },
+    );
   }
 
-  Future<bool> _initForm() async {
-    if (_initialized) {
-      return true;
+  bool _canSave(PointEditFormStore store) {
+    if (_formKey.currentState == null) {
+      return false;
     }
-    await _store!.initBySpotId(_mapInfo, _spotId);
-    _titleController = TextEditingController(text: _store!.title);
-    _commentController = TextEditingController(text: _store!.comment);
-    _titleController.addListener(() => _store!.setTitle(_titleController.text));
-    _commentController
-        .addListener(() => _store!.setComment(_commentController.text));
-    _initialized = true;
+    if (!store.interacted) {
+      return false;
+    }
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
+    if (store.saving) {
+      return false;
+    }
     return true;
   }
 
-  Future<void> _saveForm() async {
-    await _store!.save();
-    Navigator.pop(context, true);
-  }
+  Widget _createImagePreview(PointEditFormStore store) {
+    List<Widget> imageList = store.photos.map((XFile file) {
+      return Card(
+          elevation: 2,
+          child: Padding(
+              padding: const EdgeInsets.all(3),
+              child: Column(
+                children: [
+                  ImageThumbnail(File(file.path), width: 100, height: 100,
+                      imageLoadingCallBack: (context, child, event) {
+                    if (event == null) {
+                      return child;
+                    }
 
-  Widget _createImagePreview() {
-    if (_store!.photos.isEmpty) {
-      return Container(child: const Expanded(child: Text('写真を選択')));
-    }
-
-    List<Image> imageList = _store!.photos.map((XFile file) {
-      return Image.file(File(file.path), height: 50);
+                    return const SizedBox(
+                      width: 75,
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }, onTapCallBack: () {
+                    //openContainer();
+                  }),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 3.0),
+                    child: Text('名前なし'),
+                  ),
+                ],
+              )));
     }).toList();
 
-    return Row(
-      children: imageList,
+    var addPhotoCard = Card(
+        elevation: 2,
+        child: Padding(
+            padding: const EdgeInsets.all(3),
+            child: InkWell(
+              child: const CatFacePlaceholder(width: 100, height: 100),
+              onTap: () {
+                store.pickImage();
+              },
+            )));
+
+    return Column(
+      children: [
+        Wrap(
+          spacing: 2,
+          children: [...imageList, addPhotoCard],
+        )
+      ],
     );
   }
 }

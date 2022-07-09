@@ -16,50 +16,55 @@ class PointEditFormStore extends ChangeNotifier {
 
   late String _spotId;
 
-  String _title = '';
-
-  String _comment = '';
+  String title = '';
+  String comment = '';
 
   final ImagePicker _picker;
 
-  List<XFile> _photos = [];
+  List<XFile> photos = [];
 
+  bool _initialized = false;
+  bool _interacted = false;
   bool _saving = false;
 
-  String get title => _title;
-  String get comment => _comment;
-  List<XFile> get photos => _photos;
+  bool get initialized => _initialized;
+  bool get interacted => _interacted;
   bool get saving => _saving;
 
   PointEditFormStore(
       this._mapInfoRepository, this._photoRepository, this._authService)
       : _picker = ImagePicker();
 
-  Future<void> initBySpotId(MapInfo mapInfo, String spotId) async {
+  Future<void> init(MapInfo mapInfo, String spotId) async {
+    _initialized = false;
     _mapInfo = mapInfo;
     _spotId = spotId;
 
     _originalSpot = await _mapInfoRepository.fetchSpot(mapInfo, spotId);
-    _title = _originalSpot!.title;
-    _comment = _originalSpot!.comment;
-    _photos = [];
-  }
-
-  void setTitle(String title) {
-    _title = title;
+    title = _originalSpot!.title;
+    comment = _originalSpot!.comment;
+    photos = [];
+    _initialized = true;
     notifyListeners();
   }
 
-  void setComment(String comment) {
-    _comment = comment;
+  void setInteracted(bool value) {
+    _interacted = value;
     notifyListeners();
+  }
+
+  String? validateTitle(String? value) {
+    if (value == null || value == '') {
+      return 'タイトルを入力してください';
+    }
+    return null;
   }
 
   Future<void> save() async {
     var point = _originalSpot!.point;
-    var photos = _originalSpot!.photos;
-    var newMapPoint = Spot(_title, point,
-        comment: _comment,
+    var originalPhotos = _originalSpot!.photos;
+    var newMapPoint = Spot(title, point,
+        comment: comment,
         newDate: _originalSpot!.date,
         userNameInfo: _originalSpot!.userNameInfo);
 
@@ -68,27 +73,16 @@ class PointEditFormStore extends ChangeNotifier {
 
     var uid = _authService.getUser().id;
     var uploadedPhotos =
-        await _photoRepository.uploadPhotos(_mapInfo, uid, _photos);
+        await _photoRepository.uploadPhotos(_mapInfo, uid, photos);
 
-    newMapPoint.photos = photos;
+    newMapPoint.photos = originalPhotos;
     if (uploadedPhotos.length > 0) {
       newMapPoint.addPhotos(uploadedPhotos);
     }
 
     await _mapInfoRepository.updatePoint(_mapInfo, _spotId, newMapPoint);
-    _title = '';
-    _comment = '';
-    _photos = [];
     _saving = false;
     notifyListeners();
-  }
-
-  bool isValidInput() {
-    return _title.length > 0;
-  }
-
-  bool canSave() {
-    return isValidInput() && !_saving;
   }
 
   Future<void> pickImage() async {
@@ -96,7 +90,7 @@ class PointEditFormStore extends ChangeNotifier {
     if (newPhotos == null) {
       return;
     }
-    _photos.addAll(newPhotos);
+    photos.addAll(newPhotos);
     notifyListeners();
   }
 
@@ -105,11 +99,11 @@ class PointEditFormStore extends ChangeNotifier {
     if (identical(this, other)) return true;
 
     return other is PointEditFormStore &&
-        _title == other.title &&
-        _comment == other.comment &&
-        _photos == other.photos;
+        title == other.title &&
+        comment == other.comment &&
+        photos == other.photos;
   }
 
   @override
-  int get hashCode => hashValues(_title, _comment, _photos);
+  int get hashCode => hashValues(title, comment, photos);
 }

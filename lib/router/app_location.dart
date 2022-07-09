@@ -93,3 +93,21 @@ class AppLocationSpotCreate extends AppLocation {
     return UriPathBuilder.build(signature, parameters: parameters);
   }
 }
+
+class AppLocationSpotEdit extends AppLocation {
+  final String mapId;
+  final String spotId;
+
+  AppLocationSpotEdit({required this.mapId, required this.spotId}) {
+    pathSegments = ['map', ':mapId', 'spot', 'edit', ':spotId'];
+    parameters = {'mapId': mapId, 'spotId': spotId};
+  }
+
+  @override
+  String get signature => '/map/:mapId/spot/edit/:spotId';
+
+  @override
+  String toPath() {
+    return UriPathBuilder.build(signature, parameters: parameters);
+  }
+}
