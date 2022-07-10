@@ -8,6 +8,7 @@ import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -158,14 +159,15 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
   }
 
   Widget _createImagePreview() {
-    List<Widget> imageList = _store.photos.map((XFile file) {
+    List<Widget> imageList = _store.photos.map((DraftPhoto draftPhoto) {
       return Card(
           elevation: 2,
           child: Padding(
               padding: const EdgeInsets.all(3),
               child: Column(
                 children: [
-                  ImageThumbnail(File(file.path), width: 100, height: 100,
+                  ImageThumbnail(File(draftPhoto.file.path),
+                      width: 100, height: 100,
                       imageLoadingCallBack: (context, child, event) {
                     if (event == null) {
                       return child;
