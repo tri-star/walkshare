@@ -14,11 +14,19 @@ class PhotoRepository {
     List<Photo> photos = [];
     for (var draftPhoto in draftPhotos) {
       try {
-        var photo = Photo.fromPath(draftPhoto.file.path, uid);
-        var path = "maps/${map.name}/${photo.getFileName()}";
-        await FirebaseStorage.instance
-            .ref(path)
-            .putFile(File(draftPhoto.file.path));
+        Photo photo;
+        if (draftPhoto.isDraft()) {
+          photo = Photo.fromPath(draftPhoto.file!.path, uid);
+          var path = "maps/${map.name}/${photo.getFileName()}";
+          await FirebaseStorage.instance
+              .ref(path)
+              .putFile(File(draftPhoto.file!.path));
+        } else {
+          photo = draftPhoto.savedPhoto!;
+        }
+
+        // 新しく設定された名前は draftPhoto.nameに記録されている
+        photo.name = draftPhoto.name;
 
         await FirebaseFirestore.instance
             .collection('maps')

@@ -176,7 +176,7 @@ class _SpotEditFormState extends State<SpotEditForm> {
               padding: const EdgeInsets.all(3),
               child: Column(
                 children: [
-                  ImageThumbnail(File(draftPhoto.file.path),
+                  ImageThumbnail(File(draftPhoto.imagePath),
                       width: 100, height: 100,
                       imageLoadingCallBack: (context, child, event) {
                     if (event == null) {

@@ -31,10 +31,34 @@ class Photo {
   }
 }
 
-/// 写真ピッカーで選択された未保存の写真
-class DraftPhoto {
-  Name? name;
-  XFile file;
+enum DraftPhotoType { draft, saved }
 
-  DraftPhoto(this.file, {this.name});
+/// 新規登録/編集保存前状態の写真
+class DraftPhoto {
+  DraftPhotoType type;
+  Name? name;
+
+  /// 写真ピッカーで選択した写真
+  XFile? file;
+
+  /// 保存済の写真
+  Photo? savedPhoto;
+  String cachePath = '';
+
+  DraftPhoto.draft(this.file, {this.name}) : type = DraftPhotoType.draft;
+
+  DraftPhoto.saved(Photo photo, {required this.cachePath})
+      : savedPhoto = photo,
+        type = DraftPhotoType.saved {
+    name = savedPhoto?.name;
+  }
+
+  bool isDraft() {
+    return type == DraftPhotoType.draft;
+  }
+
+  /// 写真ピッカー / 保存済のどちらの場合も参照可能な画像のパスを返す
+  String get imagePath {
+    return isDraft() ? file!.path : cachePath;
+  }
 }

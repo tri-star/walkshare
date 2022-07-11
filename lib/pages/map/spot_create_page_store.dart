@@ -82,7 +82,7 @@ class SpotCreatePageStore extends ChangeNotifier {
     if (newPhotos == null) {
       return;
     }
-    _photos.addAll(newPhotos.map((e) => DraftPhoto(e)));
+    _photos.addAll(newPhotos.map((e) => DraftPhoto.draft(e)));
     notifyListeners();
   }
 

@@ -189,12 +189,12 @@ class MapInfoRepository {
         facePhoto = _makeName(facePhotoRef.id, facePhotoData);
       }
 
-      var createdDate = nameData?.created?.toDate();
+      var createdDate = nameData['created']?.toDate();
 
       name = Name(
           id: nameRef.id,
-          name: nameData?.name ?? '',
-          pronounce: nameData?.pronounce ?? '',
+          name: nameData['name'] ?? '',
+          pronounce: nameData['pronounce'] ?? '',
           created: createdDate,
           facePhoto: facePhoto);
     }
