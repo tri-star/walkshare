@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/name.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
@@ -34,6 +35,12 @@ class SpotCreatePageStore extends ChangeNotifier {
     title = '';
     comment = '';
     _photos = [];
+  }
+
+  void setName(DraftPhoto draftPhoto, Name? name) {
+    draftPhoto.name = name;
+    setInteracted(true);
+    notifyListeners();
   }
 
   void setInteracted(bool value) {

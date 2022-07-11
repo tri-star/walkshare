@@ -8,6 +8,7 @@ import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/name.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
@@ -16,6 +17,8 @@ import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/spot_create_page_store.dart';
+import 'package:strollog/repositories/name_repository.dart';
+import 'package:strollog/services/image_loader.dart';
 
 class SpotCreatePage extends AppPage {
   @override
@@ -178,12 +181,13 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
                       height: 100,
                       child: Center(child: CircularProgressIndicator()),
                     );
-                  }, onTapCallBack: () {
-                    //openContainer();
+                  }, onTapCallBack: () async {
+                    var name = await _showNameSelectDialog(_store, draftPhoto);
+                    _store.setName(draftPhoto, name);
                   }),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 3.0),
-                    child: Text('名前なし'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3.0),
+                    child: Text(draftPhoto.name?.name ?? '名前なし'),
                   ),
                 ],
               )));
@@ -208,5 +212,105 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
         )
       ],
     );
+  }
+
+  Future<Name?> _showNameSelectDialog(
+      SpotCreatePageStore store, DraftPhoto draftPhoto) async {
+    var nameRepository = Provider.of<NameRepository>(context, listen: false);
+
+    return await showModalBottomSheet(
+      context: context,
+      elevation: 10,
+      useRootNavigator: true,
+      builder: (context) {
+        return MultiProvider(providers: [
+          Provider<NameRepository>.value(value: nameRepository),
+        ], child: SizedBox(height: 600, child: NameList(_mapInfo, draftPhoto)));
+      },
+    );
+  }
+}
+
+class NameList extends StatefulWidget {
+  final MapInfo mapInfo;
+  final DraftPhoto draftPhoto;
+
+  NameList(this.mapInfo, this.draftPhoto);
+
+  @override
+  State<StatefulWidget> createState() => NameListState();
+}
+
+class NameListState extends State<NameList> {
+  List<Name>? nameList;
+  String? selectedNameId;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedNameId = widget.draftPhoto.name?.id;
+    Provider.of<NameRepository>(context, listen: false)
+        .fetchNames(widget.mapInfo.id!)
+        .then((value) => setState(() => nameList = value));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('名前を選択'),
+        SizedBox(
+            height: 300,
+            child: ListView(
+              children: nameList?.map((name) {
+                    return ListTile(
+                      title: Text(name.name),
+                      selected: selectedNameId == name.id,
+                      onTap: () {
+                        setState(() => selectedNameId = name.id);
+                      },
+                      leading: _buildFacePhoto(name),
+                    );
+                  }).toList() ??
+                  [],
+            )),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          WSButton(
+            title: '決定',
+            icon: const Icon(Icons.check),
+            onTap: () {
+              Navigator.pop(context,
+                  nameList!.firstWhere((name) => name.id == selectedNameId));
+            },
+          ),
+          WSButton(
+            title: 'キャンセル',
+            icon: const Icon(Icons.cancel),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ]),
+      ],
+    );
+  }
+
+  Widget _buildFacePhoto(Name name) {
+    return name.facePhoto == null
+        ? const CatFacePlaceholder(width: 50)
+        : FutureBuilder<File>(
+            future: ImageLoader(PhotoType.face).loadImageWithCache(
+                widget.mapInfo, name.facePhoto!.getFileName()),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const CircularProgressIndicator();
+              }
+              return Image.file(
+                snapshot.data!,
+                width: 50,
+              );
+            });
   }
 }
