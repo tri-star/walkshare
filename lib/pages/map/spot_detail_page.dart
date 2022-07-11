@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
+import 'package:strollog/components/ws_button.dart';
+import 'package:strollog/domain/photo.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/photo_preview_page.dart';
@@ -39,7 +41,7 @@ class SpotDetailPage extends StatelessWidget {
             const SizedBox(width: 100, child: Text('タイトル')),
             Text(title),
           ]),
-          FutureBuilder<List<File>>(
+          FutureBuilder<List<DraftPhoto>>(
             future: _loadImages(context),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
@@ -49,19 +51,22 @@ class SpotDetailPage extends StatelessWidget {
               }
             },
           ),
+          const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            TextButton(
-                onPressed: () {
+            WSButton(
+                onTap: () {
                   Provider.of<RouterState>(context, listen: false).pushRoute(
                       AppLocationSpotEdit(
                           mapId: store.mapInfo!.id!, spotId: _spotId));
                 },
-                child: const Text('編集')),
-            TextButton(
-                onPressed: () {
+                icon: const Icon(Icons.edit),
+                title: '編集'),
+            WSButton(
+                onTap: () {
                   Navigator.pop(context);
                 },
-                child: const Text('閉じる'))
+                icon: const Icon(Icons.close),
+                title: '閉じる')
           ]),
           Row(children: const [SizedBox(height: 30, child: null)]),
         ],
@@ -69,23 +74,25 @@ class SpotDetailPage extends StatelessWidget {
     );
   }
 
-  Future<List<File>> _loadImages(BuildContext context) async {
+  Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
     final store = Provider.of<MapPageStore>(context);
     final imageLoader = Provider.of<ImageLoader>(context, listen: false);
 
-    final pendingImageFile = store.mapInfo!.spots[_spotId]!.photos.map((photo) {
-      return imageLoader.loadImageWithCache(
+    final pendingPhotos =
+        store.mapInfo!.spots[_spotId]!.photos.map((photo) async {
+      var cacheFile = await imageLoader.loadImageWithCache(
           store.mapInfo!, photo.getFileName());
+      return DraftPhoto.saved(photo, cachePath: cacheFile.path);
     }).toList();
 
-    return await Future.wait(pendingImageFile);
+    return await Future.wait(pendingPhotos);
   }
 
-  Widget _buildPhotoList(BuildContext context, List<File> imageFiles) {
+  Widget _buildPhotoList(BuildContext context, List<DraftPhoto> draftPhotos) {
     var store = Provider.of<MapPageStore>(context);
-    final List<Widget> photos = imageFiles.asMap().entries.map((entry) {
+    final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
       var index = entry.key;
-      var imageFile = entry.value;
+      var draftPhoto = entry.value;
       return OpenContainer(
           transitionType: ContainerTransitionType.fadeThrough,
           transitionDuration: const Duration(milliseconds: 500),
@@ -101,20 +108,26 @@ class SpotDetailPage extends StatelessWidget {
           closedBuilder: (context, openContainer) {
             return Padding(
                 padding: const EdgeInsets.all(3),
-                child: ImageThumbnail(imageFile, width: 75, height: 100,
-                    imageLoadingCallBack: (context, child, event) {
-                  if (event == null) {
-                    return child;
-                  }
+                child: Column(children: [
+                  ImageThumbnail(File(draftPhoto.imagePath),
+                      width: 80, height: 80,
+                      imageLoadingCallBack: (context, child, event) {
+                    if (event == null) {
+                      return child;
+                    }
 
-                  return const SizedBox(
-                    width: 75,
-                    height: 100,
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }, onTapCallBack: () {
-                  openContainer();
-                }));
+                    return const SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }, onTapCallBack: () {
+                    openContainer();
+                  }),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 2),
+                      child: Text(draftPhoto.name?.name ?? '名前なし')),
+                ]));
           });
     }).toList();
     return Row(children: [

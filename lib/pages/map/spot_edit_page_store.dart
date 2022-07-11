@@ -1,9 +1,12 @@
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/name.dart';
+import 'package:strollog/domain/photo.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
+import 'package:strollog/services/image_loader.dart';
 
 class SpotEditPageStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
@@ -21,7 +24,7 @@ class SpotEditPageStore extends ChangeNotifier {
 
   final ImagePicker _picker;
 
-  List<XFile> photos = [];
+  List<DraftPhoto> photos = [];
 
   bool _initialized = false;
   bool _interacted = false;
@@ -43,13 +46,23 @@ class SpotEditPageStore extends ChangeNotifier {
     _originalSpot = await _mapInfoRepository.fetchSpot(mapInfo, spotId);
     title = _originalSpot!.title;
     comment = _originalSpot!.comment;
-    photos = [];
+    photos = await Future.wait(_originalSpot!.photos.map((savedPhoto) async {
+      var cacheFile = await ImageLoader(PhotoType.photo)
+          .loadImageWithCache(_mapInfo, savedPhoto.getFileName());
+      return DraftPhoto.saved(savedPhoto, cachePath: cacheFile.path);
+    }));
     _initialized = true;
     notifyListeners();
   }
 
   void setInteracted(bool value) {
     _interacted = value;
+    notifyListeners();
+  }
+
+  void setName(DraftPhoto draftPhoto, Name? name) {
+    draftPhoto.name = name;
+    setInteracted(true);
     notifyListeners();
   }
 
@@ -62,8 +75,8 @@ class SpotEditPageStore extends ChangeNotifier {
 
   Future<void> save() async {
     var point = _originalSpot!.point;
-    var originalPhotos = _originalSpot!.photos;
-    var newMapPoint = Spot(title, point,
+    // var originalPhotos = _originalSpot!.photos;
+    var newSpot = Spot(title, point,
         comment: comment,
         newDate: _originalSpot!.date,
         userNameInfo: _originalSpot!.userNameInfo);
@@ -72,15 +85,13 @@ class SpotEditPageStore extends ChangeNotifier {
     notifyListeners();
 
     var uid = _authService.getUser().id;
+
+    // 新しく選択された写真を保存する
     var uploadedPhotos =
         await _photoRepository.uploadPhotos(_mapInfo, uid, photos);
+    newSpot.photos = uploadedPhotos;
 
-    newMapPoint.photos = originalPhotos;
-    if (uploadedPhotos.length > 0) {
-      newMapPoint.addPhotos(uploadedPhotos);
-    }
-
-    await _mapInfoRepository.updatePoint(_mapInfo, _spotId, newMapPoint);
+    await _mapInfoRepository.updatePoint(_mapInfo, _spotId, newSpot);
     _saving = false;
     notifyListeners();
   }
@@ -90,7 +101,7 @@ class SpotEditPageStore extends ChangeNotifier {
     if (newPhotos == null) {
       return;
     }
-    photos.addAll(newPhotos);
+    photos.addAll(newPhotos.map((p) => DraftPhoto.draft(p)));
     notifyListeners();
   }
 

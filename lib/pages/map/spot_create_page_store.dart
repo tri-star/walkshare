@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/map_info.dart';
+import 'package:strollog/domain/name.dart';
+import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
@@ -16,12 +18,12 @@ class SpotCreatePageStore extends ChangeNotifier {
 
   final ImagePicker _picker;
 
-  List<XFile> _photos = [];
+  List<DraftPhoto> _photos = [];
 
   bool _interacted = false;
   bool _saving = false;
 
-  List<XFile> get photos => _photos;
+  List<DraftPhoto> get photos => _photos;
   bool get interacted => _interacted;
   bool get saving => _saving;
 
@@ -33,6 +35,12 @@ class SpotCreatePageStore extends ChangeNotifier {
     title = '';
     comment = '';
     _photos = [];
+  }
+
+  void setName(DraftPhoto draftPhoto, Name? name) {
+    draftPhoto.name = name;
+    setInteracted(true);
+    notifyListeners();
   }
 
   void setInteracted(bool value) {
@@ -81,7 +89,7 @@ class SpotCreatePageStore extends ChangeNotifier {
     if (newPhotos == null) {
       return;
     }
-    _photos.addAll(newPhotos);
+    _photos.addAll(newPhotos.map((e) => DraftPhoto.draft(e)));
     notifyListeners();
   }
 
