@@ -96,7 +96,8 @@ class MapInfoRepository {
       await Future.forEach(querySnapshot.docs, (element) async {
         var documentSnapshot =
             element as DocumentSnapshot<Map<String, dynamic>>;
-        result[documentSnapshot.id] = await _makeSpot(documentSnapshot);
+        result[documentSnapshot.id] =
+            await _makeSpot(documentSnapshot, shallow: true);
       });
 
       return result;
@@ -144,20 +145,22 @@ class MapInfoRepository {
     };
   }
 
-  Future<Spot> _makeSpot(
-      DocumentSnapshot<Map<String, dynamic>> snapshot) async {
+  Future<Spot> _makeSpot(DocumentSnapshot<Map<String, dynamic>> snapshot,
+      {bool shallow = false}) async {
     var data = snapshot.data()!;
-    var userNameInfo = null;
-    if (data['uid'] != null) {
+    UserNameInfo? userNameInfo;
+    if (!shallow && data['uid'] != null) {
       var userInfoData = (await data['uid'].get()).data();
       userNameInfo = UserNameInfo(data['uid'].id!, userInfoData['nickname']!);
     }
 
     List<Photo> photos = [];
-    await Future.forEach(data['photos'], (dynamic doc) async {
-      var photoSnapShot = await doc.get();
-      photos.add(await _makePhoto(photoSnapShot.data()));
-    });
+    if (!shallow) {
+      await Future.forEach(data['photos'], (dynamic doc) async {
+        var photoSnapShot = await doc.get();
+        photos.add(await _makePhoto(photoSnapShot.data()));
+      });
+    }
 
     var spot = Spot(data['title'],
         Position(data['point'].latitude, data['point'].longitude),
