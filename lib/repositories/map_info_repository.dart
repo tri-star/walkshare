@@ -202,7 +202,7 @@ class MapInfoRepository {
     return Photo(
         key: json['key'] ?? '',
         extension: json['extension'] ?? '',
-        date: json['date'].toDate() ?? '',
+        date: json['date']?.toDate(),
         uid: json['uid'] ?? '',
         name: name);
   }
