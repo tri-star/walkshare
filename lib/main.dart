@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/app_router.dart';
@@ -160,10 +161,11 @@ class _ApplicationState extends State<Application> {
       BuildContext context, Widget Function() callback) {
     return Consumer<AppStore>(
       builder: (context, appStore, child) {
+        var authService = Provider.of<AuthService>(context);
         if (appStore.loading) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (appStore.currentMap == null) {
+        if (authService.isSignedIn() && appStore.currentMap == null) {
           appStore.loadMapInfo();
           return const Center(child: CircularProgressIndicator());
         }
