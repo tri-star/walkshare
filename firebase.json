@@ -25,5 +25,8 @@
     "auth": {
       "port": 9099
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
