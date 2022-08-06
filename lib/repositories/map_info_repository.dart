@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:strollog/domain/face_photo.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/name.dart';
@@ -10,8 +9,12 @@ import 'package:strollog/domain/user.dart';
 /// マップ情報は頻繁に更新するわけではなく、ユーザー間で共有する場合も適宜リロードしてもらえば良いので
 /// Streamの購読は不要と考える
 class MapInfoRepository {
+  FirebaseFirestore _firestore;
+
+  MapInfoRepository(this._firestore);
+
   Future<MapInfo?> fetchMapByName(String name) async {
-    var snapshot = await FirebaseFirestore.instance
+    var snapshot = await _firestore
         .collection('maps')
         .withConverter<MapInfo>(
             fromFirestore: (snapshot, _) =>
@@ -26,7 +29,7 @@ class MapInfoRepository {
 
     var map = snapshot.docs.first.data();
 
-    var spots = await FirebaseFirestore.instance
+    var spots = await _firestore
         .collection('maps')
         .doc(map.id)
         .collection('spots')
@@ -40,7 +43,7 @@ class MapInfoRepository {
   }
 
   Future<MapInfo?> fetchMapMetaById(String mapId) async {
-    var snapshot = await FirebaseFirestore.instance
+    var snapshot = await _firestore
         .collection('maps')
         .doc(mapId)
         .withConverter<MapInfo>(
@@ -57,7 +60,7 @@ class MapInfoRepository {
   }
 
   Future<Map<String, MapInfo>> fetchMapMetaList() async {
-    var collectionRef = await FirebaseFirestore.instance
+    var collectionRef = await _firestore
         .collection('maps')
         .withConverter<MapInfo>(
             fromFirestore: (snapshot, _) =>
@@ -75,7 +78,7 @@ class MapInfoRepository {
   }
 
   Future<Spot> fetchSpot(MapInfo map, String spotId) async {
-    var snapshot = await FirebaseFirestore.instance
+    var snapshot = await _firestore
         .collection('maps')
         .doc(map.id)
         .collection('spots')
@@ -86,7 +89,7 @@ class MapInfoRepository {
   }
 
   Stream<Map<String, Spot>> subscribeSpotStream(MapInfo map) {
-    return FirebaseFirestore.instance
+    return _firestore
         .collection('maps')
         .doc(map.id)
         .collection('spots')
@@ -107,7 +110,7 @@ class MapInfoRepository {
   Future<void> addSpot(MapInfo map, String uid, Spot spot) async {
     map.spots[spot.id] = spot;
     var id = spot.id;
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('maps')
         .doc(map.id)
         .collection('spots')
@@ -117,7 +120,7 @@ class MapInfoRepository {
 
   Future<void> updatePoint(MapInfo map, String spotId, Spot spot) async {
     map.spots[spotId] = spot;
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('maps')
         .doc(map.id)
         .collection('spots')
@@ -130,13 +133,11 @@ class MapInfoRepository {
       'title': spot.title,
       'comment': spot.comment,
       'date': spot.date,
-      'uid': uid != null
-          ? FirebaseFirestore.instance.collection('users').doc(uid)
-          : null,
+      'uid': uid != null ? _firestore.collection('users').doc(uid) : null,
       'point': GeoPoint(spot.point.latitude, spot.point.longitude),
       'score': spot.score,
       'photos': spot.photos
-          .map((photo) => FirebaseFirestore.instance
+          .map((photo) => _firestore
               .collection('maps')
               .doc(map.id)
               .collection('photos')

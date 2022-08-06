@@ -7,6 +7,11 @@ import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 
 class PhotoRepository {
+  final FirebaseFirestore _firestore;
+  final FirebaseStorage _firestorage;
+
+  PhotoRepository(this._firestore, this._firestorage);
+
   Future<List<Photo>> uploadPhotos(
       MapInfo map, String uid, List<DraftPhoto> draftPhotos) async {
     // CloudStorageにファイルをアップロードする
@@ -18,9 +23,7 @@ class PhotoRepository {
         if (draftPhoto.isDraft()) {
           photo = Photo.fromPath(draftPhoto.file!.path, uid);
           var path = "maps/${map.name}/${photo.getFileName()}";
-          await FirebaseStorage.instance
-              .ref(path)
-              .putFile(File(draftPhoto.file!.path));
+          await _firestorage.ref(path).putFile(File(draftPhoto.file!.path));
         } else {
           photo = draftPhoto.savedPhoto!;
         }
@@ -28,7 +31,7 @@ class PhotoRepository {
         // 新しく設定された名前は draftPhoto.nameに記録されている
         photo.name = draftPhoto.name;
 
-        await FirebaseFirestore.instance
+        await _firestore
             .collection('maps')
             .doc(map.id)
             .collection('photos')
@@ -49,7 +52,7 @@ class PhotoRepository {
       'extension': photo.extension,
       'name': photo.name == null
           ? null
-          : FirebaseFirestore.instance
+          : _firestore
               .collection('maps')
               .doc(mapId)
               .collection('names')
