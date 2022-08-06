@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -96,6 +97,7 @@ class _ApplicationState extends State<Application> {
                   Provider.of<MapInfoRepository>(_context, listen: false),
                   Provider.of<PhotoRepository>(_context, listen: false),
                   Provider.of<AuthService>(_context, listen: false),
+                  ImagePicker(),
                 )),
         ChangeNotifierProvider<SpotEditPageStore>(
             create: (_context) => SpotEditPageStore(
@@ -148,7 +150,7 @@ class _ApplicationState extends State<Application> {
         var authService = Provider.of<AuthService>(context);
         if (snapshot.hasData) {
           // return const WalkShareApp();
-          authService.setUser(snapshot.data);
+          authService.setUserFromFirebaseAuth(snapshot.data);
         } else {
           authService.setUser(null);
         }
