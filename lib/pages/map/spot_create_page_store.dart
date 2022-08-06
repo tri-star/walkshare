@@ -27,9 +27,8 @@ class SpotCreatePageStore extends ChangeNotifier {
   bool get interacted => _interacted;
   bool get saving => _saving;
 
-  SpotCreatePageStore(
-      this._mapInfoRepository, this._photoRepository, this._authService)
-      : _picker = ImagePicker();
+  SpotCreatePageStore(this._mapInfoRepository, this._photoRepository,
+      this._authService, this._picker);
 
   void initialize() {
     title = '';

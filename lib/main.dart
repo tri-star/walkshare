@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -66,6 +69,12 @@ class _ApplicationState extends State<Application> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<FirebaseFirestore>(
+          create: (_) => FirebaseFirestore.instance,
+        ),
+        Provider<FirebaseStorage>(
+          create: (_) => FirebaseStorage.instance,
+        ),
         Provider<LocationService>(
           create: (_) => LocationService(),
         ),
@@ -76,10 +85,15 @@ class _ApplicationState extends State<Application> {
           create: (_) => RouteRepository(),
         ),
         Provider<MapInfoRepository>(
-          create: (_) => MapInfoRepository(),
+          create: (_context) => MapInfoRepository(
+            Provider.of<FirebaseFirestore>(_context, listen: false),
+          ),
         ),
         Provider<PhotoRepository>(
-          create: (_) => PhotoRepository(),
+          create: (_context) => PhotoRepository(
+            Provider.of<FirebaseFirestore>(_context, listen: false),
+            Provider.of<FirebaseStorage>(_context, listen: false),
+          ),
         ),
         Provider<NameRepository>(
           create: (_) => NameRepository(),
@@ -96,6 +110,7 @@ class _ApplicationState extends State<Application> {
                   Provider.of<MapInfoRepository>(_context, listen: false),
                   Provider.of<PhotoRepository>(_context, listen: false),
                   Provider.of<AuthService>(_context, listen: false),
+                  ImagePicker(),
                 )),
         ChangeNotifierProvider<SpotEditPageStore>(
             create: (_context) => SpotEditPageStore(
@@ -148,7 +163,7 @@ class _ApplicationState extends State<Application> {
         var authService = Provider.of<AuthService>(context);
         if (snapshot.hasData) {
           // return const WalkShareApp();
-          authService.setUser(snapshot.data);
+          authService.setUserFromFirebaseAuth(snapshot.data);
         } else {
           authService.setUser(null);
         }
