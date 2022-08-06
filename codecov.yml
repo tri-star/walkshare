@@ -1,0 +1,27 @@
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "50...100"
+  status:
+    project:
+      flutter:
+        target: 70%
+        threshold: 70%
+        base: auto
+        flags:
+          - flutter
+        paths:
+          - "lib"
+    patch:
+      default:
+        # basic
+        target: 70%
+        threshold: 0%
+        base: auto
+        flags:
+          - "flutter"
+        paths:
+          - "lib"
