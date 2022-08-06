@@ -15,9 +15,8 @@ jobs:
           flutter-version: "2.10.1"
       - run: flutter pub get
       - run: flutter test --coverage lib
-      - env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        run: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
+      - name: "upload coverage"
+        uses: codecov/codecov-action@v3
 
   # build:
   #   runs-on: ubuntu-latest
