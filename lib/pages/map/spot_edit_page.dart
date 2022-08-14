@@ -310,8 +310,9 @@ class NameListState extends State<NameList> {
     return name.facePhoto == null
         ? const CatFacePlaceholder(width: 50)
         : FutureBuilder<File>(
-            future: ImageLoader(PhotoType.face).loadImageWithCache(
-                widget.mapInfo, name.facePhoto!.getFileName()),
+            future: Provider.of<ImageLoaderFace>(context, listen: false)
+                .loadImageWithCache(
+                    widget.mapInfo, name.facePhoto!.getFileName()),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const CircularProgressIndicator();

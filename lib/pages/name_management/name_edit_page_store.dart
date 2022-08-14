@@ -3,28 +3,31 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:strollog/domain/face_photo.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
+import 'package:strollog/services/image_loader.dart';
 
 class NameEditPageStore with ChangeNotifier {
   String mapId;
   String nameId;
   Name name;
-  CroppedFile? croppedPhoto;
+  String? croppedPhotoPath;
+  bool loaded;
   bool interacted;
   bool saving;
   final NameRepository nameRepository;
   final MapInfoRepository mapInfoRepository;
   final ImagePicker imagePicker;
   final ImageCropper imageCropper;
+  final ImageLoaderFace imageLoader;
 
   NameEditPageStore(this.nameRepository, this.mapInfoRepository,
-      this.imagePicker, this.imageCropper)
+      this.imagePicker, this.imageCropper, this.imageLoader)
       : mapId = '',
         nameId = '',
         name = Name(name: '', pronounce: ''),
+        loaded = false,
         interacted = false,
         saving = false;
 
@@ -33,8 +36,17 @@ class NameEditPageStore with ChangeNotifier {
     this.nameId = nameId;
     interacted = false;
     saving = false;
-    croppedPhoto = null;
-    name = Name(name: '', pronounce: '');
+    croppedPhotoPath = null;
+    var mapInfo = await mapInfoRepository.fetchMapMetaById(mapId);
+    var loadedName = await nameRepository.fetchNameById(mapId, nameId);
+    if (loadedName != null) {
+      name = loadedName;
+      var croppedPhotoFile = await imageLoader.loadImageWithCache(
+          mapInfo!, name.facePhoto?.getFileName() ?? '');
+      croppedPhotoPath = croppedPhotoFile.path;
+    }
+    loaded = true;
+    notifyListeners();
   }
 
   Future<void> pickImage() async {
@@ -58,7 +70,7 @@ class NameEditPageStore with ChangeNotifier {
       return;
     }
 
-    croppedPhoto = cropped;
+    croppedPhotoPath = cropped.path;
     notifyListeners();
   }
 
@@ -82,6 +94,8 @@ class NameEditPageStore with ChangeNotifier {
   }
 
   Future<void> save() async {
+    assert(name != null);
+
     saving = true;
     notifyListeners();
 
@@ -90,12 +104,12 @@ class NameEditPageStore with ChangeNotifier {
       throw UnsupportedError('無効なマップが指定されました。id:${mapId}');
     }
 
-    if (croppedPhoto != null) {
+    if (croppedPhotoPath != null) {
       name.facePhoto =
-          await nameRepository.uploadPhoto(mapInfo, File(croppedPhoto!.path));
+          await nameRepository.uploadPhoto(mapInfo, File(croppedPhotoPath!));
     }
 
-    nameRepository.save(null, mapId, name);
+    nameRepository.save(null, mapId, name!);
     saving = false;
     notifyListeners();
   }

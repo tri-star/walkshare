@@ -9,8 +9,8 @@ import 'package:strollog/components/ws_form_value_label.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
-import 'package:strollog/pages/name_management/name_add_page_store.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
+import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class NameDetailPage extends AppPage {
@@ -109,7 +109,11 @@ class _NameDetailState extends State<NameDetail> {
                     WSButton(
                         title: '編集',
                         icon: const Icon(Icons.edit),
-                        onTap: () {}),
+                        onTap: () {
+                          Provider.of<RouterState>(context, listen: false)
+                              .pushRoute(AppLocationNameEdit(
+                                  mapId: store.mapId, nameId: store.name!.id));
+                        }),
                     WSButton(
                         title: 'キャンセル',
                         icon: const Icon(Icons.cancel),

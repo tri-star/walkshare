@@ -7,8 +7,8 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/lib/router/app_router.dart';
@@ -19,6 +19,7 @@ import 'package:strollog/pages/map/spot_edit_page_store.dart';
 import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/pages/name_management/name_add_page_store.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
+import 'package:strollog/pages/name_management/name_edit_page_store.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
@@ -123,13 +124,22 @@ class _ApplicationState extends State<Application> {
                 )),
         ChangeNotifierProvider<SpotEditPageStore>(
             create: (_context) => SpotEditPageStore(
-                Provider.of<MapInfoRepository>(_context, listen: false),
-                Provider.of<PhotoRepository>(_context, listen: false),
-                Provider.of<AuthService>(_context, listen: false))),
+                  Provider.of<MapInfoRepository>(_context, listen: false),
+                  Provider.of<PhotoRepository>(_context, listen: false),
+                  Provider.of<AuthService>(_context, listen: false),
+                  Provider.of<ImageLoaderPhoto>(_context, listen: false),
+                )),
         ChangeNotifierProvider<NameAddPageStore>(
             create: (_context) => NameAddPageStore(
                 Provider.of<NameRepository>(_context, listen: false),
                 Provider.of<MapInfoRepository>(_context, listen: false))),
+        ChangeNotifierProvider<NameEditPageStore>(
+            create: (_context) => NameEditPageStore(
+                Provider.of<NameRepository>(_context, listen: false),
+                Provider.of<MapInfoRepository>(_context, listen: false),
+                Provider.of<ImagePicker>(_context, listen: false),
+                Provider.of<ImageCropper>(_context, listen: false),
+                Provider.of<ImageLoaderFace>(_context, listen: false))),
         ChangeNotifierProvider<NameListPageStore>(
             create: (_context) => NameListPageStore(
                 Provider.of<NameRepository>(_context, listen: false),

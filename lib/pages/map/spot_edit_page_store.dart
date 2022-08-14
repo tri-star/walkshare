@@ -12,6 +12,7 @@ class SpotEditPageStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
   final PhotoRepository _photoRepository;
   final AuthService _authService;
+  final ImageLoaderPhoto _imageLoader;
 
   Spot? _originalSpot;
 
@@ -34,8 +35,8 @@ class SpotEditPageStore extends ChangeNotifier {
   bool get interacted => _interacted;
   bool get saving => _saving;
 
-  SpotEditPageStore(
-      this._mapInfoRepository, this._photoRepository, this._authService)
+  SpotEditPageStore(this._mapInfoRepository, this._photoRepository,
+      this._authService, this._imageLoader)
       : _picker = ImagePicker();
 
   Future<void> init(MapInfo mapInfo, String spotId) async {
@@ -47,8 +48,8 @@ class SpotEditPageStore extends ChangeNotifier {
     title = _originalSpot!.title;
     comment = _originalSpot!.comment;
     photos = await Future.wait(_originalSpot!.photos.map((savedPhoto) async {
-      var cacheFile = await ImageLoader(PhotoType.photo)
-          .loadImageWithCache(_mapInfo, savedPhoto.getFileName());
+      var cacheFile = await _imageLoader.loadImageWithCache(
+          _mapInfo, savedPhoto.getFileName());
       return DraftPhoto.saved(savedPhoto, cachePath: cacheFile.path);
     }));
     _initialized = true;
