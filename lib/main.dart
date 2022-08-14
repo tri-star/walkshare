@@ -97,7 +97,10 @@ class _ApplicationState extends State<Application> {
           ),
         ),
         Provider<NameRepository>(
-          create: (_) => NameRepository(),
+          create: (_context) => NameRepository(
+            Provider.of<FirebaseFirestore>(_context, listen: false),
+            Provider.of<FirebaseStorage>(_context, listen: false),
+          ),
         ),
         Provider<ImageLoaderPhoto>(
           create: (_) => ImageLoaderPhoto(),

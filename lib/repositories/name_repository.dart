@@ -9,6 +9,11 @@ import 'package:strollog/domain/name.dart';
 import 'package:strollog/domain/user.dart';
 
 class NameRepository {
+  final FirebaseFirestore firestore;
+  final FirebaseStorage firebaseStorage;
+
+  NameRepository(this.firestore, this.firebaseStorage);
+
   Future<void> save(User? user, String mapId, Name name) async {
     var json = {
       'name': name.name,
@@ -24,7 +29,7 @@ class NameRepository {
           : null,
       'created': name.created
     };
-    await FirebaseFirestore.instance
+    await firestore
         .collection('maps')
         .doc(mapId)
         .collection('names')
@@ -34,10 +39,7 @@ class NameRepository {
 
   Future<List<Name>> fetchNames(String mapId, {String order = 'latest'}) async {
     var orderField = order == 'latest' ? 'created' : 'pronounce';
-    var query = FirebaseFirestore.instance
-        .collection('maps')
-        .doc(mapId)
-        .collection('names');
+    var query = firestore.collection('maps').doc(mapId).collection('names');
 
     // if (order == 'latest') {
     //   query.orderBy('created', descending: true);
@@ -55,7 +57,7 @@ class NameRepository {
   }
 
   Future<Name?> fetchNameById(String mapId, String nameId) async {
-    var document = await FirebaseFirestore.instance
+    var document = await firestore
         .collection('maps')
         .doc(mapId)
         .collection('names')
@@ -89,7 +91,7 @@ class NameRepository {
     try {
       var photo = FacePhoto.fromPath(file.path);
       var path = "maps/${map.name}/faces/${photo.getFileName()}";
-      await FirebaseStorage.instance.ref(path).putFile(File(file.path));
+      await firebaseStorage.ref(path).putFile(File(file.path));
 
       return photo;
     } on FirebaseException catch (e) {
