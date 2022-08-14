@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/services/image_loader.dart';
@@ -23,7 +24,6 @@ class PhotoPreviewPage extends StatefulWidget {
 class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   late int _index;
   late int _photoCount;
-  final ImageLoader _imageLoader = ImageLoader(PhotoType.photo);
 
   @override
   void initState() {
@@ -137,8 +137,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   }
 
   Future<DraftPhoto> _loadPhoto() async {
-    var cache = await _imageLoader.loadImageWithCache(
-        widget.map, widget.photos[_index].getFileName());
+    var cache = await Provider.of<ImageLoaderPhoto>(context, listen: false)
+        .loadImageWithCache(widget.map, widget.photos[_index].getFileName());
 
     return DraftPhoto.saved(widget.photos[_index], cachePath: cache.path);
   }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/cat_face_placeholder.dart';
 import 'package:strollog/components/image_thumbnail.dart';
@@ -15,7 +14,6 @@ import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
-import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/services/image_loader.dart';
@@ -301,8 +299,9 @@ class NameListState extends State<NameList> {
     return name.facePhoto == null
         ? const CatFacePlaceholder(width: 50)
         : FutureBuilder<File>(
-            future: ImageLoader(PhotoType.face).loadImageWithCache(
-                widget.mapInfo, name.facePhoto!.getFileName()),
+            future: Provider.of<ImageLoaderFace>(context, listen: false)
+                .loadImageWithCache(
+                    widget.mapInfo, name.facePhoto!.getFileName()),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const CircularProgressIndicator();

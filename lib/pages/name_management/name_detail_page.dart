@@ -125,7 +125,7 @@ class _NameDetailState extends State<NameDetail> {
   }
 
   Widget _buildPhotoPreview(BuildContext context, NameDetailPageStore store) {
-    var imageLoader = ImageLoader(PhotoType.face);
+    var imageLoader = Provider.of<ImageLoaderFace>(context, listen: false);
 
     return FutureBuilder<File>(
       future: imageLoader.loadImageWithCache(

@@ -98,8 +98,17 @@ class _ApplicationState extends State<Application> {
         Provider<NameRepository>(
           create: (_) => NameRepository(),
         ),
-        Provider<ImageLoader>(
-          create: (_) => ImageLoader(PhotoType.photo),
+        Provider<ImageLoaderPhoto>(
+          create: (_) => ImageLoaderPhoto(),
+        ),
+        Provider<ImageLoaderFace>(
+          create: (_) => ImageLoaderFace(),
+        ),
+        Provider<ImagePicker>(
+          create: (_) => ImagePicker(),
+        ),
+        Provider<ImageCropper>(
+          create: (_) => ImageCropper(),
         ),
         ChangeNotifierProvider<RouterState>.value(value: routerState),
         ChangeNotifierProvider<AppStore>(

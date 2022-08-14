@@ -7,13 +7,9 @@ import 'package:http/http.dart' as http;
 
 enum PhotoType { photo, face }
 
-class ImageLoader {
-  final PhotoType type;
-
-  ImageLoader(this.type);
-
+abstract class ImageLoader {
   Future<String> getDownloadUrl(MapInfo map, String fileName) async {
-    var prefix = _photoDirPrefix(map, type);
+    var prefix = _photoDirPrefix(map);
     var path = '$prefix/$fileName';
     return await FirebaseStorage.instance.ref(path).getDownloadURL();
   }
@@ -45,7 +41,7 @@ class ImageLoader {
   Future<String> _localCachePath(MapInfo map, String fileName) async {
     final directory = await getTemporaryDirectory();
 
-    var prefix = _photoDirPrefix(map, type);
+    var prefix = _photoDirPrefix(map);
     final cacheFileName = File(fileName);
     final String cacheDir =
         '${directory.path}/image_cache/${prefix}/${cacheFileName.parent}';
@@ -57,12 +53,20 @@ class ImageLoader {
     return cachePath;
   }
 
-  String _photoDirPrefix(MapInfo map, PhotoType type) {
-    switch (type) {
-      case PhotoType.photo:
-        return 'maps/${map.name}';
-      case PhotoType.face:
-        return 'maps/${map.name}/faces';
-    }
+  /// 画像の種類に応じてパスが異なる
+  String _photoDirPrefix(MapInfo map);
+}
+
+/// 写真用の画像をロードする
+class ImageLoaderPhoto extends ImageLoader {
+  String _photoDirPrefix(MapInfo map) {
+    return 'maps/${map.name}';
+  }
+}
+
+/// 顔写真用の画像をロードする
+class ImageLoaderFace extends ImageLoader {
+  String _photoDirPrefix(MapInfo map) {
+    return 'maps/${map.name}/faces';
   }
 }
