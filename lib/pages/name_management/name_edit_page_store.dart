@@ -112,7 +112,7 @@ class NameEditPageStore with ChangeNotifier {
           await nameRepository.uploadPhoto(mapInfo, File(croppedPhotoPath!));
     }
 
-    nameRepository.save(null, mapId, name);
+    await nameRepository.save(null, mapId, name);
     saving = false;
     notifyListeners();
   }

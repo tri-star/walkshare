@@ -77,6 +77,10 @@ class MapInfoRepository {
     return list;
   }
 
+  Future<void> save(MapInfo mapInfo) async {
+    await _firestore.collection('maps').doc(mapInfo.id!).set(mapInfo.toJson());
+  }
+
   Future<Spot> fetchSpot(MapInfo map, String spotId) async {
     var snapshot = await _firestore
         .collection('maps')

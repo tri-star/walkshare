@@ -103,10 +103,14 @@ class _ApplicationState extends State<Application> {
           ),
         ),
         Provider<ImageLoaderPhoto>(
-          create: (_) => ImageLoaderPhoto(),
+          create: (_context) => ImageLoaderPhoto(
+            Provider.of<FirebaseStorage>(_context, listen: false),
+          ),
         ),
         Provider<ImageLoaderFace>(
-          create: (_) => ImageLoaderFace(),
+          create: (_context) => ImageLoaderFace(
+            Provider.of<FirebaseStorage>(_context, listen: false),
+          ),
         ),
         Provider<ImagePicker>(
           create: (_) => ImagePicker(),

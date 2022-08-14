@@ -8,10 +8,14 @@ import 'package:http/http.dart' as http;
 enum PhotoType { photo, face }
 
 abstract class ImageLoader {
+  final FirebaseStorage firebaseStorage;
+
+  ImageLoader(this.firebaseStorage);
+
   Future<String> getDownloadUrl(MapInfo map, String fileName) async {
     var prefix = _photoDirPrefix(map);
     var path = '$prefix/$fileName';
-    return await FirebaseStorage.instance.ref(path).getDownloadURL();
+    return await firebaseStorage.ref(path).getDownloadURL();
   }
 
   Future<File> loadImageWithCache(MapInfo map, String fileName) async {
@@ -59,6 +63,8 @@ abstract class ImageLoader {
 
 /// 写真用の画像をロードする
 class ImageLoaderPhoto extends ImageLoader {
+  ImageLoaderPhoto(FirebaseStorage firebaseStorage) : super(firebaseStorage);
+
   String _photoDirPrefix(MapInfo map) {
     return 'maps/${map.name}';
   }
@@ -66,6 +72,8 @@ class ImageLoaderPhoto extends ImageLoader {
 
 /// 顔写真用の画像をロードする
 class ImageLoaderFace extends ImageLoader {
+  ImageLoaderFace(FirebaseStorage firebaseStorage) : super(firebaseStorage);
+
   String _photoDirPrefix(MapInfo map) {
     return 'maps/${map.name}/faces';
   }
