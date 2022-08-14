@@ -16,6 +16,7 @@ class NameEditPageStore with ChangeNotifier {
   bool loaded;
   bool interacted;
   bool saving;
+  bool faceUpdated = false;
   final NameRepository nameRepository;
   final MapInfoRepository mapInfoRepository;
   final ImagePicker imagePicker;
@@ -29,13 +30,15 @@ class NameEditPageStore with ChangeNotifier {
         name = Name(name: '', pronounce: ''),
         loaded = false,
         interacted = false,
-        saving = false;
+        saving = false,
+        faceUpdated = false;
 
   Future<void> initialize(String mapId, String nameId) async {
     this.mapId = mapId;
     this.nameId = nameId;
     interacted = false;
     saving = false;
+    faceUpdated = false;
     croppedPhotoPath = null;
     var mapInfo = await mapInfoRepository.fetchMapMetaById(mapId);
     var loadedName = await nameRepository.fetchNameById(mapId, nameId);
@@ -71,6 +74,8 @@ class NameEditPageStore with ChangeNotifier {
     }
 
     croppedPhotoPath = cropped.path;
+    faceUpdated = true;
+    setInteracted(true);
     notifyListeners();
   }
 
@@ -94,8 +99,6 @@ class NameEditPageStore with ChangeNotifier {
   }
 
   Future<void> save() async {
-    assert(name != null);
-
     saving = true;
     notifyListeners();
 
@@ -104,12 +107,12 @@ class NameEditPageStore with ChangeNotifier {
       throw UnsupportedError('無効なマップが指定されました。id:${mapId}');
     }
 
-    if (croppedPhotoPath != null) {
+    if (faceUpdated && croppedPhotoPath != null) {
       name.facePhoto =
           await nameRepository.uploadPhoto(mapInfo, File(croppedPhotoPath!));
     }
 
-    nameRepository.save(null, mapId, name!);
+    nameRepository.save(null, mapId, name);
     saving = false;
     notifyListeners();
   }
