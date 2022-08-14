@@ -44,9 +44,11 @@ class NameEditPageStore with ChangeNotifier {
     var loadedName = await nameRepository.fetchNameById(mapId, nameId);
     if (loadedName != null) {
       name = loadedName;
-      var croppedPhotoFile = await imageLoader.loadImageWithCache(
-          mapInfo!, name.facePhoto?.getFileName() ?? '');
-      croppedPhotoPath = croppedPhotoFile.path;
+      if (name.facePhoto != null) {
+        var croppedPhotoFile = await imageLoader.loadImageWithCache(
+            mapInfo!, name.facePhoto?.getFileName() ?? '');
+        croppedPhotoPath = croppedPhotoFile.path;
+      }
     }
     loaded = true;
     notifyListeners();

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,7 +15,7 @@ abstract class ImageLoader {
 
   Future<String> getDownloadUrl(MapInfo map, String fileName) async {
     var prefix = _photoDirPrefix(map);
-    var path = '$prefix/$fileName';
+    var path = p.join(prefix, fileName);
     return await firebaseStorage.ref(path).getDownloadURL();
   }
 
@@ -46,14 +47,12 @@ abstract class ImageLoader {
     final directory = await getTemporaryDirectory();
 
     var prefix = _photoDirPrefix(map);
-    final cacheFileName = File(fileName);
-    final String cacheDir =
-        '${directory.path}/image_cache/${prefix}/${cacheFileName.parent}';
+    final String cacheDir = p.joinAll([directory.path, 'image_cache', prefix]);
     if (!(await Directory(cacheDir).exists())) {
       await Directory(cacheDir).create(recursive: true);
     }
 
-    final cachePath = '$cacheDir/$fileName';
+    final cachePath = p.join(cacheDir, fileName);
     return cachePath;
   }
 
@@ -66,7 +65,7 @@ class ImageLoaderPhoto extends ImageLoader {
   ImageLoaderPhoto(FirebaseStorage firebaseStorage) : super(firebaseStorage);
 
   String _photoDirPrefix(MapInfo map) {
-    return 'maps/${map.name}';
+    return p.join('maps', map.name);
   }
 }
 
@@ -75,6 +74,6 @@ class ImageLoaderFace extends ImageLoader {
   ImageLoaderFace(FirebaseStorage firebaseStorage) : super(firebaseStorage);
 
   String _photoDirPrefix(MapInfo map) {
-    return 'maps/${map.name}/faces';
+    return p.join('maps', map.name, 'faces');
   }
 }
