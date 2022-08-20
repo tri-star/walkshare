@@ -89,7 +89,8 @@ class _MapPageState extends State<MapPage> {
 
   void _handleMapPointTap(String spotId) {
     MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
-    ImageLoader loader = Provider.of<ImageLoader>(context, listen: false);
+    ImageLoaderPhoto loader =
+        Provider.of<ImageLoaderPhoto>(context, listen: false);
     SpotEditPageStore editFormStore =
         Provider.of<SpotEditPageStore>(context, listen: false);
     showModalBottomSheet(
@@ -99,7 +100,7 @@ class _MapPageState extends State<MapPage> {
                 ListenableProvider<MapPageStore>.value(value: store),
                 ListenableProvider<SpotEditPageStore>.value(
                     value: editFormStore),
-                Provider<ImageLoader>.value(value: loader)
+                Provider<ImageLoaderPhoto>.value(value: loader)
               ],
               child: SpotDetailPage(spotId),
             ));

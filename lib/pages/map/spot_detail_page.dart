@@ -76,7 +76,7 @@ class SpotDetailPage extends StatelessWidget {
 
   Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
     final store = Provider.of<MapPageStore>(context);
-    final imageLoader = Provider.of<ImageLoader>(context, listen: false);
+    final imageLoader = Provider.of<ImageLoaderPhoto>(context, listen: false);
 
     final pendingPhotos =
         store.mapInfo!.spots[_spotId]!.photos.map((photo) async {
