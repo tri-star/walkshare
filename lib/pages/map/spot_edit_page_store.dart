@@ -102,6 +102,7 @@ class SpotEditPageStore extends ChangeNotifier {
       return;
     }
     photos.addAll(newPhotos.map((p) => DraftPhoto.draft(p)));
+    setInteracted(true);
     notifyListeners();
   }
 
