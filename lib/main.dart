@@ -76,6 +76,10 @@ class _ApplicationState extends State<Application> {
         Provider<FirebaseStorage>(
           create: (_) => FirebaseStorage.instance,
         ),
+        Provider<FirebaseStorageDownloader>(
+            create: (_context) => FirebaseStorageDownloader(
+                  Provider.of<FirebaseStorage>(_context, listen: false),
+                )),
         Provider<LocationService>(
           create: (_) => LocationService(),
         ),
@@ -105,11 +109,13 @@ class _ApplicationState extends State<Application> {
         Provider<ImageLoaderPhoto>(
           create: (_context) => ImageLoaderPhoto(
             Provider.of<FirebaseStorage>(_context, listen: false),
+            Provider.of<FirebaseStorageDownloader>(_context, listen: false),
           ),
         ),
         Provider<ImageLoaderFace>(
           create: (_context) => ImageLoaderFace(
             Provider.of<FirebaseStorage>(_context, listen: false),
+            Provider.of<FirebaseStorageDownloader>(_context, listen: false),
           ),
         ),
         Provider<ImagePicker>(

@@ -91,7 +91,9 @@ class NameRepository {
     try {
       var photo = FacePhoto.fromPath(file.path);
       var path = "maps/${map.name}/faces/${photo.getFileName()}";
-      await firebaseStorage.ref(path).putFile(File(file.path));
+      await firebaseStorage
+          .ref(path)
+          .putData(await File(file.path).readAsBytes());
 
       return photo;
     } on FirebaseException catch (e) {

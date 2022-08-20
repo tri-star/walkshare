@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
+
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_storage_mocks/firebase_storage_mocks.dart';
 import 'package:strollog/domain/map_info.dart';
@@ -35,7 +38,8 @@ void main() {
         mapInfoRepository,
         ImagePickerStub(),
         ImageCropperStub(),
-        ImageLoaderFace(fakeFirebaseStorage));
+        ImageLoaderFace(fakeFirebaseStorage,
+            FirebaseStorageDownloaderStub(fakeFirebaseStorage)));
 
     testUser = FirebaseTestUtil.createUser();
     authService.setUser(testUser);
@@ -87,7 +91,11 @@ void main() {
       test('画像なしで保存__元の画像が残ること', () async {
         // 顔写真なしの名前データを作成し、保存しておく
         var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
-        var name = FakerBuilder<Name>().create(NameFaker.prepare());
+        var facePhoto = await nameRepository.uploadPhoto(mapInfo,
+            File(p.joinAll(['assets', 'test', 'cat_face_sample.jpg'])));
+
+        var name = FakerBuilder<Name>()
+            .create(NameFaker.prepare(facePhoto: facePhoto));
         await mapInfoRepository.save(mapInfo);
         await nameRepository.save(testUser, mapInfo.id!, name);
 
@@ -101,6 +109,7 @@ void main() {
 
         var result = await nameRepository.fetchNameById(mapInfo.id!, name.id);
         expect(result!.name, expectedName);
+        expect(result.facePhoto!.key, facePhoto.key);
       });
       test('画像を付けて保存__新しい写真が保存されること', () async {});
     });
