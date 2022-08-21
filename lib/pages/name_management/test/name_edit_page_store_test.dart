@@ -25,6 +25,8 @@ void main() {
   late User testUser;
   late MapInfoRepository mapInfoRepository;
   late NameRepository nameRepository;
+  late ImagePickerStub imagePickerStub;
+  late ImageCropperStub imageCropperStub;
 
   setUp(() {
     authService = AuthService();
@@ -32,12 +34,14 @@ void main() {
     var fakeFirebaseStorage = MockFirebaseStorage();
     mapInfoRepository = MapInfoRepository(fakeFirestore);
     nameRepository = NameRepository(fakeFirestore, fakeFirebaseStorage);
+    imagePickerStub = ImagePickerStub();
+    imageCropperStub = ImageCropperStub();
 
     store = NameEditPageStore(
         nameRepository,
         mapInfoRepository,
-        ImagePickerStub(),
-        ImageCropperStub(),
+        imagePickerStub,
+        imageCropperStub,
         ImageLoaderFace(fakeFirebaseStorage,
             FirebaseStorageDownloaderStub(fakeFirebaseStorage)));
 
@@ -84,7 +88,25 @@ void main() {
         var result = await nameRepository.fetchNameById(mapInfo.id!, name.id);
         expect(result!.name, expectedName);
       });
-      test('画像を付けて保存__その写真が保存されること', () async {});
+      test('画像を付けて保存__その写真が保存されること', () async {
+        // 顔写真なしの名前データを作成し、保存しておく
+        var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
+        var name = FakerBuilder<Name>().create(NameFaker.prepare());
+        await mapInfoRepository.save(mapInfo);
+        await nameRepository.save(testUser, mapInfo.id!, name);
+
+        await store.initialize(mapInfo.id!, name.id);
+        // 写真を追加して保存
+        var imagePath = p.joinAll(['assets', 'test', 'cat_face_sample.jpg']);
+        imagePickerStub.setImage(imagePath);
+        imageCropperStub.setImagePath(imagePath);
+        await store.pickImage();
+
+        await store.save();
+
+        var result = await nameRepository.fetchNameById(mapInfo.id!, name.id);
+        expect(result!.facePhoto, isNotNull);
+      });
     });
 
     group('事前に写真登録ありの場合', () {
@@ -111,7 +133,28 @@ void main() {
         expect(result!.name, expectedName);
         expect(result.facePhoto!.key, facePhoto.key);
       });
-      test('画像を付けて保存__新しい写真が保存されること', () async {});
+      test('画像を付けて保存__新しい写真が保存されること', () async {
+        // 顔写真なしの名前データを作成し、保存しておく
+        var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
+        var facePhoto = await nameRepository.uploadPhoto(mapInfo,
+            File(p.joinAll(['assets', 'test', 'cat_face_sample.jpg'])));
+
+        var name = FakerBuilder<Name>()
+            .create(NameFaker.prepare(facePhoto: facePhoto));
+        await mapInfoRepository.save(mapInfo);
+        await nameRepository.save(testUser, mapInfo.id!, name);
+
+        await store.initialize(mapInfo.id!, name.id);
+        var imagePath = p.joinAll(['assets', 'test', 'cat_face_sample.jpg']);
+        imagePickerStub.setImage(imagePath);
+        imageCropperStub.setImagePath(imagePath);
+        await store.pickImage();
+
+        await store.save();
+
+        var result = await nameRepository.fetchNameById(mapInfo.id!, name.id);
+        expect(result!.facePhoto!.key != facePhoto.key, isTrue);
+      });
     });
 
     test('各項目の変更が反映されていること', () {});
