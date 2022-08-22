@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/cat_face_placeholder.dart';
-import 'package:strollog/domain/face_photo.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/layouts/default_layout.dart';
 import 'package:strollog/lib/router/router_state.dart';
@@ -115,7 +114,7 @@ class NameListState extends State<NameList> {
   }
 
   Widget _buildFacePhoto(BuildContext context, Name name) {
-    var imageLoader = ImageLoader(PhotoType.face);
+    var imageLoader = Provider.of<ImageLoaderFace>(context, listen: false);
     var store = Provider.of<NameListPageStore>(context, listen: false);
 
     return FutureBuilder<File>(

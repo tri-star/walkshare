@@ -1,6 +1,7 @@
 import 'package:faker_dart/faker_dart.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/lib/test/faker_builder.dart';
+import 'package:ulid/ulid.dart';
 
 class MapInfoFaker {
   static PrepareFunction<MapInfo> prepare({
@@ -10,7 +11,8 @@ class MapInfoFaker {
     return () {
       var faker = Faker.instance;
 
-      name ??= faker.locale.name.name?.join(' ') ?? '';
+      id ??= Ulid().toString();
+      name ??= faker.animal.cat();
       return MapInfo(name!, {}, id: id);
     };
   }

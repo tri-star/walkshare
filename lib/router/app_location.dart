@@ -52,6 +52,25 @@ class AppLocationNameDetail extends AppLocation {
   String toPath() => UriPathBuilder.build(signature, parameters: parameters);
 }
 
+class AppLocationNameEdit extends AppLocation {
+  final String mapId;
+  final String nameId;
+
+  AppLocationNameEdit({required this.mapId, required this.nameId}) {
+    pathSegments = ['map', ':mapId', 'names', ':nameId', 'edit'];
+    parameters = {
+      'mapId': mapId,
+      'nameId': nameId,
+    };
+  }
+
+  @override
+  String get signature => '/map/:mapId/names/:nameId/edit';
+
+  @override
+  String toPath() => UriPathBuilder.build(signature, parameters: parameters);
+}
+
 class AppLocationPhotoPreview extends AppLocation {
   final String mapId;
   final String spotId;
