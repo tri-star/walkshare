@@ -37,19 +37,7 @@ class _MapPageState extends State<MapPage> {
     if (_state == null) {
       _state = Provider.of<MapPageStore>(context, listen: false);
       _state!.setMapController(_mapController);
-      _state!.init().then((_) {
-        if (!_state!.locationRequested) {
-          _state!.requestLocationPermission().then((permission) {
-            if (permission == LocationPermissionResult.deniedForever) {
-              //return const Center(child: Text("位置情報の使用が拒否されています。"));
-              return;
-            }
-
-            // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
-            _state!.updateLocation();
-          });
-        }
-      });
+      _state!.init();
     }
   }
 
