@@ -146,7 +146,8 @@ class MapInfoRepository {
               .doc(map.id)
               .collection('photos')
               .doc(photo.key))
-          .toList()
+          .toList(),
+      'last_visited': spot.lastVisited,
     };
   }
 
@@ -174,7 +175,8 @@ class MapInfoRepository {
         newDate: data['date'].toDate(),
         score: data['score'] + .0,
         userNameInfo: userNameInfo,
-        photos: photos);
+        photos: photos,
+        lastVisited: data['last_visited']);
     return spot;
   }
 

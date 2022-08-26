@@ -21,13 +21,16 @@ class Spot {
 
   List<Photo> photos;
 
+  DateTime? lastVisited;
+
   Spot(this.title, this.point,
       {String? id,
       this.comment = "",
       DateTime? newDate,
       this.score = 1.0,
       this.userNameInfo,
-      List<Photo>? photos})
+      List<Photo>? photos,
+      this.lastVisited})
       : id = id ?? Ulid().toString(),
         date = newDate ?? DateTime.now(),
         photos = photos ?? [];
