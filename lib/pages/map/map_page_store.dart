@@ -49,6 +49,25 @@ class MapPageStore extends ChangeNotifier {
     var user = _authService.getUser();
     //await _routeRepository.save(user, _strollRoute);
     _mapInfo = await _mapInfoRepository.fetchMapByName('cats');
+
+    if (!_locationRequested) {
+      var permission = await requestLocationPermission();
+      if (permission == LocationPermissionResult.deniedForever) {
+        //return const Center(child: Text("位置情報の使用が拒否されています。"));
+        // 現在位置は取得できないので、デフォルトの座標を取得する。
+        // 最初のスポットか、それがない場合は110-0001あたりにする
+        _position = null;
+        if (_mapInfo?.spots.entries.first != null) {
+          _position = _mapInfo?.spots.entries.first.value.point;
+        } else {
+          _position = Position(35.723605, 139.768156);
+        }
+        return;
+      }
+
+      // 位置情報の追跡を行う場合はここで現在地を求めると停止してしまうので、開始場所は別途検討する
+      updateLocation();
+    }
   }
 
   /// 位置情報の権限を確認、必要に応じて権限の取得を求める
