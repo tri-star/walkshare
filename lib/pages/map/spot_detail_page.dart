@@ -41,9 +41,12 @@ class SpotDetailPage extends StatelessWidget {
             const SizedBox(width: 100, child: Text('タイトル')),
             Text(title),
           ]),
-          Row(children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(width: 100, child: Text('コメント')),
-            Text(comment),
+            Container(
+                child: Flexible(
+              child: Text(comment),
+            ))
           ]),
           Row(children: [
             const SizedBox(width: 100, child: Text('最終訪問日')),
