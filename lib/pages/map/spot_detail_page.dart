@@ -22,6 +22,7 @@ class SpotDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
     var title = store.mapInfo!.spots[_spotId]!.title;
+    var comment = store.mapInfo!.spots[_spotId]!.comment;
     var date = store.mapInfo!.spots[_spotId]!.date;
     final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
@@ -37,6 +38,10 @@ class SpotDetailPage extends StatelessWidget {
           Row(children: [
             const SizedBox(width: 100, child: Text('タイトル')),
             Text(title),
+          ]),
+          Row(children: [
+            const SizedBox(width: 100, child: Text('コメント')),
+            Text(comment),
           ]),
           FutureBuilder<List<DraftPhoto>>(
             future: _loadImages(context),
