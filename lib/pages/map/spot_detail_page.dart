@@ -10,7 +10,6 @@ import 'package:strollog/domain/photo.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/photo_preview_page.dart';
-import 'package:strollog/pages/map/spot_edit_page_store.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
@@ -25,8 +24,6 @@ class SpotDetailPage extends StatelessWidget {
     var title = store.mapInfo!.spots[_spotId]!.title;
     var date = store.mapInfo!.spots[_spotId]!.date;
     final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
-
-    var editFormStore = Provider.of<SpotEditPageStore>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.all(10),
