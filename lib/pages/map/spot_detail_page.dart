@@ -4,6 +4,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/components/date_time_picker.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/domain/map_info.dart';
@@ -164,6 +165,13 @@ class SpotDetailPage extends StatelessWidget {
               Text(dateString),
               const Icon(Icons.update, size: 32),
             ])),
-        onTap: () {});
+        onTap: () async {
+          await DateTimePicker.show(
+            context,
+            initialDate: spot.lastVisited ?? DateTime.now(),
+            firstDate: DateTime(2000, 1, 1),
+            lastDate: DateTime.now(),
+          );
+        });
   }
 }
