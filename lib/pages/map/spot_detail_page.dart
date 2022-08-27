@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
+import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
@@ -42,6 +43,10 @@ class SpotDetailPage extends StatelessWidget {
           Row(children: [
             const SizedBox(width: 100, child: Text('コメント')),
             Text(comment),
+          ]),
+          Row(children: [
+            const SizedBox(width: 100, child: Text('最終訪問日')),
+            _buildLastVisited(context, store.mapInfo!.spots[_spotId]!),
           ]),
           FutureBuilder<List<DraftPhoto>>(
             future: _loadImages(context),
@@ -145,5 +150,20 @@ class SpotDetailPage extends StatelessWidget {
             children: photos)
       ]))
     ])));
+  }
+
+  Widget _buildLastVisited(BuildContext context, Spot spot) {
+    var dateString = spot.lastVisited != null
+        ? DateFormat('yyyy-MM-DD HH:mm').format(spot.lastVisited!)
+        : '未設定';
+
+    return InkWell(
+        child: Container(
+            padding: const EdgeInsets.only(top: 8, bottom: 8),
+            child: Row(children: [
+              Text(dateString),
+              const Icon(Icons.update, size: 32),
+            ])),
+        onTap: () {});
   }
 }
