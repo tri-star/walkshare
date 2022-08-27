@@ -132,7 +132,9 @@ class SpotDetailPage extends StatelessWidget {
                 ]));
           });
     }).toList();
-    return Row(children: [
+    return Flexible(
+        child: SingleChildScrollView(
+            child: Row(children: [
       Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -142,6 +144,6 @@ class SpotDetailPage extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.start,
             children: photos)
       ]))
-    ]);
+    ])));
   }
 }
