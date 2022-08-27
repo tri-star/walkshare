@@ -90,7 +90,7 @@ class _MapPageState extends State<MapPage> {
                     value: editFormStore),
                 Provider<ImageLoaderPhoto>.value(value: loader)
               ],
-              child: SpotDetailPage(spotId),
+              child: SpotDetailPage(store.mapInfo!.spots[spotId]!),
             ));
   }
 }

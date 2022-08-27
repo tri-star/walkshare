@@ -16,21 +16,16 @@ import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
 class SpotDetailPage extends StatelessWidget {
-  final String _spotId;
-  Spot? spot;
+  Spot spot;
 
-  SpotDetailPage(this._spotId, {Key? key})
-      : spot = null,
-        super(key: key);
+  SpotDetailPage(this.spot, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var store = Provider.of<MapPageStore>(context);
-    spot = store.mapInfo!.spots[_spotId];
-
-    var title = spot!.title;
-    var comment = spot!.comment;
-    var date = spot!.date;
+    final mapPageStore = Provider.of<MapPageStore>(context);
+    var title = spot.title;
+    var comment = spot.comment;
+    var date = spot.date;
     final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
     return Container(
@@ -55,7 +50,7 @@ class SpotDetailPage extends StatelessWidget {
           ]),
           Row(children: [
             const SizedBox(width: 100, child: Text('最終訪問日')),
-            _buildLastVisited(context, spot!),
+            _buildLastVisited(context, spot),
           ]),
           FutureBuilder<List<DraftPhoto>>(
             future: _loadImages(context),
@@ -73,7 +68,7 @@ class SpotDetailPage extends StatelessWidget {
                 onTap: () {
                   Provider.of<RouterState>(context, listen: false).pushRoute(
                       AppLocationSpotEdit(
-                          mapId: store.mapInfo!.id!, spotId: _spotId));
+                          mapId: mapPageStore.mapInfo!.id!, spotId: spot.id));
                 },
                 icon: const Icon(Icons.edit),
                 title: '編集'),
@@ -91,12 +86,12 @@ class SpotDetailPage extends StatelessWidget {
   }
 
   Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
-    final store = Provider.of<MapPageStore>(context);
+    final mapPageStore = Provider.of<MapPageStore>(context);
     final imageLoader = Provider.of<ImageLoaderPhoto>(context, listen: false);
 
-    final pendingPhotos = spot!.photos.map((photo) async {
+    final pendingPhotos = spot.photos.map((photo) async {
       var cacheFile = await imageLoader.loadImageWithCache(
-          store.mapInfo!, photo.getFileName());
+          mapPageStore.mapInfo!, photo.getFileName());
       return DraftPhoto.saved(photo, cachePath: cacheFile.path);
     }).toList();
 
@@ -104,7 +99,7 @@ class SpotDetailPage extends StatelessWidget {
   }
 
   Widget _buildPhotoList(BuildContext context, List<DraftPhoto> draftPhotos) {
-    var store = Provider.of<MapPageStore>(context);
+    var mapPageStore = Provider.of<MapPageStore>(context);
     final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
       var index = entry.key;
       var draftPhoto = entry.value;
@@ -112,9 +107,9 @@ class SpotDetailPage extends StatelessWidget {
           transitionType: ContainerTransitionType.fadeThrough,
           transitionDuration: const Duration(milliseconds: 500),
           openBuilder: (context, closeContainer) {
-            var spotPhotos = spot!.photos;
+            var spotPhotos = spot.photos;
             return PhotoPreviewPage(
-                map: store.mapInfo!, photos: spotPhotos ?? [], index: index);
+                map: mapPageStore.mapInfo!, photos: spotPhotos, index: index);
           },
           closedElevation: 2.0,
           closedShape: RoundedRectangleBorder(
