@@ -132,6 +132,19 @@ class MapInfoRepository {
         .set(_makeSpotJson(map, spot, spot.userNameInfo?.id));
   }
 
+  Future<void> updateLastVisited(
+      MapInfo map, String spotId, DateTime? date) async {
+//    map.spots[spotId]!.lastVisited = date;
+    await _firestore
+        .collection('maps')
+        .doc(map.id)
+        .collection('spots')
+        .doc(spotId)
+        .update({
+      'last_visited': date,
+    });
+  }
+
   Map<String, dynamic> _makeSpotJson(MapInfo map, Spot spot, String? uid) {
     return {
       'title': spot.title,
@@ -146,7 +159,8 @@ class MapInfoRepository {
               .doc(map.id)
               .collection('photos')
               .doc(photo.key))
-          .toList()
+          .toList(),
+      'last_visited': spot.lastVisited,
     };
   }
 
@@ -174,7 +188,8 @@ class MapInfoRepository {
         newDate: data['date'].toDate(),
         score: data['score'] + .0,
         userNameInfo: userNameInfo,
-        photos: photos);
+        photos: photos,
+        lastVisited: data['last_visited']?.toDate());
     return spot;
   }
 

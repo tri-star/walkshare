@@ -57,7 +57,7 @@ class MapPageStore extends ChangeNotifier {
         // 現在位置は取得できないので、デフォルトの座標を取得する。
         // 最初のスポットか、それがない場合は110-0001あたりにする
         _position = null;
-        if (_mapInfo?.spots.entries.first != null) {
+        if (_mapInfo?.spots.entries.isNotEmpty ?? false) {
           _position = _mapInfo?.spots.entries.first.value.point;
         } else {
           _position = Position(35.723605, 139.768156);
