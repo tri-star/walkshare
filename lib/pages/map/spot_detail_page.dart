@@ -12,6 +12,7 @@ import 'package:strollog/domain/photo.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/photo_preview_page.dart';
+import 'package:strollog/pages/map/spot_detail_page_store.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/services/image_loader.dart';
 
@@ -23,6 +24,10 @@ class SpotDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapPageStore = Provider.of<MapPageStore>(context);
+    final store = Provider.of<SpotDetailPageStore>(context);
+
+    store.init(mapPageStore.mapInfo!, spot);
+
     var title = spot.title;
     var comment = spot.comment;
     var date = spot.date;
@@ -156,8 +161,9 @@ class SpotDetailPage extends StatelessWidget {
   }
 
   Widget _buildLastVisited(BuildContext context, Spot spot) {
+    var store = Provider.of<SpotDetailPageStore>(context);
     var dateString = spot.lastVisited != null
-        ? DateFormat('yyyy-MM-DD HH:mm').format(spot.lastVisited!)
+        ? DateFormat('yyyy-MM-dd HH:mm').format(spot.lastVisited!)
         : '未設定';
 
     return InkWell(
@@ -168,12 +174,13 @@ class SpotDetailPage extends StatelessWidget {
               const Icon(Icons.update, size: 32),
             ])),
         onTap: () async {
-          await DateTimePicker.show(
+          var date = await DateTimePicker.show(
             context,
             initialDate: spot.lastVisited ?? DateTime.now(),
             firstDate: DateTime(2000, 1, 1),
             lastDate: DateTime.now(),
           );
+          store.setLastVisited(date);
         });
   }
 }
