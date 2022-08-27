@@ -17,15 +17,20 @@ import 'package:strollog/services/image_loader.dart';
 
 class SpotDetailPage extends StatelessWidget {
   final String _spotId;
+  Spot? spot;
 
-  const SpotDetailPage(this._spotId, {Key? key}) : super(key: key);
+  SpotDetailPage(this._spotId, {Key? key})
+      : spot = null,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var store = Provider.of<MapPageStore>(context);
-    var title = store.mapInfo!.spots[_spotId]!.title;
-    var comment = store.mapInfo!.spots[_spotId]!.comment;
-    var date = store.mapInfo!.spots[_spotId]!.date;
+    spot = store.mapInfo!.spots[_spotId];
+
+    var title = spot!.title;
+    var comment = spot!.comment;
+    var date = spot!.date;
     final dateString = DateFormat('yyyy-MM-dd HH:mm').format(date);
 
     return Container(
@@ -50,7 +55,7 @@ class SpotDetailPage extends StatelessWidget {
           ]),
           Row(children: [
             const SizedBox(width: 100, child: Text('最終訪問日')),
-            _buildLastVisited(context, store.mapInfo!.spots[_spotId]!),
+            _buildLastVisited(context, spot!),
           ]),
           FutureBuilder<List<DraftPhoto>>(
             future: _loadImages(context),
@@ -89,8 +94,7 @@ class SpotDetailPage extends StatelessWidget {
     final store = Provider.of<MapPageStore>(context);
     final imageLoader = Provider.of<ImageLoaderPhoto>(context, listen: false);
 
-    final pendingPhotos =
-        store.mapInfo!.spots[_spotId]!.photos.map((photo) async {
+    final pendingPhotos = spot!.photos.map((photo) async {
       var cacheFile = await imageLoader.loadImageWithCache(
           store.mapInfo!, photo.getFileName());
       return DraftPhoto.saved(photo, cachePath: cacheFile.path);
@@ -108,7 +112,7 @@ class SpotDetailPage extends StatelessWidget {
           transitionType: ContainerTransitionType.fadeThrough,
           transitionDuration: const Duration(milliseconds: 500),
           openBuilder: (context, closeContainer) {
-            var spotPhotos = store.mapInfo?.spots[_spotId]?.photos;
+            var spotPhotos = spot!.photos;
             return PhotoPreviewPage(
                 map: store.mapInfo!, photos: spotPhotos ?? [], index: index);
           },
