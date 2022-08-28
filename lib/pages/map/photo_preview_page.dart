@@ -92,7 +92,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       width: 60,
                       child: Text('登録日'),
                     ),
-                    Text(photo?.savedPhoto?.date != null
+                    Text(photo.savedPhoto?.date != null
                         ? DateFormat('yyyy-MM-dd HH:mm')
                             .format(photo.savedPhoto!.date!)
                         : '-'),
