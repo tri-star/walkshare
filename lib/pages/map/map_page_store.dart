@@ -96,6 +96,11 @@ class MapPageStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setPosition(Position newPosition) {
+    _position = newPosition;
+    notifyListeners();
+  }
+
   Future<void> listenLocation() async {
     if (!_locationRequested) {
       throw UnsupportedError("予期しない呼び出しです2");

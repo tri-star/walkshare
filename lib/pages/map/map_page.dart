@@ -68,6 +68,9 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _handleLongTap(Position position) async {
+    MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
+    store.setPosition(position);
+
     Provider.of<RouterState>(context, listen: false)
         .pushRoute(AppLocationSpotCreate(
       mapId: _state!.mapInfo!.id!,
@@ -81,6 +84,8 @@ class _MapPageState extends State<MapPage> {
         Provider.of<ImageLoaderPhoto>(context, listen: false);
     SpotEditPageStore editFormStore =
         Provider.of<SpotEditPageStore>(context, listen: false);
+    store.setPosition(store.mapInfo!.spots[spotId]!.point);
+
     showModalBottomSheet(
         context: context,
         builder: (context) => MultiProvider(
