@@ -25,13 +25,14 @@ export const migrate01LastVisited = functions.pubsub.topic("migrate01LastVisited
 
       let lastVisited: Date|undefined = pickLatest(document.date?.toDate(), document.lastVisited?.toDate());
       if (photos && photos.length > 0) {
-        lastVisited = pickLatest(getPhotoDate(photos));
+        lastVisited = pickLatest(getPhotoDate(photos), lastVisited);
       }
 
       await admin.firestore().collection("maps").doc(mapId).collection("spots").doc(doc.id).update({
         "last_visited": lastVisited ?? null,
       });
     });
+    console.log("done");
   });
 
 
@@ -44,19 +45,19 @@ function getPhotoDate(documents: admin.firestore.DocumentData[]): Date|undefined
 
 function pickLatest(date1?: Date, date2?: Date): Date|undefined {
   // 深夜・早朝のものはリアルなものではないので除外する
-  let hour = 0;
-  if (date1) {
-    hour = date1.getHours() + 9;
-    if (hour <= 6 || hour >= 20) {
-      date1 = undefined;
-    }
-  }
-  if (date2) {
-    hour = date2.getHours() + 9;
-    if (hour <= 6 || hour >= 20) {
-      date2 = undefined;
-    }
-  }
+  // let hour = 0;
+  // if (date1) {
+  //   hour = date1.getHours() + 9;
+  //   if (hour <= 6 || hour >= 20) {
+  //     date1 = undefined;
+  //   }
+  // }
+  // if (date2) {
+  //   hour = date2.getHours() + 9;
+  //   if (hour <= 6 || hour >= 20) {
+  //     date2 = undefined;
+  //   }
+  // }
 
   if (!date1 && !date2) {
     return undefined;
