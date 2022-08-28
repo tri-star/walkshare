@@ -80,7 +80,8 @@ class SpotEditPageStore extends ChangeNotifier {
     var newSpot = Spot(title, point,
         comment: comment,
         newDate: _originalSpot!.date,
-        userNameInfo: _originalSpot!.userNameInfo);
+        userNameInfo: _originalSpot!.userNameInfo,
+        lastVisited: _originalSpot!.lastVisited);
 
     _saving = true;
     notifyListeners();

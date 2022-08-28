@@ -33,7 +33,9 @@ class Spot {
       this.lastVisited})
       : id = id ?? Ulid().toString(),
         date = newDate ?? DateTime.now(),
-        photos = photos ?? [];
+        photos = photos ?? [] {
+    lastVisited ??= DateTime.now();
+  }
 
   void addPhotos(List<Photo> newPhotos) {
     photos.addAll(newPhotos);
