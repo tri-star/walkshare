@@ -140,6 +140,7 @@ class _ApplicationState extends State<Application> {
             create: (_context) => SpotEditPageStore(
                   Provider.of<MapInfoRepository>(_context, listen: false),
                   Provider.of<PhotoRepository>(_context, listen: false),
+                  Provider.of<NameRepository>(_context, listen: false),
                   Provider.of<AuthService>(_context, listen: false),
                   Provider.of<ImageLoaderPhoto>(_context, listen: false),
                 )),

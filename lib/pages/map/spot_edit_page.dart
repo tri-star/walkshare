@@ -14,6 +14,7 @@ import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/spot_edit_page_store.dart';
+import 'package:strollog/pages/name_management/name_edit_page_store.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/services/image_loader.dart';
 
@@ -251,47 +252,52 @@ class NameList extends StatefulWidget {
 }
 
 class NameListState extends State<NameList> {
-  List<Name>? nameList;
   String? selectedNameId;
 
   @override
   void initState() {
     super.initState();
     selectedNameId = widget.draftPhoto.name?.id;
-    Provider.of<NameRepository>(context, listen: false)
-        .fetchNames(widget.mapInfo.id!)
-        .then((value) => setState(() => nameList = value));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    var store = Provider.of<SpotEditPageStore>(context);
+    return Container(
+        child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text('名前を選択'),
-        SizedBox(
-            height: 300,
+        TextField(
+          decoration: const InputDecoration(hintText: 'よみを入力'),
+          onChanged: (text) {
+            store.updateNameFilter(text);
+          },
+        ),
+        Expanded(
             child: ListView(
-              children: nameList?.map((name) {
-                    return ListTile(
-                      title: Text(name.name),
-                      selected: selectedNameId == name.id,
-                      onTap: () {
-                        setState(() => selectedNameId = name.id);
-                      },
-                      leading: _buildFacePhoto(name),
-                    );
-                  }).toList() ??
-                  [],
-            )),
+          children: store.getFilteredNames().map((name) {
+            return ListTile(
+              title: Text(name.name),
+              selected: selectedNameId == name.id,
+              onTap: () {
+                setState(() => selectedNameId = name.id);
+              },
+              leading: _buildFacePhoto(name),
+            );
+          }).toList(),
+        )),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           WSButton(
             title: '決定',
             icon: const Icon(Icons.check),
             onTap: () {
-              Navigator.pop(context,
-                  nameList!.firstWhere((name) => name.id == selectedNameId));
+              Navigator.pop(
+                  context,
+                  store
+                      .getFilteredNames()
+                      .firstWhere((name) => name.id == selectedNameId));
             },
           ),
           WSButton(
@@ -303,7 +309,7 @@ class NameListState extends State<NameList> {
           ),
         ]),
       ],
-    );
+    ));
   }
 
   Widget _buildFacePhoto(Name name) {
