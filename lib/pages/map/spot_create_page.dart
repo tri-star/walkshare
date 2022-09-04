@@ -255,26 +255,34 @@ class NameListState extends State<NameList> {
 
   @override
   Widget build(BuildContext context) {
+    var store = Provider.of<SpotCreatePageStore>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text('名前を選択'),
-        SizedBox(
-            height: 300,
+        TextFormField(
+          initialValue: store.nameFilter,
+          decoration: const InputDecoration(
+            hintText: 'よみを入力',
+          ),
+          onChanged: (text) {
+            store.updateNameFilter(text);
+          },
+        ),
+        Expanded(
             child: ListView(
-              children: nameList?.map((name) {
-                    return ListTile(
-                      title: Text(name.name),
-                      selected: selectedNameId == name.id,
-                      onTap: () {
-                        setState(() => selectedNameId = name.id);
-                      },
-                      leading: _buildFacePhoto(name),
-                    );
-                  }).toList() ??
-                  [],
-            )),
+          children: store.getFilteredNames().map((name) {
+            return ListTile(
+              title: Text(name.name),
+              selected: selectedNameId == name.id,
+              onTap: () {
+                setState(() => selectedNameId = name.id);
+              },
+              leading: _buildFacePhoto(name),
+            );
+          }).toList(),
+        )),
         Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
           WSButton(
             title: '決定',

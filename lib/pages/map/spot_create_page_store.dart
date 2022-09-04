@@ -84,6 +84,8 @@ class SpotCreatePageStore extends ChangeNotifier {
     return spot;
   }
 
+  String get nameFilter => _nameFilter;
+
   void updateNameFilter(String filter) {
     _nameFilter = filter;
     notifyListeners();
