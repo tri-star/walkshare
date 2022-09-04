@@ -176,7 +176,7 @@ class SpotDetailPage extends StatelessWidget {
         onTap: () async {
           var date = await DateTimePicker.show(
             context,
-            initialDate: spot.lastVisited ?? DateTime.now(),
+            initialDate: DateTime.now(),
             firstDate: DateTime(2000, 1, 1),
             lastDate: DateTime.now(),
           );
