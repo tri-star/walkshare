@@ -15,6 +15,7 @@ class SpotEditPageStore extends ChangeNotifier {
   final NameRepository _nameRepository;
   final AuthService _authService;
   final ImageLoaderPhoto _imageLoader;
+  final ImagePicker _imagePicker;
 
   Spot? _originalSpot;
 
@@ -24,8 +25,6 @@ class SpotEditPageStore extends ChangeNotifier {
 
   String title = '';
   String comment = '';
-
-  final ImagePicker _picker;
 
   List<DraftPhoto> photos = [];
 
@@ -40,9 +39,13 @@ class SpotEditPageStore extends ChangeNotifier {
   bool get interacted => _interacted;
   bool get saving => _saving;
 
-  SpotEditPageStore(this._mapInfoRepository, this._photoRepository,
-      this._nameRepository, this._authService, this._imageLoader)
-      : _picker = ImagePicker();
+  SpotEditPageStore(
+      this._mapInfoRepository,
+      this._photoRepository,
+      this._nameRepository,
+      this._authService,
+      this._imagePicker,
+      this._imageLoader);
 
   Future<void> init(MapInfo mapInfo, String spotId) async {
     _initialized = false;
@@ -122,7 +125,7 @@ class SpotEditPageStore extends ChangeNotifier {
   }
 
   Future<void> pickImage() async {
-    List<XFile>? newPhotos = await _picker.pickMultiImage();
+    List<XFile>? newPhotos = await _imagePicker.pickMultiImage();
     if (newPhotos == null) {
       return;
     }

@@ -111,7 +111,7 @@ class MapInfoRepository {
     });
   }
 
-  Future<void> addSpot(MapInfo map, String uid, Spot spot) async {
+  Future<void> addSpot(MapInfo map, String? uid, Spot spot) async {
     map.spots[spot.id] = spot;
     var id = spot.id;
     await _firestore
