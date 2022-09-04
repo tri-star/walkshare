@@ -79,6 +79,8 @@ class SpotEditPageStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  String get nameFilter => _nameFilter;
+
   void updateNameFilter(String newValue) {
     _nameFilter = newValue;
     notifyListeners();
