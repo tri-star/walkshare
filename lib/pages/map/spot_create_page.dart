@@ -43,7 +43,6 @@ class SpotCreateForm extends StatefulWidget {
 }
 
 class _SpotCreateFormState extends State<SpotCreateForm> {
-  late MapInfo _mapInfo;
   late SpotCreatePageStore _store;
   final _formKey = GlobalKey<FormState>();
 
@@ -51,9 +50,9 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
   void initState() {
     super.initState();
     _store = Provider.of<SpotCreatePageStore>(context, listen: false);
-    _store.initialize();
-    _mapInfo =
+    var mapInfo =
         Provider.of<AppStore>(context, listen: false).getMapInfo(widget.mapId)!;
+    _store.initialize(mapInfo, widget.position);
   }
 
   @override
@@ -111,8 +110,7 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
                           onTap: _canSave()
                               ? () async {
                                   _formKey.currentState!.save();
-                                  var spot = await store.save(
-                                      _mapInfo, widget.position);
+                                  var spot = await store.save();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content: Text('スポットを登録しました。')),
@@ -221,9 +219,12 @@ class _SpotCreateFormState extends State<SpotCreateForm> {
       elevation: 10,
       useRootNavigator: true,
       builder: (context) {
-        return MultiProvider(providers: [
-          Provider<NameRepository>.value(value: nameRepository),
-        ], child: SizedBox(height: 600, child: NameList(_mapInfo, draftPhoto)));
+        return MultiProvider(
+            providers: [
+              Provider<NameRepository>.value(value: nameRepository),
+            ],
+            child: SizedBox(
+                height: 600, child: NameList(store.mapInfo, draftPhoto)));
       },
     );
   }
