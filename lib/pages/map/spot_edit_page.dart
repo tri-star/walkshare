@@ -14,7 +14,6 @@ import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/spot_edit_page_store.dart';
-import 'package:strollog/pages/name_management/name_edit_page_store.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/services/image_loader.dart';
 
@@ -269,7 +268,8 @@ class NameListState extends State<NameList> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const Text('名前を選択'),
-        TextField(
+        TextFormField(
+          initialValue: store.nameFilter,
           decoration: const InputDecoration(hintText: 'よみを入力'),
           onChanged: (text) {
             store.updateNameFilter(text);

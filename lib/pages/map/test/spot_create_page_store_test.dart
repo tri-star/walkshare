@@ -10,6 +10,7 @@ import 'package:strollog/lib/test/firebase_test_utils.dart';
 import 'package:strollog/lib/test/image_picker_stub.dart';
 import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:test/test.dart';
@@ -21,9 +22,13 @@ void main() {
 
   setUp(() {
     authService = AuthService();
+    var fakeFireStore = FakeFirebaseFirestore();
+    var fakeFirebaseStorage = MockFirebaseStorage();
+
     store = SpotCreatePageStore(
-        MapInfoRepository(FakeFirebaseFirestore()),
-        PhotoRepository(FakeFirebaseFirestore(), MockFirebaseStorage()),
+        MapInfoRepository(fakeFireStore),
+        PhotoRepository(fakeFireStore, fakeFirebaseStorage),
+        NameRepository(fakeFireStore, fakeFirebaseStorage),
         authService,
         ImagePickerStub());
 
@@ -52,10 +57,11 @@ void main() {
       test('保存処理中に再度保存を実行', () {
         var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
         var position = FakerBuilder<Position>().create(PositionFaker.prepare());
+        store.initialize(mapInfo, position);
 
         store.setInteracted(true);
 
-        store.save(mapInfo, position);
+        store.save();
         var result = store.canSave();
         expect(result, false);
       });
@@ -65,10 +71,11 @@ void main() {
       test('フォームに何か変更を加えた後で保存実行', () async {
         var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
         var position = FakerBuilder<Position>().create(PositionFaker.prepare());
+        store.initialize(mapInfo, position);
 
         store.setInteracted(true);
 
-        var result = await store.save(mapInfo, position);
+        var result = await store.save();
         expect(result.id, isNotEmpty);
       });
     });

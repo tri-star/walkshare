@@ -5,20 +5,27 @@ import 'package:strollog/domain/name.dart';
 import 'package:strollog/domain/photo.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
+import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
 
 class SpotCreatePageStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
   final PhotoRepository _photoRepository;
+  final NameRepository _nameRepository;
   final AuthService _authService;
+  final ImagePicker _picker;
+
+  late MapInfo mapInfo;
+  late Position _position;
 
   String title = '';
   String comment = '';
 
-  final ImagePicker _picker;
-
   List<DraftPhoto> _photos = [];
+
+  List<Name> _nameList = [];
+  String _nameFilter = '';
 
   bool _interacted = false;
   bool _saving = false;
@@ -28,12 +35,17 @@ class SpotCreatePageStore extends ChangeNotifier {
   bool get saving => _saving;
 
   SpotCreatePageStore(this._mapInfoRepository, this._photoRepository,
-      this._authService, this._picker);
+      this._nameRepository, this._authService, this._picker);
 
-  void initialize() {
+  Future<void> initialize(MapInfo mapInfo, Position position) async {
+    this.mapInfo = mapInfo;
+    _position = position;
+
     title = '';
     comment = '';
     _photos = [];
+    _nameList = await _nameRepository.fetchNames(this.mapInfo.id!);
+    _nameFilter = '';
   }
 
   void setName(DraftPhoto draftPhoto, Name? name) {
@@ -47,7 +59,7 @@ class SpotCreatePageStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Spot> save(MapInfo mapInfo, Position _position) async {
+  Future<Spot> save() async {
     var spot = Spot(title, _position, comment: comment);
 
     _saving = true;
@@ -70,6 +82,22 @@ class SpotCreatePageStore extends ChangeNotifier {
     notifyListeners();
 
     return spot;
+  }
+
+  String get nameFilter => _nameFilter;
+
+  void updateNameFilter(String filter) {
+    _nameFilter = filter;
+    notifyListeners();
+  }
+
+  List<Name> getFilteredNames() {
+    return _nameList.where((name) {
+      if (_nameFilter == '') {
+        return true;
+      }
+      return name.pronounce.contains(_nameFilter);
+    }).toList();
   }
 
   String? validateTitle(String? value) {
