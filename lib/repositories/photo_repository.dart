@@ -5,6 +5,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
+import 'package:strollog/services/exif_datetime_parser.dart';
 
 class PhotoRepository {
   final FirebaseFirestore _firestore;
@@ -22,6 +23,14 @@ class PhotoRepository {
         Photo photo;
         if (draftPhoto.isDraft()) {
           photo = Photo.fromPath(draftPhoto.file!.path, uid);
+
+          var exifDateTimeParser = ExifDateTimeParser();
+          var exifDateTime =
+              await exifDateTimeParser.parseFromPath(draftPhoto.file!.path);
+          if (exifDateTime != null) {
+            photo.date = exifDateTime;
+          }
+
           var path = "maps/${map.name}/${photo.getFileName()}";
           await _firestorage.ref(path).putFile(File(draftPhoto.file!.path));
         } else {
