@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
@@ -22,6 +23,7 @@ import 'package:test/test.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
   late AuthService authService;
   late NameEditPageStore store;
   late User testUser;
