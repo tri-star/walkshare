@@ -23,7 +23,6 @@ import 'package:test/test.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
   late AuthService authService;
   late NameEditPageStore store;
   late User testUser;
@@ -115,6 +114,7 @@ void main() {
 
     group('事前に写真登録ありの場合', () {
       test('画像なしで保存__元の画像が残ること', () async {
+        DartPluginRegistrant.ensureInitialized();
         // 顔写真なしの名前データを作成し、保存しておく
         var mapInfo = FakerBuilder<MapInfo>().create(MapInfoFaker.prepare());
         var facePhoto = await nameRepository.uploadPhoto(mapInfo,
