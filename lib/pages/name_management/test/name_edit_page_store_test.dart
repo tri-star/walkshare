@@ -20,7 +20,7 @@ import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
 import 'package:test/test.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   late AuthService authService;
   late NameEditPageStore store;
