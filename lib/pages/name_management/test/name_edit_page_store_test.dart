@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
@@ -19,7 +20,8 @@ import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
 import 'package:test/test.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   late AuthService authService;
   late NameEditPageStore store;
   late User testUser;
