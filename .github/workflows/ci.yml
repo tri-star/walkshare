@@ -16,7 +16,7 @@ jobs:
           java-version: "17.x"
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "3.0.5"
+          flutter-version: "3.7.0"
       - run: flutter pub get
       - run: flutter test --coverage lib
       - name: "upload coverage"
@@ -31,7 +31,7 @@ jobs:
           java-version: "17.x"
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "3.0.5"
+          flutter-version: "3.7.0"
       - run: flutter pub get
       - env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
