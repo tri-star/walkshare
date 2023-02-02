@@ -16,7 +16,8 @@ class LightThemeBuilder {
         // フォーム見出し
         labelMedium: TextStyle(fontSize: 14, color: Colors.grey.shade600),
       ),
-      selectedRowColor: Colors.blue.shade200,
+      colorScheme: base.colorScheme.copyWith(),
+      // selectedRowColor: Colors.blue.shade200,
       listTileTheme: base.listTileTheme.copyWith(
           selectedTileColor: Colors.lightBlue.shade50,
           selectedColor: Colors.lightBlue.shade800),

@@ -13,12 +13,14 @@ class ImagePickerStub extends ImagePicker {
     _imagePaths = paths;
   }
 
+  @override
   Future<XFile?> pickImage({
     required ImageSource source,
     double? maxWidth,
     double? maxHeight,
     int? imageQuality,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
+    bool requestFullMetadata = true,
   }) async {
     if (_imagePaths.isEmpty) {
       return null;
@@ -33,13 +35,15 @@ class ImagePickerStub extends ImagePicker {
     );
   }
 
-  Future<List<XFile>?> pickMultiImage({
+  @override
+  Future<List<XFile>> pickMultiImage({
     double? maxWidth,
     double? maxHeight,
     int? imageQuality,
+    bool requestFullMetadata = true,
   }) async {
     if (_imagePaths.isEmpty) {
-      return null;
+      return [];
     }
     return Future.wait(_imagePaths.map((path) async {
       var imageFile = File(_imagePaths[0]);
