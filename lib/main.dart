@@ -32,13 +32,16 @@ import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
 import 'package:strollog/theme/light_theme_builder.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
     if (!kIsWeb) {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     } else {
       throw UnimplementedError("Web版は未対応です");
