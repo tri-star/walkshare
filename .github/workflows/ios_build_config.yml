@@ -19,6 +19,8 @@ jobs:
 
       - name: Flutter build config only
         run: |
+          flutter clean
+          pod repo update
           flutter pub get
           flutter build ios --config-only --no-codesign
 
