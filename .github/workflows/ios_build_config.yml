@@ -3,6 +3,7 @@ name: iOS Build Config
 on:
   workflow_dispatch:
 
+# このワークフローを実行する際は、Podfile, Podfile.lock両方の削除が必要です。
 jobs:
   build-config:
     runs-on: macos-latest
