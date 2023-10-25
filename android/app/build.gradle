@@ -22,20 +22,10 @@ if (flutterVersionName == null) {
 }
 
 
-def dartEnvironmentVariables = [:];
-if (project.hasProperty('dart-defines')) {
-    dartEnvironmentVariables = dartEnvironmentVariables + project.property('dart-defines')
-        .split(',')
-        .collectEntries { entry ->
-            def pair = new String(entry.decodeBase64(), 'UTF-8').split('=')
-            [(pair.first()): pair.last()]
-        }
-}
-
-def googleMapsApiKey = localProperties.getProperty("google.maps_api_key_${dartEnvironmentVariables.FLAVOR}")
+def googleMapsApiKey = localProperties.getProperty("google.maps_api_key_$flavor")
 
 task selectGoogleServicesJson(type: Copy) {
-    from "src/flavors/${dartEnvironmentVariables.FLAVOR}/google-services.json"
+    from "src/flavors/$flavor/google-services.json"
     into './'
 }
 
@@ -78,12 +68,8 @@ android {
             googleMapsApiKey: "$googleMapsApiKey"
         ]
         multiDexEnabled true
-
-        if (dartEnvironmentVariables.FLAVOR != 'prod') {
-            applicationIdSuffix ".${dartEnvironmentVariables.FLAVOR}"
-        }
-        resValue "string", "app_name", "WalkShare" + 
-            (dartEnvironmentVariables.FLAVOR == 'prod' ? '' : ".${dartEnvironmentVariables.FLAVOR}")
+        applicationIdSuffix appIdSuffix
+        resValue "string", "app_name", appName
     }
 
     buildTypes {

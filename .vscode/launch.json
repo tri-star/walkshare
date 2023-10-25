@@ -9,7 +9,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--dart-define=FLAVOR=dev"
+                "--dart-define-from-file=dart_defines/dev.json"
             ]
         },
         {
@@ -18,7 +18,7 @@
             "type": "dart",
             "flutterMode": "profile",
             "args": [
-                "--dart-define=FLAVOR=dev"
+                "--dart-define-from-file=dart_defines/dev.json"
             ]
         }
     ]
