@@ -12,3 +12,10 @@ updates:
     group:
       - "devDependencies"
       - "dependencies"
+  - package-ecosystem: "npm"
+    directory: "/functions" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    group:
+      - "devDependencies"
+      - "dependencies"
