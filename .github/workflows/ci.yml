@@ -38,4 +38,4 @@ jobs:
         run: |
           mkdir -p ./android/app/src/flavors/dev
           echo $GOOGLE_SERVICES_JSON > ./android/app/src/flavors/dev/google-services.json
-      - run: flutter build apk --dart-define=FLAVOR=dev
+      - run: flutter build apk --dart-define-from-file=dart_defines/dev.json

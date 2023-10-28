@@ -11,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:strollog/flavors/firebase_options.dart';
 import 'package:strollog/lib/router/app_router.dart';
 import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_store.dart';
@@ -32,13 +33,18 @@ import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
 import 'package:strollog/theme/light_theme_builder.dart';
+import 'flavors/dev/firebase_options.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    const flavorName = String.fromEnvironment('flavor');
+
     if (!kIsWeb) {
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: getFirebaseOptions(flavorName),
+      );
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     } else {
       throw UnimplementedError("Web版は未対応です");

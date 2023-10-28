@@ -85,14 +85,14 @@ platform :ios do
             }
         )
 
-        firebase_app_distribution(
-            app: ENV["FIREBASE_APP_ID"],
-            groups: "developer",
-            release_notes: "test",
-            firebase_cli_path: `which firebase`.strip(),
-            firebase_cli_token: ENV["FIREBASE_TOKEN"],
-            debug: true
-        )
+        # firebase_app_distribution(
+        #     app: ENV["FIREBASE_APP_ID"],
+        #     groups: "developer",
+        #     release_notes: "test",
+        #     firebase_cli_path: `which firebase`.strip(),
+        #     firebase_cli_token: ENV["FIREBASE_TOKEN"],
+        #     debug: true
+        # )
         slack(
             message: "ベータ版が配信されました\nhttps://appdistribution.firebase.dev/app_distro/projects",
             slack_url: ENV["SLACK_URL"]
