@@ -42,9 +42,6 @@ jobs:
         env:
           FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
   
-      - name: set shell script permission
-        run: chmod 755 ios/scripts/retrieve_dart_defines.sh
-
       - name: Flutter build
         run: |
           flutter pub get
