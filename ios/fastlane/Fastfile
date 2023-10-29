@@ -93,6 +93,11 @@ platform :ios do
             firebase_cli_token: ENV["FIREBASE_TOKEN"],
             debug: true
         )
+
+        upload_symbols_to_crashlytics(
+            gsp_path: "./flavors/prod/GoogleService-Info.plist",
+        )
+
         slack(
             message: "ベータ版が配信されました\nhttps://appdistribution.firebase.dev/app_distro/projects",
             slack_url: ENV["SLACK_URL"]
