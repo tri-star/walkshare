@@ -20,6 +20,15 @@
             "args": [
                 "--dart-define-from-file=dart_defines/dev.json"
             ]
-        }
+        },
+        {
+            "name": "strollog(Prod)",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=dart_defines/prod.json",
+                "--debug"
+            ]
+        },
     ]
 }
