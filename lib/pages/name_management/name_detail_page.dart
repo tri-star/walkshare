@@ -11,7 +11,7 @@ import 'package:strollog/lib/router/router_state.dart';
 import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/name_management/name_detail_page_store.dart';
 import 'package:strollog/router/app_location.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class NameDetailPage extends AppPage {
   NameDetailPage() {
@@ -129,10 +129,10 @@ class _NameDetailState extends State<NameDetail> {
   }
 
   Widget _buildPhotoPreview(BuildContext context, NameDetailPageStore store) {
-    var imageLoader = Provider.of<ImageLoaderFace>(context, listen: false);
+    var imageLoader = Provider.of<FacePhotoImageLoader>(context, listen: false);
 
-    return FutureBuilder<File>(
-      future: imageLoader.loadImageWithCache(
+    return FutureBuilder<String>(
+      future: imageLoader.load(
           store.mapInfo!, store.name!.facePhoto!.getFileName()),
       builder: (_context, imageFile) {
         if (imageFile.hasError) {
@@ -143,7 +143,7 @@ class _NameDetailState extends State<NameDetail> {
         }
 
         return Image.file(
-          imageFile.data!,
+          File(imageFile.data!),
           width: 200,
         );
       },

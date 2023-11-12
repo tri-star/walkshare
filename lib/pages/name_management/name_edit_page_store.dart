@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:strollog/domain/name.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class NameEditPageStore with ChangeNotifier {
   String mapId;
@@ -21,7 +21,7 @@ class NameEditPageStore with ChangeNotifier {
   final MapInfoRepository mapInfoRepository;
   final ImagePicker imagePicker;
   final ImageCropper imageCropper;
-  final ImageLoaderFace imageLoader;
+  final FacePhotoImageLoader imageLoader;
 
   NameEditPageStore(this.nameRepository, this.mapInfoRepository,
       this.imagePicker, this.imageCropper, this.imageLoader)
@@ -45,9 +45,9 @@ class NameEditPageStore with ChangeNotifier {
     if (loadedName != null) {
       name = loadedName;
       if (name.facePhoto != null) {
-        var croppedPhotoFile = await imageLoader.loadImageWithCache(
+        var croppedPhotoFilePath = await imageLoader.load(
             mapInfo!, name.facePhoto?.getFileName() ?? '');
-        croppedPhotoPath = croppedPhotoFile.path;
+        croppedPhotoPath = croppedPhotoFilePath;
       }
     }
     loaded = true;

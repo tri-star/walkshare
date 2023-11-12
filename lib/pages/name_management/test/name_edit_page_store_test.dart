@@ -18,7 +18,8 @@ import 'package:strollog/pages/name_management/name_edit_page_store.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/services/auth_service.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/drivers.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -45,8 +46,7 @@ void main() {
         mapInfoRepository,
         imagePickerStub,
         imageCropperStub,
-        ImageLoaderFace(fakeFirebaseStorage,
-            FirebaseStorageDownloaderStub(fakeFirebaseStorage)));
+        FacePhotoImageLoader(ImageLoaderStorageDriver(fakeFirebaseStorage)));
 
     testUser = FirebaseTestUtil.createUser();
     authService.setUser(testUser);

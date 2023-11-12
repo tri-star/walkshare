@@ -16,7 +16,7 @@ import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/app_store.dart';
 import 'package:strollog/pages/map/spot_create_page_store.dart';
 import 'package:strollog/repositories/name_repository.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class SpotCreatePage extends AppPage {
   @override
@@ -307,16 +307,15 @@ class NameListState extends State<NameList> {
   Widget _buildFacePhoto(Name name) {
     return name.facePhoto == null
         ? const CatFacePlaceholder(width: 50)
-        : FutureBuilder<File>(
-            future: Provider.of<ImageLoaderFace>(context, listen: false)
-                .loadImageWithCache(
-                    widget.mapInfo, name.facePhoto!.getFileName()),
+        : FutureBuilder<String>(
+            future: Provider.of<FacePhotoImageLoader>(context, listen: false)
+                .load(widget.mapInfo, name.facePhoto!.getFileName()),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const CircularProgressIndicator();
               }
               return Image.file(
-                snapshot.data!,
+                File(snapshot.data!),
                 width: 50,
               );
             });
