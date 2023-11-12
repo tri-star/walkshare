@@ -12,7 +12,8 @@ import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/drivers.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -36,8 +37,7 @@ void main() {
         NameRepository(fakeFireStore, fakeFirebaseStorage),
         authService,
         imagePickerStub,
-        ImageLoaderPhoto(fakeFirebaseStorage,
-            FirebaseStorageDownloaderStub(fakeFirebaseStorage)));
+        PhotoImageLoader(ImageLoaderStorageDriver(fakeFirebaseStorage)));
 
     testUser = FirebaseTestUtil.createUser();
     authService.setUser(testUser);

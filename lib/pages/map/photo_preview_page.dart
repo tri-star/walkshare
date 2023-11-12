@@ -6,7 +6,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class PhotoPreviewPage extends StatefulWidget {
   final MapInfo map;
@@ -65,7 +65,11 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                         if (_index < _photoCount - 1) {setState(() => _index++)}
                       }
                   },
-                  onVerticalDragEnd: (details) => {Navigator.of(context).pop()},
+                  onVerticalDragEnd: (details) {
+                    if ((details.primaryVelocity?.abs() ?? 0) > 500) {
+                      Navigator.of(context).pop();
+                    }
+                  },
                   child: PhotoView(
                     imageProvider: FileImage(File(photo.imagePath)),
                     minScale: PhotoViewComputedScale.contained * 0.8,
@@ -137,9 +141,9 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   }
 
   Future<DraftPhoto> _loadPhoto() async {
-    var cache = await Provider.of<ImageLoaderPhoto>(context, listen: false)
-        .loadImageWithCache(widget.map, widget.photos[_index].getFileName());
+    var cachePath = await Provider.of<PhotoImageLoader>(context, listen: false)
+        .load(widget.map, widget.photos[_index].getFileName());
 
-    return DraftPhoto.saved(widget.photos[_index], cachePath: cache.path);
+    return DraftPhoto.saved(widget.photos[_index], cachePath: cachePath);
   }
 }

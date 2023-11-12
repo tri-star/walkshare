@@ -30,10 +30,10 @@ import 'package:strollog/repositories/route_repository.dart';
 import 'package:strollog/router/app_location.dart';
 import 'package:strollog/router/route_definition.dart';
 import 'package:strollog/services/auth_service.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/drivers.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
 import 'package:strollog/theme/light_theme_builder.dart';
-import 'flavors/dev/firebase_options.dart';
 
 Future<void> main() async {
   runZonedGuarded<Future<void>>(() async {
@@ -83,10 +83,6 @@ class _ApplicationState extends State<Application> {
         Provider<FirebaseStorage>(
           create: (_) => FirebaseStorage.instance,
         ),
-        Provider<FirebaseStorageDownloader>(
-            create: (_context) => FirebaseStorageDownloader(
-                  Provider.of<FirebaseStorage>(_context, listen: false),
-                )),
         Provider<LocationService>(
           create: (_) => LocationService(),
         ),
@@ -113,18 +109,15 @@ class _ApplicationState extends State<Application> {
             Provider.of<FirebaseStorage>(_context, listen: false),
           ),
         ),
-        Provider<ImageLoaderPhoto>(
-          create: (_context) => ImageLoaderPhoto(
-            Provider.of<FirebaseStorage>(_context, listen: false),
-            Provider.of<FirebaseStorageDownloader>(_context, listen: false),
-          ),
-        ),
-        Provider<ImageLoaderFace>(
-          create: (_context) => ImageLoaderFace(
-            Provider.of<FirebaseStorage>(_context, listen: false),
-            Provider.of<FirebaseStorageDownloader>(_context, listen: false),
-          ),
-        ),
+        Provider<PhotoImageLoader>(
+            create: (_context) => PhotoImageLoader(ImageLoaderStorageDriver(
+                Provider.of<FirebaseStorage>(_context, listen: false)))),
+        Provider<FacePhotoImageLoader>(
+            create: (_context) => FacePhotoImageLoader(ImageLoaderStorageDriver(
+                Provider.of<FirebaseStorage>(_context, listen: false)))),
+        Provider<PhotoThumbnailImageLoader>(
+            create: (_context) =>
+                PhotoThumbnailImageLoader(ImageLoaderThumbnailApiDriver())),
         Provider<ImagePicker>(
           create: (_) => ImagePicker(),
         ),
@@ -150,7 +143,7 @@ class _ApplicationState extends State<Application> {
                   Provider.of<NameRepository>(_context, listen: false),
                   Provider.of<AuthService>(_context, listen: false),
                   ImagePicker(),
-                  Provider.of<ImageLoaderPhoto>(_context, listen: false),
+                  Provider.of<PhotoImageLoader>(_context, listen: false),
                 )),
         ChangeNotifierProvider<SpotDetailPageStore>(
             create: (_context) => SpotDetailPageStore(
@@ -165,7 +158,7 @@ class _ApplicationState extends State<Application> {
                 Provider.of<MapInfoRepository>(_context, listen: false),
                 Provider.of<ImagePicker>(_context, listen: false),
                 Provider.of<ImageCropper>(_context, listen: false),
-                Provider.of<ImageLoaderFace>(_context, listen: false))),
+                Provider.of<FacePhotoImageLoader>(_context, listen: false))),
         ChangeNotifierProvider<NameListPageStore>(
             create: (_context) => NameListPageStore(
                 Provider.of<NameRepository>(_context, listen: false),

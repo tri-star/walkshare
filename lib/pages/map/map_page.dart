@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/map_view.dart';
-import 'package:strollog/domain/location_permission_result.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/position.dart';
 import 'package:strollog/layouts/default_layout.dart';
@@ -11,7 +10,7 @@ import 'package:strollog/pages/map/spot_edit_page_store.dart';
 import 'package:strollog/pages/map/spot_detail_page.dart';
 import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/router/app_location.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -80,8 +79,8 @@ class _MapPageState extends State<MapPage> {
 
   void _handleMapPointTap(String spotId) {
     MapPageStore store = Provider.of<MapPageStore>(context, listen: false);
-    ImageLoaderPhoto loader =
-        Provider.of<ImageLoaderPhoto>(context, listen: false);
+    PhotoImageLoader loader =
+        Provider.of<PhotoImageLoader>(context, listen: false);
     SpotEditPageStore editFormStore =
         Provider.of<SpotEditPageStore>(context, listen: false);
     store.setPosition(store.mapInfo!.spots[spotId]!.point);
@@ -93,7 +92,7 @@ class _MapPageState extends State<MapPage> {
                 ListenableProvider<MapPageStore>.value(value: store),
                 ListenableProvider<SpotEditPageStore>.value(
                     value: editFormStore),
-                Provider<ImageLoaderPhoto>.value(value: loader)
+                Provider<PhotoImageLoader>.value(value: loader)
               ],
               child: SpotDetailPage(store.mapInfo!.spots[spotId]!),
             ));

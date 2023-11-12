@@ -12,7 +12,7 @@ import 'package:strollog/pages/app_page.dart';
 import 'package:strollog/pages/name_management/name_add_page.dart';
 import 'package:strollog/pages/name_management/name_list_page_store.dart';
 import 'package:strollog/router/app_location.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class NameListPage extends AppPage {
   @override
@@ -114,17 +114,16 @@ class NameListState extends State<NameList> {
   }
 
   Widget _buildFacePhoto(BuildContext context, Name name) {
-    var imageLoader = Provider.of<ImageLoaderFace>(context, listen: false);
+    var imageLoader = Provider.of<FacePhotoImageLoader>(context, listen: false);
     var store = Provider.of<NameListPageStore>(context, listen: false);
 
-    return FutureBuilder<File>(
-      future: imageLoader.loadImageWithCache(
-          store.mapInfo!, name.facePhoto!.getFileName()),
+    return FutureBuilder<String>(
+      future: imageLoader.load(store.mapInfo!, name.facePhoto!.getFileName()),
       builder: (context, snapshot) {
         if (snapshot.hasError || !snapshot.hasData) {
           return const CatFacePlaceholder(width: 60);
         }
-        return Image.file(snapshot.data!, width: 60);
+        return Image.file(File(snapshot.data!), width: 60);
       },
     );
   }

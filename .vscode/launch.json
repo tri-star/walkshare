@@ -30,5 +30,14 @@
                 "--debug"
             ]
         },
+        {
+            "name": "strollog(Prod profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": [
+                "--dart-define-from-file=dart_defines/prod.json",
+            ]
+        },
     ]
 }

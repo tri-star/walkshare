@@ -7,14 +7,14 @@ import 'package:strollog/repositories/map_info_repository.dart';
 import 'package:strollog/repositories/name_repository.dart';
 import 'package:strollog/repositories/photo_repository.dart';
 import 'package:strollog/services/auth_service.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class SpotEditPageStore extends ChangeNotifier {
   final MapInfoRepository _mapInfoRepository;
   final PhotoRepository _photoRepository;
   final NameRepository _nameRepository;
   final AuthService _authService;
-  final ImageLoaderPhoto _imageLoader;
+  final PhotoImageLoader _imageLoader;
   final ImagePicker _imagePicker;
 
   Spot? _originalSpot;
@@ -56,9 +56,9 @@ class SpotEditPageStore extends ChangeNotifier {
     title = _originalSpot!.title;
     comment = _originalSpot!.comment;
     photos = await Future.wait(_originalSpot!.photos.map((savedPhoto) async {
-      var cacheFile = await _imageLoader.loadImageWithCache(
-          _mapInfo, savedPhoto.getFileName());
-      return DraftPhoto.saved(savedPhoto, cachePath: cacheFile.path);
+      var cacheFilePath =
+          await _imageLoader.load(_mapInfo, savedPhoto.getFileName());
+      return DraftPhoto.saved(savedPhoto, cachePath: cacheFilePath);
     }));
 
     _nameList = await _nameRepository.fetchNames(mapInfo.id!);

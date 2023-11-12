@@ -1,5 +1,12 @@
 {
     "eslint.format.enable": true,
     "eslint.run": "onType",
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+    ],
+    "eslint.workingDirectories": [
+        "functions"
+    ],
     "dart.flutterSdkPath": ".fvm/flutter_sdk"
 }

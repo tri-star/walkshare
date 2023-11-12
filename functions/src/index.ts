@@ -10,9 +10,15 @@ import * as admin from "firebase-admin";
 // });
 
 import {migrate01LastVisited} from "./migrate_01_last_visited";
+import {generateThumbnail} from "./image-cache";
 
 admin.initializeApp();
 
+// functions
+export {generateThumbnail};
+
+
+// migration
 export {migrate01LastVisited};
 
 export const migratePhoto = functions.pubsub.topic("aaa")
