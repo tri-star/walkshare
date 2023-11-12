@@ -65,7 +65,11 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                         if (_index < _photoCount - 1) {setState(() => _index++)}
                       }
                   },
-                  onVerticalDragEnd: (details) => {Navigator.of(context).pop()},
+                  onVerticalDragEnd: (details) {
+                    if ((details.primaryVelocity?.abs() ?? 0) > 500) {
+                      Navigator.of(context).pop();
+                    }
+                  },
                   child: PhotoView(
                     imageProvider: FileImage(File(photo.imagePath)),
                     minScale: PhotoViewComputedScale.contained * 0.8,
