@@ -13,14 +13,14 @@ class PhotoImageLoader {
 
   Future<String> load(MapInfo map, String fileName) async {
     final path = _buildPath(map, fileName);
+    final cachePath = await _buildLocalCachePath(map, fileName);
 
-    if (File(path).existsSync()) {
-      return path;
+    if (File(cachePath).existsSync()) {
+      return cachePath;
     }
 
     final data = await _driver.loadFile(path);
 
-    final cachePath = await _buildLocalCachePath(map, fileName);
     final file = File(cachePath);
     await file.writeAsBytes(data);
 
@@ -56,14 +56,14 @@ class PhotoThumbnailImageLoader {
 
   Future<String> load(MapInfo map, String fileName, int size) async {
     final path = _buildPath(map, fileName);
+    final cachePath = await _buildLocalCachePath(map, fileName, size);
 
-    if (File(path).existsSync()) {
-      return path;
+    if (File(cachePath).existsSync()) {
+      return cachePath;
     }
 
     final data = await _driver.loadFile(path, size);
 
-    final cachePath = await _buildLocalCachePath(map, fileName, size);
     final file = File(cachePath);
     await file.writeAsBytes(data);
 
@@ -82,7 +82,7 @@ class PhotoThumbnailImageLoader {
     // filePath = maps/cats/xxxx.jpg という形式
     final filePath = _buildPath(map, fileName);
     final String cacheDir =
-        p.joinAll([directory.path, 'image_cache', p.dirname(filePath)]);
+        p.joinAll([directory.path, 'thumbnail_cache', p.dirname(filePath)]);
     if (!(await Directory(cacheDir).exists())) {
       await Directory(cacheDir).create(recursive: true);
     }

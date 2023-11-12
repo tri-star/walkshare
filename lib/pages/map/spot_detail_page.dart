@@ -14,7 +14,7 @@ import 'package:strollog/pages/map/map_page_store.dart';
 import 'package:strollog/pages/map/photo_preview_page.dart';
 import 'package:strollog/pages/map/spot_detail_page_store.dart';
 import 'package:strollog/router/app_location.dart';
-import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 
 class SpotDetailPage extends StatelessWidget {
   Spot spot;
@@ -92,12 +92,13 @@ class SpotDetailPage extends StatelessWidget {
 
   Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
     final mapPageStore = Provider.of<MapPageStore>(context);
-    final imageLoader = Provider.of<ImageLoaderPhoto>(context, listen: false);
+    final imageLoader =
+        Provider.of<PhotoThumbnailImageLoader>(context, listen: false);
 
     final pendingPhotos = spot.photos.map((photo) async {
-      var cacheFile = await imageLoader.loadImageWithCache(
-          mapPageStore.mapInfo!, photo.getFileName());
-      return DraftPhoto.saved(photo, cachePath: cacheFile.path);
+      var cacheFile = await imageLoader.load(
+          mapPageStore.mapInfo!, photo.getFileName(), 100);
+      return DraftPhoto.saved(photo, cachePath: cacheFile);
     }).toList();
 
     return await Future.wait(pendingPhotos);
@@ -125,15 +126,15 @@ class SpotDetailPage extends StatelessWidget {
                 padding: const EdgeInsets.all(3),
                 child: Column(children: [
                   ImageThumbnail(File(draftPhoto.imagePath),
-                      width: 80, height: 80,
+                      width: 100, height: 100,
                       imageLoadingCallBack: (context, child, event) {
                     if (event == null) {
                       return child;
                     }
 
                     return const SizedBox(
-                      width: 80,
-                      height: 80,
+                      width: 100,
+                      height: 100,
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }, onTapCallBack: () {

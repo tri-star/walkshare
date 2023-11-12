@@ -115,6 +115,9 @@ class _ApplicationState extends State<Application> {
             Provider.of<FirebaseStorage>(_context, listen: false),
           ),
         ),
+        Provider<PhotoImageLoader>(
+            create: (_context) => PhotoImageLoader(ImageLoaderStorageDriver(
+                Provider.of<FirebaseStorage>(_context, listen: false)))),
         Provider<PhotoThumbnailImageLoader>(
             create: (_context) =>
                 PhotoThumbnailImageLoader(ImageLoaderThumbnailApiDriver())),
