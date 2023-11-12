@@ -31,6 +31,8 @@ import 'package:strollog/router/app_location.dart';
 import 'package:strollog/router/route_definition.dart';
 import 'package:strollog/services/auth_service.dart';
 import 'package:strollog/services/image_loader.dart';
+import 'package:strollog/services/image_loader/drivers.dart';
+import 'package:strollog/services/image_loader/image_loader.dart';
 import 'package:strollog/services/location_service.dart';
 import 'package:strollog/theme/light_theme_builder.dart';
 import 'flavors/dev/firebase_options.dart';
@@ -113,6 +115,9 @@ class _ApplicationState extends State<Application> {
             Provider.of<FirebaseStorage>(_context, listen: false),
           ),
         ),
+        Provider<PhotoThumbnailImageLoader>(
+            create: (_context) =>
+                PhotoThumbnailImageLoader(ImageLoaderThumbnailApiDriver())),
         Provider<ImageLoaderPhoto>(
           create: (_context) => ImageLoaderPhoto(
             Provider.of<FirebaseStorage>(_context, listen: false),
