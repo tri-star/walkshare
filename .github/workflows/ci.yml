@@ -2,9 +2,13 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      - 'functions/**'
   push:
     branches:
       - main
+    paths-ignore:
+      - 'functions/**'
 
 jobs:
   test:
