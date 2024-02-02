@@ -4,9 +4,11 @@ on:
   pull_request:
     paths-ignore:
       - 'functions/**'
+      - '.github/**'
   push:
     paths-ignore:
       - 'functions/**'
+      - '.github/**'
 
 jobs:
   test:
