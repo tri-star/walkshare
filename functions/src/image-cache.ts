@@ -41,24 +41,50 @@ export const generateThumbnail = functions.runWith({memory: "512MB"}).https.onRe
   const expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + 7);
 
+  console.info("phase1", {
+    filePath,
+    fileName,
+    fileDir,
+    cachePath,
+    w,
+    h,
+    expirationDate,
+  });
+
   const bucket = admin.storage().bucket();
   const workDir = tmpdir();
   const originalFilePath = join(workDir, fileName);
   const resizedFilePath = join(workDir, `thumb_${fileName}`);
+
+  console.info("phase2", {
+    workDir,
+    originalFilePath,
+    resizedFilePath,
+  });
 
   // キャッシュが存在する場合はそのまま返す
   const cacheFile = bucket.file(cachePath);
   const exists = await cacheFile.exists();
   if (exists[0]) {
     const url = await bucket.file(cachePath).getSignedUrl({action: "read", expires: expirationDate});
+    console.info("file exists: " + cachePath);
     res.redirect(302, url[0]);
     return;
   }
+
+  console.info("phase3", {
+    workDir,
+    originalFilePath,
+    resizedFilePath,
+  });
 
   // 元画像のサムネイルを作成
   await fs.ensureDir(workDir);
   await bucket.file(filePath).download({destination: originalFilePath});
 
+  console.info("phase4: download from storage: " + originalFilePath );
+
+  console.info("phase5: start create thumbnail" );
   const thumbnail = sharp(originalFilePath)
     .sharpen()
     .resize(w, h, {
@@ -66,14 +92,19 @@ export const generateThumbnail = functions.runWith({memory: "512MB"}).https.onRe
     });
 
   if (originalFilePath.split(".").pop() === "jpg") {
+    console.info("phase6-1: create jpeg file" );
     thumbnail.jpeg({quality: 90});
   }
 
+  console.info("phase6-2: save file: " + resizedFilePath);
   await thumbnail.toFile(resizedFilePath);
 
+  console.info("phase6-3: upload to storage: " + cachePath);
   await bucket.upload(resizedFilePath, {destination: cachePath});
 
+  console.info("phase7: generate url");
   const url = await bucket.file(cachePath).getSignedUrl({action: "read", expires: expirationDate});
+  console.info("phase8: url: " + url[0]);
   res.redirect(302, url[0]);
 
   // ファイルをローカル上からunlinkした後、レスポンスを返す
