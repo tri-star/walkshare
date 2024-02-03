@@ -2,7 +2,11 @@ name: "Build Functions"
 
 on:
   pull_request:
+    paths:
+      - 'functions/**'
   push:
+    branches:
+      - main
     paths:
       - 'functions/**'
       

@@ -2,14 +2,24 @@ name: CI
 
 on:
   pull_request:
-    paths-ignore:
-      - 'functions/**'
+    paths:
       - '.github/**'
+      - 'android/**'
+      - 'dart_defines/**'
+      - 'lib/**'
+      - 'resources/**'
+      - 'pubspec.lock'
   push:
-    paths-ignore:
-      - 'functions/**'
+    branches:
+      - main
+    paths:
       - '.github/**'
-
+      - 'android/**'
+      - 'dart_defines/**'
+      - 'lib/**'
+      - 'resources/**'
+      - 'pubspec.lock'
+  
 jobs:
   test:
     runs-on: ubuntu-latest
