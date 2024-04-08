@@ -17,7 +17,7 @@
   "dependencies": {
     "@types/fs-extra": "^11.0.4",
     "firebase-admin": "^11.0.0",
-    "firebase-functions": "^4.6.0",
+    "firebase-functions": "^4.9.0",
     "fs-extra": "^11.2.0",
     "sharp": "^0.33.3",
     "ulid": "^2.3.0"
