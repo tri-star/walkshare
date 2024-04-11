@@ -16,7 +16,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@types/fs-extra": "^11.0.4",
-    "firebase-admin": "^11.0.0",
+    "firebase-admin": "^11.11.1",
     "firebase-functions": "^4.9.0",
     "fs-extra": "^11.2.0",
     "sharp": "^0.33.3",
