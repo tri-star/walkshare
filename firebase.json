@@ -1,32 +1,52 @@
 {
-  "functions": {
-    "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint",
-      "npm --prefix \"$RESOURCE_DIR\" run build"
-    ],
-    "source": "functions"
-  },
-  "emulators": {
     "functions": {
-      "port": 5001
+        "predeploy": [
+            "npm --prefix \"$RESOURCE_DIR\" run lint",
+            "npm --prefix \"$RESOURCE_DIR\" run build"
+        ],
+        "source": "functions"
     },
-    "firestore": {
-      "port": 8080
-    },
-    "pubsub": {
-      "port": 8085
+    "emulators": {
+        "functions": {
+            "port": 5001
+        },
+        "firestore": {
+            "port": 8080
+        },
+        "pubsub": {
+            "port": 8085
+        },
+        "storage": {
+            "port": 9199
+        },
+        "ui": {
+            "enabled": true
+        },
+        "auth": {
+            "port": 9099
+        }
     },
     "storage": {
-      "port": 9199
+        "rules": "storage.rules"
     },
-    "ui": {
-      "enabled": true
-    },
-    "auth": {
-      "port": 9099
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "walkshare-dev-46242",
+                    "appId": "1:21860733232:android:643d163f269cc40be238f5",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "walkshare-dev-46242",
+                    "configurations": {
+                        "android": "1:21860733232:android:643d163f269cc40be238f5",
+                        "ios": "1:21860733232:ios:cc79d8ec8f10cccee238f5"
+                    }
+                }
+            }
+        }
     }
-  },
-  "storage": {
-    "rules": "storage.rules"
-  }
 }
