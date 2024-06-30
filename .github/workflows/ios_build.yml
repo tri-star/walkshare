@@ -72,11 +72,10 @@ jobs:
       - name: install firebase-tools
         run: npm install -g firebase-tools
 
-      # 2023-10-29時点のデフォルトを指定
       - name: Select Xcode version
         run: |
           cd ios
-          sudo xcode-select -s '/Applications/Xcode_14.2.app'
+          sudo xcode-select -s '/Applications/Xcode_14.3.1.app'
           xcodebuild -version
       - name: Adhoc
         env:
