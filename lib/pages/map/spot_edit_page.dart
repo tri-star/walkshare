@@ -178,17 +178,7 @@ class _SpotEditFormState extends State<SpotEditForm> {
               child: Column(
                 children: [
                   SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
-                      imageLoadingCallBack: (context, child, event) {
-                    if (event == null) {
-                      return child;
-                    }
-
-                    return const SizedBox(
-                      width: 75,
-                      height: 100,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }, onTapCallBack: () async {
+                      onTapCallBack: () async {
                     var name = await _showNameSelectDialog(store, draftPhoto);
                     store.setName(draftPhoto, name);
                   }),

@@ -127,31 +127,35 @@ class SpotDetailPage extends StatelessWidget {
     final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
       var index = entry.key;
       var draftPhoto = entry.value;
-      return OpenContainer(
-          transitionType: ContainerTransitionType.fadeThrough,
-          transitionDuration: const Duration(milliseconds: 500),
-          openBuilder: (context, closeContainer) {
-            var spotPhotos = spot.photos;
-            return PhotoPreviewPage(
-                map: mapPageStore.mapInfo!, photos: spotPhotos, index: index);
-          },
-          closedElevation: 2.0,
-          closedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          closedBuilder: (context, openContainer) {
-            return Padding(
-                padding: const EdgeInsets.all(3),
-                child: Column(children: [
-                  SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
-                      onTapCallBack: () {
-                    openContainer();
-                  }),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 2),
-                      child: Text(draftPhoto.name?.name ?? '名前なし')),
-                ]));
-          });
+      return SizedBox(
+          width: 100,
+          child: OpenContainer(
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 500),
+              openBuilder: (context, closeContainer) {
+                var spotPhotos = spot.photos;
+                return PhotoPreviewPage(
+                    map: mapPageStore.mapInfo!,
+                    photos: spotPhotos,
+                    index: index);
+              },
+              closedElevation: 2.0,
+              closedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              closedBuilder: (context, openContainer) {
+                return Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Column(children: [
+                      SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
+                          onTapCallBack: () {
+                        openContainer();
+                      }),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 2),
+                          child: Text(draftPhoto.name?.name ?? '名前なし')),
+                    ]));
+              }));
     }).toList();
     return Flexible(
         child: SingleChildScrollView(
