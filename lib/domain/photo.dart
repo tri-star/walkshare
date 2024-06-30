@@ -43,12 +43,14 @@ class DraftPhoto {
 
   /// 保存済の写真
   Photo? savedPhoto;
-  String cachePath = '';
+  Future<String> Function()? loadCacheCallback;
+  String? cachePath;
 
   DraftPhoto.draft(this.file, {this.name}) : type = DraftPhotoType.draft;
 
-  DraftPhoto.saved(Photo photo, {required this.cachePath})
+  DraftPhoto.saved(Photo photo, {required this.loadCacheCallback})
       : savedPhoto = photo,
+        cachePath = null,
         type = DraftPhotoType.saved {
     name = savedPhoto?.name;
   }
@@ -58,7 +60,17 @@ class DraftPhoto {
   }
 
   /// 写真ピッカー / 保存済のどちらの場合も参照可能な画像のパスを返す
-  String get imagePath {
-    return isDraft() ? file!.path : cachePath;
+  Future<String> get getImagePath async {
+    if (isDraft()) {
+      return file!.path;
+    } else {
+      if (cachePath == null) {
+        if (loadCacheCallback == null) {
+          throw Exception('loadCacheCallback is null');
+        }
+        cachePath = await loadCacheCallback!();
+      }
+      return cachePath!;
+    }
   }
 }

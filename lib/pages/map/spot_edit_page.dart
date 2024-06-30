@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/cat_face_placeholder.dart';
 import 'package:strollog/components/image_thumbnail.dart';
+import 'package:strollog/components/spot_photo_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/components/ws_form_label.dart';
 import 'package:strollog/domain/map_info.dart';
@@ -176,8 +177,7 @@ class _SpotEditFormState extends State<SpotEditForm> {
               padding: const EdgeInsets.all(3),
               child: Column(
                 children: [
-                  ImageThumbnail(File(draftPhoto.imagePath),
-                      width: 100, height: 100,
+                  SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
                       imageLoadingCallBack: (context, child, event) {
                     if (event == null) {
                       return child;
