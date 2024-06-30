@@ -56,9 +56,9 @@ class SpotEditPageStore extends ChangeNotifier {
     title = _originalSpot!.title;
     comment = _originalSpot!.comment;
     photos = await Future.wait(_originalSpot!.photos.map((savedPhoto) async {
-      var cacheFilePath =
-          await _imageLoader.load(_mapInfo, savedPhoto.getFileName());
-      return DraftPhoto.saved(savedPhoto, cachePath: cacheFilePath);
+      return DraftPhoto.saved(savedPhoto, loadCacheCallback: () async {
+        return _imageLoader.load(_mapInfo, savedPhoto.getFileName());
+      });
     }));
 
     _nameList = await _nameRepository.fetchNames(mapInfo.id!);

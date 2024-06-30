@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/date_time_picker.dart';
 import 'package:strollog/components/image_thumbnail.dart';
+import 'package:strollog/components/spot_photo_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/domain/map_info.dart';
 import 'package:strollog/domain/photo.dart';
@@ -90,18 +91,35 @@ class SpotDetailPage extends StatelessWidget {
     );
   }
 
+  List<List<T>> chunk<T>(List<T> list, int size) {
+    List<List<T>> chunks = [];
+    for (var i = 0; i < list.length; i += size) {
+      var end = (i + size < list.length) ? i + size : list.length;
+      chunks.add(list.sublist(i, end));
+    }
+    return chunks;
+  }
+
   Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
     final mapPageStore = Provider.of<MapPageStore>(context);
     final imageLoader =
         Provider.of<PhotoThumbnailImageLoader>(context, listen: false);
 
-    final pendingPhotos = spot.photos.map((photo) async {
-      var cacheFile = await imageLoader.load(
-          mapPageStore.mapInfo!, photo.getFileName(), 100);
-      return DraftPhoto.saved(photo, cachePath: cacheFile);
-    }).toList();
+    final List<DraftPhoto> pendingPhotos = [];
+    var photoChunks = chunk(spot.photos, 10);
+    for (List<Photo> chunk in photoChunks) {
+      List<Future<DraftPhoto>> futures = chunk.map((photo) async {
+        return DraftPhoto.saved(photo, loadCacheCallback: () async {
+          return imageLoader.load(
+              mapPageStore.mapInfo!, photo.getFileName(), 100);
+        });
+      }).toList();
 
-    return await Future.wait(pendingPhotos);
+      // 各チャンクの結果を待ち、pendingPhotosに追加
+      List<DraftPhoto> results = await Future.wait(futures);
+      pendingPhotos.addAll(results);
+    }
+    return pendingPhotos;
   }
 
   Widget _buildPhotoList(BuildContext context, List<DraftPhoto> draftPhotos) {
@@ -109,42 +127,35 @@ class SpotDetailPage extends StatelessWidget {
     final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
       var index = entry.key;
       var draftPhoto = entry.value;
-      return OpenContainer(
-          transitionType: ContainerTransitionType.fadeThrough,
-          transitionDuration: const Duration(milliseconds: 500),
-          openBuilder: (context, closeContainer) {
-            var spotPhotos = spot.photos;
-            return PhotoPreviewPage(
-                map: mapPageStore.mapInfo!, photos: spotPhotos, index: index);
-          },
-          closedElevation: 2.0,
-          closedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-          closedBuilder: (context, openContainer) {
-            return Padding(
-                padding: const EdgeInsets.all(3),
-                child: Column(children: [
-                  ImageThumbnail(File(draftPhoto.imagePath),
-                      width: 100, height: 100,
-                      imageLoadingCallBack: (context, child, event) {
-                    if (event == null) {
-                      return child;
-                    }
-
-                    return const SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  }, onTapCallBack: () {
-                    openContainer();
-                  }),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 2),
-                      child: Text(draftPhoto.name?.name ?? '名前なし')),
-                ]));
-          });
+      return SizedBox(
+          width: 100,
+          child: OpenContainer(
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 500),
+              openBuilder: (context, closeContainer) {
+                var spotPhotos = spot.photos;
+                return PhotoPreviewPage(
+                    map: mapPageStore.mapInfo!,
+                    photos: spotPhotos,
+                    index: index);
+              },
+              closedElevation: 2.0,
+              closedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              closedBuilder: (context, openContainer) {
+                return Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Column(children: [
+                      SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
+                          onTapCallBack: () {
+                        openContainer();
+                      }),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 2),
+                          child: Text(draftPhoto.name?.name ?? '名前なし')),
+                    ]));
+              }));
     }).toList();
     return Flexible(
         child: SingleChildScrollView(

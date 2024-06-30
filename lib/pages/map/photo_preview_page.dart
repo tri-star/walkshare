@@ -39,7 +39,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
         title: const Text('写真プレビュー'),
       ),
       body: Container(
-        child: FutureBuilder<DraftPhoto>(
+        child: FutureBuilder<_PhotoPreviewData>(
             future: _loadPhoto(),
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
@@ -51,7 +51,8 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
               if (!snapshot.hasData) {
                 return const Center(child: Text("画像が見つかりません"));
               }
-              var photo = snapshot.data!;
+              var draftPhoto = snapshot.data!.photo;
+              var cachePath = snapshot.data!.cachePath;
               return Column(children: [
                 Expanded(
                     child: GestureDetector(
@@ -71,7 +72,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                     }
                   },
                   child: PhotoView(
-                    imageProvider: FileImage(File(photo.imagePath)),
+                    imageProvider: FileImage(File(cachePath)),
                     minScale: PhotoViewComputedScale.contained * 0.8,
                     initialScale: PhotoViewComputedScale.contained,
                     basePosition: Alignment.center,
@@ -86,7 +87,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       width: 60,
                       child: Text('名前'),
                     ),
-                    Text(photo.name?.name ?? '名前なし'),
+                    Text(draftPhoto.name?.name ?? '名前なし'),
                   ]),
                 ),
                 Container(
@@ -96,9 +97,9 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       width: 60,
                       child: Text('登録日'),
                     ),
-                    Text(photo.savedPhoto?.date != null
+                    Text(draftPhoto.savedPhoto?.date != null
                         ? DateFormat('yyyy-MM-dd HH:mm')
-                            .format(photo.savedPhoto!.date!)
+                            .format(draftPhoto.savedPhoto!.date!)
                         : '-'),
                   ]),
                 ),
@@ -140,10 +141,22 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
     return _index < (_photoCount - 1);
   }
 
-  Future<DraftPhoto> _loadPhoto() async {
-    var cachePath = await Provider.of<PhotoImageLoader>(context, listen: false)
-        .load(widget.map, widget.photos[_index].getFileName());
+  Future<_PhotoPreviewData> _loadPhoto() async {
+    final draftPhoto =
+        DraftPhoto.saved(widget.photos[_index], loadCacheCallback: () async {
+      return Provider.of<PhotoImageLoader>(context, listen: false)
+          .load(widget.map, widget.photos[_index].getFileName());
+    });
 
-    return DraftPhoto.saved(widget.photos[_index], cachePath: cachePath);
+    final cachePath = await draftPhoto.getImagePath;
+
+    return _PhotoPreviewData(draftPhoto, cachePath);
   }
+}
+
+class _PhotoPreviewData {
+  final DraftPhoto photo;
+  final String cachePath;
+
+  _PhotoPreviewData(this.photo, this.cachePath);
 }
