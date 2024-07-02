@@ -50,6 +50,11 @@ jobs:
           echo "${FIREBASE_OPTIONS_DART}" > lib/flavors/prod/firebase_options.dart
         env:
           FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+
+      - name: Select XCode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '14.3.1'
   
       - name: Flutter build
         run: |
@@ -72,10 +77,6 @@ jobs:
       - name: install firebase-tools
         run: npm install -g firebase-tools
 
-      - name: Select XCode version
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '14.3.1'
       - name: Adhoc
         env:
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
