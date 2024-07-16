@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,12 +14,13 @@ typedef OnTapCallBack = void Function();
 
 class SpotPhotoThumbnail extends StatefulWidget {
   final DraftPhoto _draftPhoto;
+  String? _imagePath;
 
   final double? _width;
   final double? _height;
   final OnTapCallBack? _onTapCallBack;
 
-  const SpotPhotoThumbnail(this._draftPhoto,
+  SpotPhotoThumbnail(this._draftPhoto,
       {Key? key, double? width, double? height, OnTapCallBack? onTapCallBack})
       : _width = width,
         _height = height,
@@ -34,30 +36,34 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
 
   @override
   Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: Key(widget._draftPhoto.hashCode.toString()),
-      onVisibilityChanged: (visibilityInfo) {
-        if (visibilityInfo.visibleFraction > 0.2) {
-          setState(() {
-            _isVisible = true;
-          });
-        } else {
-          setState(() {
-            _isVisible = false;
-          });
-        }
-      },
-      child: SizedBox(
-          width: widget._width,
-          height: widget._height,
+    return SizedBox(
+      width: widget._width,
+      height: widget._height,
+      child: VisibilityDetector(
+          key: Key(widget._draftPhoto.keyString()),
+          onVisibilityChanged: (visibilityInfo) {
+            if (visibilityInfo.visibleFraction > 0.1) {
+              setState(() {
+                _isVisible = true;
+              });
+            } else {
+              setState(() {
+                _isVisible = false;
+              });
+            }
+          },
           child: GestureDetector(
             onTap: () {
               widget._onTapCallBack?.call();
             },
-            child: _isVisible
+            child: imageLoaded()
                 ? FutureBuilder<String>(
                     future: widget._draftPhoto.getImagePath,
                     builder: (context, snapshot) {
+                      if (widget._imagePath != null) {
+                        return _Thumbnail(widget._imagePath!, widget._width!,
+                            widget._height!);
+                      }
                       if (snapshot.connectionState != ConnectionState.done) {
                         return Center(
                             child: SizedBox(
@@ -73,20 +79,37 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
                         return const Center(child: Text("画像が見つかりません"));
                       }
 
-                      return SizedBox(
-                          width: widget._width,
-                          height: widget._height,
-                          child: Image.file(File(snapshot.data!),
-                              width: widget._width,
-                              height: widget._height,
-                              fit: BoxFit.cover));
-                    },
-                  )
+                      widget._imagePath = snapshot.data!;
+                      return _Thumbnail(
+                          widget._imagePath!, widget._width!, widget._height!);
+                    })
                 : SizedBox(
                     width: widget._width,
                     height: widget._height,
-                    child: const Center(child: CircularProgressIndicator())),
+                    child: Container()),
           )),
     );
+  }
+
+  bool imageLoaded() {
+    return _isVisible || widget._imagePath != null;
+  }
+}
+
+class _Thumbnail extends StatelessWidget {
+  final String _imagePath;
+  final double _width;
+  final double _height;
+
+  const _Thumbnail(this._imagePath, this._width, this._height, {Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: _width,
+        height: _height,
+        child: Image.file(File(_imagePath),
+            width: _width, height: _height, fit: BoxFit.cover));
   }
 }
