@@ -55,6 +55,14 @@ class DraftPhoto {
     name = savedPhoto?.name;
   }
 
+  String keyString() {
+    if (isDraft()) {
+      return 'DRAFT_${file!.path}';
+    } else {
+      return 'SAVED_${savedPhoto!.key}';
+    }
+  }
+
   bool isDraft() {
     return type == DraftPhotoType.draft;
   }

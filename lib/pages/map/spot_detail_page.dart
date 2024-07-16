@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:strollog/components/date_time_picker.dart';
-import 'package:strollog/components/image_thumbnail.dart';
 import 'package:strollog/components/spot_photo_thumbnail.dart';
 import 'package:strollog/components/ws_button.dart';
 import 'package:strollog/domain/map_info.dart';
@@ -58,16 +55,7 @@ class SpotDetailPage extends StatelessWidget {
             const SizedBox(width: 100, child: Text('最終訪問日')),
             _buildLastVisited(context, spot),
           ]),
-          FutureBuilder<List<DraftPhoto>>(
-            future: _loadImages(context),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return _buildPhotoList(context, snapshot.data!);
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
+          PhotoListArea(spot.photos),
           const SizedBox(height: 10),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             WSButton(
@@ -89,87 +77,6 @@ class SpotDetailPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<List<T>> chunk<T>(List<T> list, int size) {
-    List<List<T>> chunks = [];
-    for (var i = 0; i < list.length; i += size) {
-      var end = (i + size < list.length) ? i + size : list.length;
-      chunks.add(list.sublist(i, end));
-    }
-    return chunks;
-  }
-
-  Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
-    final mapPageStore = Provider.of<MapPageStore>(context);
-    final imageLoader =
-        Provider.of<PhotoThumbnailImageLoader>(context, listen: false);
-
-    final List<DraftPhoto> pendingPhotos = [];
-    var photoChunks = chunk(spot.photos, 10);
-    for (List<Photo> chunk in photoChunks) {
-      List<Future<DraftPhoto>> futures = chunk.map((photo) async {
-        return DraftPhoto.saved(photo, loadCacheCallback: () async {
-          return imageLoader.load(
-              mapPageStore.mapInfo!, photo.getFileName(), 100);
-        });
-      }).toList();
-
-      // 各チャンクの結果を待ち、pendingPhotosに追加
-      List<DraftPhoto> results = await Future.wait(futures);
-      pendingPhotos.addAll(results);
-    }
-    return pendingPhotos;
-  }
-
-  Widget _buildPhotoList(BuildContext context, List<DraftPhoto> draftPhotos) {
-    var mapPageStore = Provider.of<MapPageStore>(context);
-    final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
-      var index = entry.key;
-      var draftPhoto = entry.value;
-      return SizedBox(
-          width: 100,
-          child: OpenContainer(
-              transitionType: ContainerTransitionType.fadeThrough,
-              transitionDuration: const Duration(milliseconds: 500),
-              openBuilder: (context, closeContainer) {
-                var spotPhotos = spot.photos;
-                return PhotoPreviewPage(
-                    map: mapPageStore.mapInfo!,
-                    photos: spotPhotos,
-                    index: index);
-              },
-              closedElevation: 2.0,
-              closedShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0),
-              ),
-              closedBuilder: (context, openContainer) {
-                return Padding(
-                    padding: const EdgeInsets.all(3),
-                    child: Column(children: [
-                      SpotPhotoThumbnail(draftPhoto, width: 100, height: 100,
-                          onTapCallBack: () {
-                        openContainer();
-                      }),
-                      Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 2),
-                          child: Text(draftPhoto.name?.name ?? '名前なし')),
-                    ]));
-              }));
-    }).toList();
-    return Flexible(
-        child: SingleChildScrollView(
-            child: Row(children: [
-      Expanded(
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Wrap(
-            spacing: 5,
-            runSpacing: 5,
-            crossAxisAlignment: WrapCrossAlignment.start,
-            children: photos)
-      ]))
-    ])));
   }
 
   Widget _buildLastVisited(BuildContext context, Spot spot) {
@@ -194,5 +101,109 @@ class SpotDetailPage extends StatelessWidget {
           );
           store.setLastVisited(date);
         });
+  }
+}
+
+class PhotoListArea extends StatelessWidget {
+  final List<Photo> photos;
+  List<DraftPhoto>? loadedPhotos;
+
+  PhotoListArea(this.photos, {Key? key}) : super(key: key);
+
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<DraftPhoto>>(
+      future: _loadImages(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return _buildPhotoList(context, snapshot.data!);
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+  Future<List<DraftPhoto>> _loadImages(BuildContext context) async {
+    List<DraftPhoto> loadedPhotos = [];
+
+    final mapPageStore = Provider.of<MapPageStore>(context);
+    final imageLoader =
+        Provider.of<PhotoThumbnailImageLoader>(context, listen: false);
+
+    var photoChunks = chunk(photos, 10);
+    for (List<Photo> chunk in photoChunks) {
+      List<Future<DraftPhoto>> futures = chunk.map((photo) async {
+        return DraftPhoto.saved(photo, loadCacheCallback: () async {
+          return imageLoader.load(
+              mapPageStore.mapInfo!, photo.getFileName(), 100);
+        });
+      }).toList();
+
+      // 各チャンクの結果を待ち、pendingPhotosに追加
+      List<DraftPhoto> results = await Future.wait(futures);
+      loadedPhotos.addAll(results);
+    }
+    return loadedPhotos;
+  }
+
+  List<List<T>> chunk<T>(List<T> list, int size) {
+    List<List<T>> chunks = [];
+    for (var i = 0; i < list.length; i += size) {
+      var end = (i + size < list.length) ? i + size : list.length;
+      chunks.add(list.sublist(i, end));
+    }
+    return chunks;
+  }
+
+  Widget _buildPhotoList(BuildContext context, List<DraftPhoto> draftPhotos) {
+    var mapPageStore = Provider.of<MapPageStore>(context);
+    final List<Widget> photos = draftPhotos.asMap().entries.map((entry) {
+      var index = entry.key;
+      var draftPhoto = entry.value;
+      return SizedBox(
+          width: 100,
+          child: OpenContainer(
+              transitionType: ContainerTransitionType.fadeThrough,
+              transitionDuration: const Duration(milliseconds: 500),
+              openBuilder: (context, closeContainer) {
+                var spotPhotos = this.photos;
+                return PhotoPreviewPage(
+                    map: mapPageStore.mapInfo!,
+                    photos: spotPhotos,
+                    index: index);
+              },
+              closedElevation: 2.0,
+              closedShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              closedBuilder: (context, openContainer) {
+                return Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: Column(children: [
+                      SpotPhotoThumbnail(draftPhoto,
+                          key: Key(draftPhoto.keyString()),
+                          width: 100,
+                          height: 100, onTapCallBack: () {
+                        openContainer();
+                      }),
+                      Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 2),
+                          child: Text(draftPhoto.name?.name ?? '名前なし')),
+                    ]));
+              }));
+    }).toList();
+    return Flexible(
+        child: SingleChildScrollView(
+            child: Row(children: [
+      Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Wrap(
+            spacing: 5,
+            runSpacing: 5,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: photos)
+      ]))
+    ])));
   }
 }
