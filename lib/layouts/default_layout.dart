@@ -17,7 +17,7 @@ class DefaultLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('WalkShare'),
+          title: const Text(''),
         ),
         bottomNavigationBar: _buildBottomAppBar(context),
         body: SafeArea(child: _content),
