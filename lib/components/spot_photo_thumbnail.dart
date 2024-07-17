@@ -14,7 +14,6 @@ typedef OnTapCallBack = void Function();
 
 class SpotPhotoThumbnail extends StatefulWidget {
   final DraftPhoto _draftPhoto;
-  String? _imagePath;
 
   final double? _width;
   final double? _height;
@@ -33,6 +32,19 @@ class SpotPhotoThumbnail extends StatefulWidget {
 
 class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
   bool _isVisible = false;
+  bool _isMounted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isMounted = true;
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +54,9 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
       child: VisibilityDetector(
           key: Key(widget._draftPhoto.keyString()),
           onVisibilityChanged: (visibilityInfo) {
+            if (!_isMounted) {
+              return;
+            }
             if (visibilityInfo.visibleFraction > 0.1) {
               setState(() {
                 _isVisible = true;
@@ -56,13 +71,13 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
             onTap: () {
               widget._onTapCallBack?.call();
             },
-            child: imageLoaded()
+            child: _isVisible
                 ? FutureBuilder<String>(
                     future: widget._draftPhoto.getImagePath,
                     builder: (context, snapshot) {
-                      if (widget._imagePath != null) {
-                        return _Thumbnail(widget._imagePath!, widget._width!,
-                            widget._height!);
+                      if (snapshot.data != null) {
+                        return _Thumbnail(
+                            snapshot.data!, widget._width!, widget._height!);
                       }
                       if (snapshot.connectionState != ConnectionState.done) {
                         return Center(
@@ -79,9 +94,8 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
                         return const Center(child: Text("画像が見つかりません"));
                       }
 
-                      widget._imagePath = snapshot.data!;
                       return _Thumbnail(
-                          widget._imagePath!, widget._width!, widget._height!);
+                          snapshot.data!, widget._width!, widget._height!);
                     })
                 : SizedBox(
                     width: widget._width,
@@ -89,10 +103,6 @@ class _SpotPhotoThumbnailState extends State<SpotPhotoThumbnail> {
                     child: Container()),
           )),
     );
-  }
-
-  bool imageLoaded() {
-    return _isVisible || widget._imagePath != null;
   }
 }
 
