@@ -12,18 +12,19 @@ jobs:
         run: |
           ls -l /Applications | grep Xcode
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v2
         with:
           java-version: "17.x"
+          distribution: "oracle"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.7.0"
 
       - name: Cache CocoaPods
         id: cache-cocoapods
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: /Users/runner/Library/Caches/CocoaPods/Pods
           key: ${{ runner.os }}-cache-cocoapods-${{ hashFiles('pubspec.lock') }}
@@ -70,7 +71,7 @@ jobs:
       - name: list cache directory
         run: ls -l ${HOME}/Library/Caches/CocoaPods/Pods
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
           node-version: "16.x"
 
